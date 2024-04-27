@@ -1,6 +1,6 @@
 import { observer } from 'mobx-react-lite';
 import { Handle, Position } from 'reactflow';
-import { andStyle, connectorStyle } from '../utils/blockStyles';
+import { connectorStyle, notStyle } from '../utils/blockStyles';
 import Title from 'antd/es/typography/Title';
 import appStore from '../utils/appStore';
 import { Flex } from 'antd';
@@ -11,7 +11,7 @@ interface Props {
 	id: string;
 }
 
-const And: React.FC<Props> = observer(({ id }) => {
+const Not: React.FC<Props> = observer(({ id }) => {
 	const { removeNode } = appStore;
 
 	const handleRemoving = useCallback(() => {
@@ -20,11 +20,11 @@ const And: React.FC<Props> = observer(({ id }) => {
 
 	return (
 		<Flex
-			style={andStyle}
+			style={notStyle}
 			justify='center'
 			align='center'
 		>
-			<Title style={{ color: '#fff', margin: 0 }}>AND</Title>
+			<Title style={{ color: '#000', margin: 0 }}>NOT</Title>
 			<CloseOutlined
 				style={{ position: 'absolute', top: 10, right: 10 }}
 				onClick={handleRemoving}
@@ -34,21 +34,11 @@ const And: React.FC<Props> = observer(({ id }) => {
 				type='target'
 				position={'left' as Position}
 				style={{
-					top: '33.3%',
-					bottom: '66.6%',
+					top: '50%',
 					...connectorStyle,
 				}}
 			/>
-			<Handle
-				id='b'
-				type='target'
-				position={'left' as Position}
-				style={{
-					top: '66.6%',
-					bottom: '33.3%',
-					...connectorStyle,
-				}}
-			/>
+
 			<Handle
 				id='c'
 				type='source'
@@ -59,4 +49,4 @@ const And: React.FC<Props> = observer(({ id }) => {
 	);
 });
 
-export default And;
+export default Not;
