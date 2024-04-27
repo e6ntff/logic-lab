@@ -1,22 +1,60 @@
 import { observer } from 'mobx-react-lite';
-import { Handle, Position } from 'reactflow';
+import { Edge, Handle, Position } from 'reactflow';
 import { andStyle, connectorStyle } from '../utils/blockStyles';
 import Title from 'antd/es/typography/Title';
 import appStore from '../utils/appStore';
 import { Flex } from 'antd';
 import { CloseOutlined } from '@ant-design/icons';
-import { useCallback } from 'react';
+import { useCallback, useEffect, useMemo } from 'react';
 
 interface Props {
 	id: string;
 }
 
 const And: React.FC<Props> = observer(({ id }) => {
-	const { removeNode } = appStore;
+	const { removeNode, nodeSignals, edges, addNodeSignal, setEdgeActive } =
+		appStore;
 
 	const handleRemoving = useCallback(() => {
 		removeNode(id);
 	}, [id, removeNode]);
+
+	const [prevNodeIds, prevEdgeIds]: string[][] = useMemo(() => {
+		const check = (edge: Edge<any>) => edge.target === id;
+		const prevNodes: string[] = edges
+			.filter(check)
+			.map((edge: Edge<any>) => edge.source || '');
+		const prevEdges: string[] = edges
+			.filter(check)
+			.map((edge: Edge<any>) => edge.id || '');
+		return [prevNodes, prevEdges];
+	}, [edges, id]);
+
+	useEffect(() => {
+		if (prevNodeIds.some((id: string | null) => id === '')) return;
+		if (prevNodeIds[0] === prevNodeIds[1]) return;
+		if (prevNodeIds.length !== 2) return;
+		try {
+			const inputs: [boolean, boolean] = [
+				nodeSignals[prevNodeIds[0]]?.output || false,
+				nodeSignals[prevNodeIds[1]]?.output || false,
+			];
+			const output = inputs[0] && inputs[1];
+			addNodeSignal(id, inputs, output);
+			prevEdgeIds.forEach((id: string, index: number) =>
+				setEdgeActive(id, inputs[index])
+			);
+		} catch (error) {}
+		// eslint-disable-next-line
+	}, [
+		prevNodeIds,
+		// eslint-disable-next-line
+		nodeSignals[prevNodeIds[0]],
+		// eslint-disable-next-line
+		nodeSignals[prevNodeIds[1]],
+		addNodeSignal,
+		id,
+	]);
 
 	return (
 		<Flex

@@ -1,17 +1,16 @@
 import { observer } from 'mobx-react-lite';
-import { Edge, Handle, Position } from 'reactflow';
-import { connectorStyle, notStyle } from '../utils/blockStyles';
-import Title from 'antd/es/typography/Title';
+import { startStyle, connectorStyle } from '../utils/blockStyles';
 import appStore from '../utils/appStore';
 import { Flex } from 'antd';
 import { CloseOutlined } from '@ant-design/icons';
 import { useCallback, useEffect, useMemo } from 'react';
+import { Edge, Handle, Position } from 'reactflow';
 
 interface Props {
 	id: string;
 }
 
-const Not: React.FC<Props> = observer(({ id }) => {
+const End: React.FC<Props> = observer(({ id }) => {
 	const { removeNode, edges, nodeSignals, addNodeSignal, setEdgeActive } =
 		appStore;
 
@@ -30,8 +29,7 @@ const Not: React.FC<Props> = observer(({ id }) => {
 		if (!prevNodeId) return;
 		try {
 			const input: boolean = nodeSignals[prevNodeId]?.output || false;
-			const output = !input;
-			addNodeSignal(id, input, output);
+			addNodeSignal(id, input, false);
 			setEdgeActive(prevEdgeId, input);
 		} catch (error) {}
 		// eslint-disable-next-line
@@ -45,11 +43,13 @@ const Not: React.FC<Props> = observer(({ id }) => {
 
 	return (
 		<Flex
-			style={notStyle}
+			style={{
+				...startStyle,
+				background: nodeSignals[prevNodeId as string] ? '#ff0' : '#555',
+			}}
 			justify='center'
 			align='center'
 		>
-			<Title style={{ color: '#000', margin: 0 }}>NOT</Title>
 			<CloseOutlined
 				style={{ position: 'absolute', top: 10, right: 10 }}
 				onClick={handleRemoving}
@@ -63,15 +63,8 @@ const Not: React.FC<Props> = observer(({ id }) => {
 					...connectorStyle,
 				}}
 			/>
-
-			<Handle
-				id='b'
-				type='source'
-				position={'right' as Position}
-				style={{ top: '50%', ...connectorStyle }}
-			/>
 		</Flex>
 	);
 });
 
-export default Not;
+export default End;
