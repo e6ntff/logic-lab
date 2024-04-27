@@ -7,6 +7,8 @@ const Panel: React.FC = observer(() => {
 
 	return (
 		<Flex
+			vertical
+			gap={16}
 			style={{
 				position: 'absolute',
 				inset: 0,
@@ -16,6 +18,8 @@ const Panel: React.FC = observer(() => {
 			}}
 		>
 			<Button onClick={() => addNode('and')}>AND</Button>
+			<Button onClick={() => addNode('or')}>OR</Button>
+			<Button onClick={() => addNode('not')}>NOT</Button>
 		</Flex>
 	);
 });
