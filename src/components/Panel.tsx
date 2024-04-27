@@ -17,9 +17,11 @@ const Panel: React.FC = observer(() => {
 				blockSize: 'min-content',
 			}}
 		>
+			<Button onClick={() => addNode('start')}>START</Button>
 			<Button onClick={() => addNode('and')}>AND</Button>
 			<Button onClick={() => addNode('or')}>OR</Button>
 			<Button onClick={() => addNode('not')}>NOT</Button>
+			<Button onClick={() => addNode('end')}>END</Button>
 		</Flex>
 	);
 });
