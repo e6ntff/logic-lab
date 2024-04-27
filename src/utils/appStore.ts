@@ -14,6 +14,34 @@ class AppStore {
 		localStorage.getItem('nodes') || '[]'
 	);
 	edges: Edge<any>[] = JSON.parse(localStorage.getItem('edges') || '[]');
+	activeEdges: { [key: string]: boolean } = {};
+	nodeSignals: {
+		[id: string]: { input: boolean | [boolean, boolean]; output: boolean };
+	} = {
+		start: {
+			input: false,
+			output: localStorage.getItem('startSignal') === 'true',
+		},
+	};
+
+	addNodeSignal = (
+		id: string,
+		input: boolean | [boolean, boolean],
+		output: boolean
+	) => {
+		this.nodeSignals = { ...this.nodeSignals, [id]: { input, output } };
+	};
+
+	setStartSignal = (signal: (typeof this.nodeSignals)['start']['output']) => {
+		this.nodeSignals = {
+			...this.nodeSignals,
+			start: { input: false, output: signal },
+		};
+	};
+
+	setEdgeActive = (id: string, active: boolean) => {
+		this.activeEdges = { ...this.activeEdges, [id]: active };
+	};
 
 	updateNodes = (changes: any) => {
 		this.nodes = applyNodeChanges(changes, this.nodes);
@@ -61,12 +89,34 @@ reaction(
 	() => appStore.nodes,
 	() => {
 		localStorage.setItem('nodes', JSON.stringify(appStore.nodes));
+		localStorage.setItem('edges', JSON.stringify(appStore.edges));
+		localStorage.setItem(
+			'startSignal',
+			JSON.stringify(appStore.nodeSignals.start.output)
+		);
 	}
 );
 
 reaction(
 	() => appStore.edges,
 	() => {
+		localStorage.setItem('nodes', JSON.stringify(appStore.nodes));
 		localStorage.setItem('edges', JSON.stringify(appStore.edges));
+		localStorage.setItem(
+			'startSignal',
+			JSON.stringify(appStore.nodeSignals.start.output)
+		);
+	}
+);
+
+reaction(
+	() => appStore.nodeSignals['start'],
+	() => {
+		localStorage.setItem('nodes', JSON.stringify(appStore.nodes));
+		localStorage.setItem('edges', JSON.stringify(appStore.edges));
+		localStorage.setItem(
+			'startSignal',
+			JSON.stringify(appStore.nodeSignals.start.output)
+		);
 	}
 );
