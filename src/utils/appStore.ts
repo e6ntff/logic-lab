@@ -7,26 +7,7 @@ import {
 	applyNodeChanges,
 } from 'reactflow';
 import uniqid from 'uniqid';
-
-// nodes: Node<any, string | undefined>[] = [
-// 	{
-// 		id: '1',
-// 		position: { x: 0, y: 0 },
-// 		data: { label: 'Hello' },
-// 	},
-// 	{
-// 		id: '2',
-// 		position: { x: 100, y: 100 },
-// 		data: { label: 'World' },
-// 	},
-// 	{
-// 		id: '3',
-// 		position: { x: 200, y: 200 },
-// 		data: { label: 'AND' },
-// 		type: 'and',
-// 	},
-// ];
-// edges: Edge<any>[] = [{ id: '1-2', type: 'wire', source: '1', target: '2' }];
+import { nodeType } from './types';
 
 class AppStore {
 	nodes: Node<any, string | undefined>[] = JSON.parse(
@@ -43,18 +24,28 @@ class AppStore {
 	};
 
 	updateConnections = (changes: any) => {
+		changes = { ...changes, type: 'wire' };
 		this.edges = addEdge(changes, this.edges);
 	};
 
-	addNode = () => {
-		const node = {
-			id: uniqid,
-			position: { x: 200, y: 200 },
-			data: { label: 'AND' },
-			type: 'and',
+	addNode = (type: nodeType) => {
+		const id = uniqid();
+		const node: Node<any, string | undefined> = {
+			id: id,
+			position: { x: 0, y: 0 },
+			data: { id: id },
+			type: type,
 		};
 
-		this.nodes = [...this.nodes];
+		this.nodes = [...this.nodes, node];
+	};
+
+	removeNode = (id: string) => {
+		this.nodes = this.nodes.filter((node) => node.id !== id);
+	};
+
+	removeEdge = (id: string) => {
+		this.edges = this.edges.filter((edge) => edge.id !== id);
 	};
 
 	constructor() {
