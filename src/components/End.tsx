@@ -2,7 +2,7 @@ import { observer } from 'mobx-react-lite';
 import { blockStyleSmall, connectorStyle } from '../utils/blockStyles';
 import appStore from '../utils/appStore';
 import { Flex } from 'antd';
-import { BulbOutlined, CloseOutlined, StopOutlined } from '@ant-design/icons';
+import { BulbOutlined, CloseOutlined } from '@ant-design/icons';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Edge, Handle, Position } from 'reactflow';
 import Title from 'antd/es/typography/Title';
