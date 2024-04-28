@@ -41,16 +41,25 @@ class AppStore {
 		this.edges = addEdge(changes, this.edges);
 	};
 
-	addNode = (type: nodeType) => {
-		const id = uniqid();
-		const node: Node<any, string | undefined> = {
-			id: id,
+	addNode = (type: nodeType, delay?: number) => {
+		let node: Node<any, string | undefined> = {
+			id: uniqid(),
 			position: { x: 0, y: 0 },
-			data: { id: id },
+			data: {
+				delay: delay,
+			},
 			type: type,
 		};
 
 		this.nodes = [...this.nodes, node];
+	};
+
+	changeDelay = (id: string, delay: number) => {
+		const node = this.nodes.find(
+			(node: Node<any, string | undefined>) => node.id === id
+		);
+		if (node?.data) node.data.delay = delay;
+		this.updateNodes([node]);
 	};
 
 	removeNode = (id: string) => {
