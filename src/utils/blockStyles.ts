@@ -15,7 +15,7 @@ export const andStyle: CSSProperties = {
 	borderRadius: 10,
 	padding: 10,
 	width: 100,
-	height: 150,
+	height: 100,
 };
 
 export const orStyle: CSSProperties = {
@@ -24,7 +24,7 @@ export const orStyle: CSSProperties = {
 	borderRadius: 10,
 	padding: 10,
 	width: 100,
-	height: 150,
+	height: 100,
 };
 
 export const notStyle: CSSProperties = {
@@ -41,6 +41,6 @@ export const startStyle: CSSProperties = {
 	border: '3px solid #000',
 	borderRadius: 10,
 	padding: 10,
-	width: 100,
+	width: 50,
 	height: 50,
 };

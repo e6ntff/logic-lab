@@ -53,6 +53,7 @@ const End: React.FC<Props> = observer(({ id }) => {
 				style={{
 					top: '50%',
 					...connectorStyle,
+					background: active ? '#f00' : '#000',
 				}}
 			/>
 		</Flex>

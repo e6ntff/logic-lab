@@ -29,17 +29,34 @@ const Or: React.FC<Props> = observer(({ id }) => {
 		[edges, id]
 	);
 
-	const incoming: [boolean, boolean] = useMemo(
-		() => [activeEdges[prevEdgeIds[0]], activeEdges[prevEdgeIds[1]]],
+	const incoming: [boolean, boolean] | null = useMemo(
+		() => {
+			if (prevEdgeIds.length < 2) return null;
+			return [activeEdges[prevEdgeIds[0]], activeEdges[prevEdgeIds[1]]];
+		},
 		// eslint-disable-next-line
 		[activeEdges[prevEdgeIds[0]], activeEdges[prevEdgeIds[1]], prevEdgeIds]
 	);
 
+	const outgoing: boolean | null = useMemo(() => {
+		if (incoming === null) return null;
+		return incoming[0] || incoming[1];
+	}, [incoming]);
+
 	useEffect(() => {
-		if (!prevEdgeIds.length || !nextEdgeId) return;
-		const outgoing = incoming[0] || incoming[1];
-		setEdgeActive(nextEdgeId, outgoing);
-	}, [prevEdgeIds, nextEdgeId, incoming, setEdgeActive]);
+		if (!nextEdgeId) return;
+		setEdgeActive(nextEdgeId, outgoing || false);
+	}, [prevEdgeIds, nextEdgeId, incoming, outgoing, setEdgeActive]);
+
+	const activeConnectors: { [key: string]: boolean | null } = useMemo(() => {
+		const result: { [key: string]: boolean } = {};
+		prevEdgeIds.forEach((id: string) => {
+			const prevEdge = edges.find((edge: Edge<any>) => edge.id === id);
+			if (prevEdge?.targetHandle)
+				result[prevEdge.targetHandle] = activeEdges[id];
+		});
+		return { ...result, c: outgoing };
+	}, [prevEdgeIds, activeEdges, edges, outgoing]);
 
 	return (
 		<Flex
@@ -47,7 +64,7 @@ const Or: React.FC<Props> = observer(({ id }) => {
 			justify='center'
 			align='center'
 		>
-			<Title style={{ color: '#000', margin: 0 }}>OR</Title>
+			<Title style={{ color: '#000', margin: 0 }}>||</Title>
 			<CloseOutlined
 				style={{ position: 'absolute', top: 10, right: 10 }}
 				onClick={handleRemoving}
@@ -60,6 +77,7 @@ const Or: React.FC<Props> = observer(({ id }) => {
 					top: '33.3%',
 					bottom: '66.6%',
 					...connectorStyle,
+					background: activeConnectors.a ? '#f00' : '#000',
 				}}
 			/>
 			<Handle
@@ -70,13 +88,18 @@ const Or: React.FC<Props> = observer(({ id }) => {
 					top: '66.6%',
 					bottom: '33.3%',
 					...connectorStyle,
+					background: activeConnectors.b ? '#f00' : '#000',
 				}}
 			/>
 			<Handle
 				id='c'
 				type='source'
 				position={'right' as Position}
-				style={{ top: '50%', ...connectorStyle }}
+				style={{
+					top: '50%',
+					...connectorStyle,
+					background: activeConnectors.c ? '#f00' : '#000',
+				}}
 			/>
 		</Flex>
 	);

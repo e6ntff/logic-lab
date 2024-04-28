@@ -26,19 +26,28 @@ const Not: React.FC<Props> = observer(({ id }) => {
 		[edges, id]
 	);
 
+	const incoming: boolean | null = useMemo(() => {
+		try {
+			return prevEdgeId ? activeEdges[prevEdgeId] : null;
+		} catch (error) {
+			return false;
+		}
+		// eslint-disable-next-line
+	}, [activeEdges[prevEdgeId as string]]);
+
+	const outgoing: boolean | null = useMemo(
+		() => (incoming !== null ? !incoming : null),
+		[incoming]
+	);
+
 	useEffect(() => {
-		if (!prevEdgeId || !nextEdgeId) return;
-		const incoming: boolean = activeEdges[prevEdgeId];
-		const outgoing: boolean = !incoming;
-		setEdgeActive(nextEdgeId, outgoing);
-		// eslint-disable-next-line
-	}, [
-		prevEdgeId,
-		nextEdgeId,
-		// eslint-disable-next-line
-		activeEdges[prevEdgeId as string],
-		setEdgeActive,
-	]);
+		setEdgeActive(nextEdgeId as string, outgoing || false);
+	}, [nextEdgeId, setEdgeActive, outgoing]);
+
+	const activeConnectors = useMemo(
+		() => ({ a: incoming, b: outgoing }),
+		[incoming, outgoing]
+	);
 
 	return (
 		<Flex
@@ -46,7 +55,7 @@ const Not: React.FC<Props> = observer(({ id }) => {
 			justify='center'
 			align='center'
 		>
-			<Title style={{ color: '#000', margin: 0 }}>NOT</Title>
+			<Title style={{ color: '#000', margin: 0 }}>!</Title>
 			<CloseOutlined
 				style={{ position: 'absolute', top: 10, right: 10 }}
 				onClick={handleRemoving}
@@ -58,6 +67,7 @@ const Not: React.FC<Props> = observer(({ id }) => {
 				style={{
 					top: '50%',
 					...connectorStyle,
+					background: activeConnectors.a ? '#f00' : '#000',
 				}}
 			/>
 
@@ -65,7 +75,11 @@ const Not: React.FC<Props> = observer(({ id }) => {
 				id='b'
 				type='source'
 				position={'right' as Position}
-				style={{ top: '50%', ...connectorStyle }}
+				style={{
+					top: '50%',
+					...connectorStyle,
+					background: activeConnectors.b ? '#f00' : '#000',
+				}}
 			/>
 		</Flex>
 	);

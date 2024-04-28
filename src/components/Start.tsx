@@ -56,7 +56,11 @@ const Start: React.FC<Props> = observer(({ id }) => {
 				id='a'
 				type='source'
 				position={'right' as Position}
-				style={{ top: '50%', ...connectorStyle }}
+				style={{
+					top: '50%',
+					...connectorStyle,
+					background: active ? '#f00' : '#000',
+				}}
 			/>
 		</Flex>
 	);
