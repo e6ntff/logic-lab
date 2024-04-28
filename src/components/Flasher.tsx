@@ -12,24 +12,23 @@ import { Edge, Handle, Position } from 'reactflow';
 
 interface Props {
 	id: string;
+	data: { delay: number };
 }
 
-const Flasher: React.FC<Props> = observer(({ id }) => {
-	const { removeNode, edges, setEdgeActive } = appStore;
+const Flasher: React.FC<Props> = observer(({ id, data }) => {
+	const { removeNode, edges, setEdgeActive, changeDelay } = appStore;
 
-	const [delay, setDelay] = useState<number>(1000);
+	const { delay } = data;
 
 	const [active, setActive] = useState<boolean>(true);
 
 	const handleDelayChange = useCallback(
 		(diff: number) => {
-			setDelay((prevDelay: number) => {
-				const delay = prevDelay + diff;
-				if (delay > 10000 || delay < 100) return prevDelay;
-				return delay;
-			});
+			const newDelay = delay + diff;
+			if (newDelay > 10000 || newDelay < 100) return;
+			changeDelay(id, newDelay);
 		},
-		[setDelay]
+		[changeDelay, delay, id]
 	);
 
 	useEffect(() => {
