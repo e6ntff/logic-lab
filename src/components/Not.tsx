@@ -31,9 +31,11 @@ const Not: React.FC<Props> = observer(({ id }) => {
 		const incoming: boolean = activeEdges[prevEdgeId];
 		const outgoing: boolean = !incoming;
 		setEdgeActive(nextEdgeId, outgoing);
+		// eslint-disable-next-line
 	}, [
 		prevEdgeId,
 		nextEdgeId,
+		// eslint-disable-next-line
 		activeEdges[prevEdgeId as string],
 		setEdgeActive,
 	]);
