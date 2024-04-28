@@ -14,7 +14,7 @@ export const blockStyleLarge: CSSProperties = {
 	borderRadius: 10,
 	padding: 10,
 	width: 70,
-	height: 130,
+	height: 150,
 };
 
 export const blockStyleSmall: CSSProperties = {
@@ -23,5 +23,5 @@ export const blockStyleSmall: CSSProperties = {
 	borderRadius: 10,
 	padding: 10,
 	width: 70,
-	height: 50,
+	height: 70,
 };

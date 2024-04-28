@@ -72,7 +72,7 @@ const Splitter: React.FC<Props> = observer(({ id }) => {
 				type='source'
 				position={'right' as Position}
 				style={{
-					top: 40,
+					top: 50,
 					...connectorStyle,
 					background: incoming ? '#f00' : '#000',
 				}}
@@ -82,7 +82,7 @@ const Splitter: React.FC<Props> = observer(({ id }) => {
 				type='source'
 				position={'right' as Position}
 				style={{
-					top: 120,
+					top: 130,
 					...connectorStyle,
 					background: incoming ? '#f00' : '#000',
 				}}

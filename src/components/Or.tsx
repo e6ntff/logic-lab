@@ -74,7 +74,7 @@ const Or: React.FC<Props> = observer(({ id }) => {
 				type='target'
 				position={'left' as Position}
 				style={{
-					top: 40,
+					top: 50,
 					...connectorStyle,
 					background: activeConnectors.a ? '#f00' : '#000',
 				}}
@@ -84,7 +84,7 @@ const Or: React.FC<Props> = observer(({ id }) => {
 				type='target'
 				position={'left' as Position}
 				style={{
-					top: 120,
+					top: 130,
 					...connectorStyle,
 					background: activeConnectors.b ? '#f00' : '#000',
 				}}
