@@ -1,6 +1,6 @@
 import { observer } from 'mobx-react-lite';
 import { Edge, Handle, Position } from 'reactflow';
-import { connectorStyle, orStyle } from '../utils/blockStyles';
+import { connectorStyle, blockStyleLarge } from '../utils/blockStyles';
 import Title from 'antd/es/typography/Title';
 import appStore from '../utils/appStore';
 import { Flex } from 'antd';
@@ -60,7 +60,7 @@ const Or: React.FC<Props> = observer(({ id }) => {
 
 	return (
 		<Flex
-			style={orStyle}
+			style={{ ...blockStyleLarge, background: '#0f0' }}
 			justify='center'
 			align='center'
 		>
@@ -74,8 +74,7 @@ const Or: React.FC<Props> = observer(({ id }) => {
 				type='target'
 				position={'left' as Position}
 				style={{
-					top: '33.3%',
-					bottom: '66.6%',
+					top: 40,
 					...connectorStyle,
 					background: activeConnectors.a ? '#f00' : '#000',
 				}}
@@ -85,8 +84,7 @@ const Or: React.FC<Props> = observer(({ id }) => {
 				type='target'
 				position={'left' as Position}
 				style={{
-					top: '66.6%',
-					bottom: '33.3%',
+					top: 120,
 					...connectorStyle,
 					background: activeConnectors.b ? '#f00' : '#000',
 				}}

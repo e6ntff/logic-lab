@@ -28,7 +28,7 @@ const Wire: React.FC = observer(
 						d={edgePath}
 						stroke={active ? '#f00' : '#555'}
 						fill='#0000'
-						strokeWidth={active ? 5 : 3}
+						strokeWidth={active ? 7 : 5}
 						className='animated'
 					/>
 				</g>

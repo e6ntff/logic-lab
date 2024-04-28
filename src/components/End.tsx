@@ -1,5 +1,5 @@
 import { observer } from 'mobx-react-lite';
-import { startStyle, connectorStyle } from '../utils/blockStyles';
+import { blockStyleSmall, connectorStyle } from '../utils/blockStyles';
 import appStore from '../utils/appStore';
 import { Flex } from 'antd';
 import { CloseOutlined } from '@ant-design/icons';
@@ -36,7 +36,7 @@ const End: React.FC<Props> = observer(({ id }) => {
 	return (
 		<Flex
 			style={{
-				...startStyle,
+				...blockStyleSmall,
 				background: active ? '#ff0' : '#555',
 			}}
 			justify='center'

@@ -13,6 +13,8 @@ const App: React.FC = observer(() => {
 		<>
 			<Panel />
 			<ReactFlow
+				snapToGrid
+				snapGrid={[20, 20]}
 				connectionMode={'loose' as ConnectionMode}
 				nodeTypes={nodeTypes}
 				edgeTypes={edgeTypes}

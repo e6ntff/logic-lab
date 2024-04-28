@@ -1,6 +1,6 @@
 import { observer } from 'mobx-react-lite';
 import { Edge, Handle, Position } from 'reactflow';
-import { andStyle, connectorStyle } from '../utils/blockStyles';
+import { blockStyleLarge, connectorStyle } from '../utils/blockStyles';
 import Title from 'antd/es/typography/Title';
 import appStore from '../utils/appStore';
 import { Flex } from 'antd';
@@ -57,11 +57,11 @@ const And: React.FC<Props> = observer(({ id }) => {
 
 	return (
 		<Flex
-			style={andStyle}
+			style={{ ...blockStyleLarge, background: '#f00' }}
 			justify='center'
 			align='center'
 		>
-			<Title style={{ color: '#fff', margin: 0 }}>&&</Title>
+			<Title style={{ color: '#fff', margin: 0 }}>&</Title>
 			<CloseOutlined
 				style={{ position: 'absolute', top: 10, right: 10 }}
 				onClick={handleRemoving}
@@ -71,8 +71,7 @@ const And: React.FC<Props> = observer(({ id }) => {
 				type='target'
 				position={'left' as Position}
 				style={{
-					top: '33.3%',
-					bottom: '66.6%',
+					top: 40,
 					...connectorStyle,
 					background: activeConnectors.a ? '#f00' : '#000',
 				}}
@@ -82,8 +81,7 @@ const And: React.FC<Props> = observer(({ id }) => {
 				type='target'
 				position={'left' as Position}
 				style={{
-					top: '66.6%',
-					bottom: '33.3%',
+					top: 120,
 					...connectorStyle,
 					background: activeConnectors.b ? '#f00' : '#000',
 				}}

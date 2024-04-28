@@ -1,5 +1,5 @@
 import { observer } from 'mobx-react-lite';
-import { startStyle, connectorStyle } from '../utils/blockStyles';
+import { blockStyleSmall, connectorStyle } from '../utils/blockStyles';
 import Title from 'antd/es/typography/Title';
 import appStore from '../utils/appStore';
 import { Flex } from 'antd';
@@ -40,7 +40,7 @@ const Start: React.FC<Props> = observer(({ id }) => {
 
 	return (
 		<Flex
-			style={startStyle}
+			style={blockStyleSmall}
 			justify='center'
 			align='center'
 			onClick={toggleStartSignal}

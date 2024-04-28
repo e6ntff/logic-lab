@@ -1,6 +1,6 @@
 import { observer } from 'mobx-react-lite';
 import { Edge, Handle, Position } from 'reactflow';
-import { connectorStyle, notStyle } from '../utils/blockStyles';
+import { connectorStyle, blockStyleSmall } from '../utils/blockStyles';
 import Title from 'antd/es/typography/Title';
 import appStore from '../utils/appStore';
 import { Flex } from 'antd';
@@ -51,7 +51,7 @@ const Not: React.FC<Props> = observer(({ id }) => {
 
 	return (
 		<Flex
-			style={notStyle}
+			style={blockStyleSmall}
 			justify='center'
 			align='center'
 		>
