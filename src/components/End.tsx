@@ -2,9 +2,10 @@ import { observer } from 'mobx-react-lite';
 import { blockStyleSmall, connectorStyle } from '../utils/blockStyles';
 import appStore from '../utils/appStore';
 import { Flex } from 'antd';
-import { CloseOutlined } from '@ant-design/icons';
+import { BulbOutlined, CloseOutlined, StopOutlined } from '@ant-design/icons';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Edge, Handle, Position } from 'reactflow';
+import Title from 'antd/es/typography/Title';
 
 interface Props {
 	id: string;
@@ -42,6 +43,9 @@ const End: React.FC<Props> = observer(({ id }) => {
 			justify='center'
 			align='center'
 		>
+			<Title style={{ color: '#000', margin: 0 }}>
+				<BulbOutlined />
+			</Title>
 			<CloseOutlined
 				style={{ position: 'absolute', top: 10, right: 10 }}
 				onClick={handleRemoving}

@@ -5,8 +5,9 @@ import Or from '../components/Or';
 import Not from '../components/Not';
 import Start from '../components/Start';
 import End from '../components/End';
+import Splitter from '../components/Splitter';
 
-export type nodeType = 'and' | 'or' | 'not' | 'start' | 'end';
+export type nodeType = 'and' | 'or' | 'not' | 'splitter' | 'start' | 'end';
 
 export type edgeType = 'wire';
 
@@ -16,6 +17,7 @@ export const nodeTypes: NodeTypes = {
 	not: Not,
 	start: Start,
 	end: End,
+	splitter: Splitter,
 };
 
 export const edgeTypes: EdgeTypes = { wire: Wire };

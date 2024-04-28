@@ -1,6 +1,7 @@
 import { Button, Flex } from 'antd';
 import { observer } from 'mobx-react-lite';
 import appStore from '../utils/appStore';
+import { ApiOutlined, BulbOutlined, ShareAltOutlined } from '@ant-design/icons';
 
 const Panel: React.FC = observer(() => {
 	const { addNode } = appStore;
@@ -17,11 +18,18 @@ const Panel: React.FC = observer(() => {
 				blockSize: 'min-content',
 			}}
 		>
-			<Button onClick={() => addNode('start')}>START</Button>
-			<Button onClick={() => addNode('and')}>AND</Button>
-			<Button onClick={() => addNode('or')}>OR</Button>
-			<Button onClick={() => addNode('not')}>NOT</Button>
-			<Button onClick={() => addNode('end')}>END</Button>
+			<Button onClick={() => addNode('start')}>
+				<ApiOutlined />
+			</Button>
+			<Button onClick={() => addNode('and')}>&</Button>
+			<Button onClick={() => addNode('or')}>||</Button>
+			<Button onClick={() => addNode('splitter')}>
+				<ShareAltOutlined />
+			</Button>
+			<Button onClick={() => addNode('not')}>!</Button>
+			<Button onClick={() => addNode('end')}>
+				<BulbOutlined />
+			</Button>
 		</Flex>
 	);
 });
