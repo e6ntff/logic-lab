@@ -4,13 +4,24 @@ import 'reactflow/dist/style.css';
 import { edgeTypes, nodeTypes } from './utils/types';
 import appStore from './utils/appStore';
 import Panel from './components/Panel';
+import { ConfigProvider } from 'antd';
 
 const App: React.FC = observer(() => {
 	const { nodes, edges, updateNodes, updateEdges, updateConnections } =
 		appStore;
 
 	return (
-		<>
+		<ConfigProvider
+			theme={{
+				components: {
+					Progress: {
+						motionDurationSlow: '0s',
+						motionEaseInOutCirc: 'linear',
+						motionEaseOutQuint: 'linear',
+					},
+				},
+			}}
+		>
 			<Panel />
 			<ReactFlow
 				snapToGrid
@@ -27,7 +38,7 @@ const App: React.FC = observer(() => {
 				<Background />
 				<Controls />
 			</ReactFlow>
-		</>
+		</ConfigProvider>
 	);
 });
 
