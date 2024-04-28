@@ -33,10 +33,10 @@ const Panel: React.FC = observer(() => {
 			<Button onClick={() => addNode('splitter')}>
 				<ShareAltOutlined />
 			</Button>
-			<Button onClick={() => addNode('flasher')}>
+			<Button onClick={() => addNode('flasher', 1000)}>
 				<HistoryOutlined />
 			</Button>
-			<Button onClick={() => addNode('delay')}>
+			<Button onClick={() => addNode('delay', 1000)}>
 				<EllipsisOutlined />
 			</Button>
 			<Button onClick={() => addNode('end')}>
