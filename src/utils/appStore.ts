@@ -51,7 +51,6 @@ class AppStore {
 			},
 			type: type,
 		};
-
 		this.nodes = [...this.nodes, node];
 	};
 

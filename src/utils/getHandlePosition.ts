@@ -6,35 +6,24 @@ const getHandlePosition = (
 	rotation: number,
 	styles: CSSProperties
 ) => {
-	const { top, left, bottom, right } = styles;
+	const { top, left } = styles;
+
 	switch (rotation) {
 		case 90: {
+			if (typeof top === 'string' || !top) break;
 			styles = {
 				...styles,
+				left: top,
 				top: left,
-				left: bottom,
-				bottom: right,
-				right: top,
-			};
-			break;
-		}
-		case 180: {
-			styles = {
-				...styles,
-				top: bottom,
-				left: right,
-				bottom: top,
-				right: left,
 			};
 			break;
 		}
 		case 270: {
+			if (typeof top === 'string') break;
 			styles = {
 				...styles,
-				top: right,
 				left: top,
-				bottom: left,
-				right: bottom,
+				top: left,
 			};
 			break;
 		}

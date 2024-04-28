@@ -51,7 +51,7 @@ const Splitter: React.FC<Props> = observer(({ id }) => {
 
 	return (
 		<Flex
-			style={{ ...blockStyleLarge, background: '#0f0' }}
+			style={{ ...blockStyleLarge(rotation), background: '#0f0' }}
 			justify='center'
 			align='center'
 		>
@@ -72,9 +72,10 @@ const Splitter: React.FC<Props> = observer(({ id }) => {
 				position={'left' as Position}
 				active={incoming}
 				styles={{
-					top: '50%',
+					top: 110,
 				}}
 				rotation={rotation}
+				nodeId={id}
 			/>
 			<Connector
 				id='b'
@@ -85,6 +86,7 @@ const Splitter: React.FC<Props> = observer(({ id }) => {
 					top: 50,
 				}}
 				rotation={rotation}
+				nodeId={id}
 			/>
 			<Connector
 				id='c'
@@ -95,6 +97,7 @@ const Splitter: React.FC<Props> = observer(({ id }) => {
 					top: 170,
 				}}
 				rotation={rotation}
+				nodeId={id}
 			/>
 		</Flex>
 	);

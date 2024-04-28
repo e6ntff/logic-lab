@@ -63,6 +63,7 @@ const Start: React.FC<Props> = observer(({ id }) => {
 					top: '50%',
 				}}
 				rotation={rotation}
+				nodeId={id}
 			/>
 		</Flex>
 	);

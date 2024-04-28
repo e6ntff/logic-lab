@@ -1,6 +1,11 @@
 import { observer } from 'mobx-react-lite';
-import { CSSProperties, useMemo } from 'react';
-import { Handle, HandleType, Position } from 'reactflow';
+import { CSSProperties, useEffect, useMemo } from 'react';
+import {
+	Handle,
+	HandleType,
+	Position,
+	useUpdateNodeInternals,
+} from 'reactflow';
 import getHandlePosition from '../utils/getHandlePosition';
 import { connectorStyle } from '../utils/blockStyles';
 
@@ -10,15 +15,22 @@ interface Props {
 	id: string;
 	position: Position;
 	rotation: number;
+	nodeId: string;
 	styles: CSSProperties;
 }
 
 const Connector: React.FC<Props> = observer(
-	({ active, type, id, position, rotation, styles }) => {
+	({ active, type, id, position, rotation, styles, nodeId }) => {
+		const updateNodeInternals = useUpdateNodeInternals();
+
 		const { computedStyles, computedPosition } = useMemo(
 			() => getHandlePosition(position, rotation, styles),
 			[position, rotation, styles]
 		);
+
+		useEffect(() => {
+			updateNodeInternals(nodeId);
+		}, [computedPosition, nodeId, updateNodeInternals]);
 
 		return (
 			<Handle

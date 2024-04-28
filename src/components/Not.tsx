@@ -78,6 +78,7 @@ const Not: React.FC<Props> = observer(({ id }) => {
 					top: '50%',
 				}}
 				rotation={rotation}
+				nodeId={id}
 			/>
 			<Connector
 				id='b'
@@ -88,6 +89,7 @@ const Not: React.FC<Props> = observer(({ id }) => {
 					top: '50%',
 				}}
 				rotation={rotation}
+				nodeId={id}
 			/>
 		</Flex>
 	);

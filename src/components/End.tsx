@@ -65,6 +65,7 @@ const End: React.FC<Props> = observer(({ id }) => {
 				type='target'
 				rotation={rotation}
 				styles={{ top: '50%' }}
+				nodeId={id}
 			/>
 		</Flex>
 	);

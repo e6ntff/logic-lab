@@ -62,7 +62,7 @@ const And: React.FC<Props> = observer(({ id }) => {
 
 	return (
 		<Flex
-			style={{ ...blockStyleLarge, background: '#f00' }}
+			style={{ ...blockStyleLarge(rotation), background: '#f00' }}
 			justify='center'
 			align='center'
 		>
@@ -84,6 +84,7 @@ const And: React.FC<Props> = observer(({ id }) => {
 					top: 50,
 				}}
 				rotation={rotation}
+				nodeId={id}
 			/>
 			<Connector
 				id='b'
@@ -94,6 +95,7 @@ const And: React.FC<Props> = observer(({ id }) => {
 					top: 170,
 				}}
 				rotation={rotation}
+				nodeId={id}
 			/>
 			<Connector
 				id='c'
@@ -101,9 +103,10 @@ const And: React.FC<Props> = observer(({ id }) => {
 				position={'right' as Position}
 				active={activeConnectors.c}
 				styles={{
-					top: '50%',
+					top: 110,
 				}}
 				rotation={rotation}
+				nodeId={id}
 			/>
 		</Flex>
 	);

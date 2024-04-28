@@ -98,6 +98,7 @@ const Flasher: React.FC<Props> = observer(({ id, data }) => {
 					top: '50%',
 				}}
 				rotation={rotation}
+				nodeId={id}
 			/>
 		</Flex>
 	);
