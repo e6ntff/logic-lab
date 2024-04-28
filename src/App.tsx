@@ -24,6 +24,7 @@ const App: React.FC = observer(() => {
 		>
 			<Panel />
 			<ReactFlow
+				fitView
 				snapToGrid
 				snapGrid={[20, 20]}
 				connectionMode={'loose' as ConnectionMode}

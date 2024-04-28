@@ -1,18 +1,23 @@
 import { observer } from 'mobx-react-lite';
-import { Edge, Handle, Position } from 'reactflow';
-import { connectorStyle, blockStyleSmall } from '../utils/blockStyles';
+import { Edge, Position } from 'reactflow';
+import { blockStyleSmall } from '../utils/blockStyles';
 import Title from 'antd/es/typography/Title';
 import appStore from '../utils/appStore';
 import { Flex } from 'antd';
 import { CloseOutlined } from '@ant-design/icons';
-import { useCallback, useEffect, useMemo } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import Connector from './Connector';
+import RotationPanel from './RotationPanel';
 
 interface Props {
 	id: string;
+	data: { rotate: number };
 }
 
 const Not: React.FC<Props> = observer(({ id }) => {
 	const { removeNode, edges, activeEdges, setEdgeActive } = appStore;
+
+	const [rotation, setRotation] = useState<number>(0);
 
 	const handleRemoving = useCallback(() => {
 		removeNode(id);
@@ -60,26 +65,29 @@ const Not: React.FC<Props> = observer(({ id }) => {
 				style={{ position: 'absolute', top: 10, right: 10 }}
 				onClick={handleRemoving}
 			/>
-			<Handle
+			<RotationPanel
+				id={id}
+				setRotation={setRotation}
+			/>
+			<Connector
 				id='a'
 				type='target'
 				position={'left' as Position}
-				style={{
+				active={activeConnectors.a}
+				styles={{
 					top: '50%',
-					...connectorStyle,
-					background: activeConnectors.a ? '#f00' : '#000',
 				}}
+				rotation={rotation}
 			/>
-
-			<Handle
+			<Connector
 				id='b'
 				type='source'
 				position={'right' as Position}
-				style={{
+				active={activeConnectors.b}
+				styles={{
 					top: '50%',
-					...connectorStyle,
-					background: activeConnectors.b ? '#f00' : '#000',
 				}}
+				rotation={rotation}
 			/>
 		</Flex>
 	);

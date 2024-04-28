@@ -47,6 +47,7 @@ class AppStore {
 			position: { x: 0, y: 0 },
 			data: {
 				delay: delay,
+				rotate: 0,
 			},
 			type: type,
 		};
@@ -59,6 +60,14 @@ class AppStore {
 			(node: Node<any, string | undefined>) => node.id === id
 		);
 		if (node?.data) node.data.delay = delay;
+		this.updateNodes([node]);
+	};
+
+	rotateNode = (id: string, deg: number) => {
+		const node = this.nodes.find(
+			(node: Node<any, string | undefined>) => node.id === id
+		);
+		if (node?.data) node.data.rotate = deg;
 		this.updateNodes([node]);
 	};
 

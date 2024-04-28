@@ -1,5 +1,5 @@
 import { observer } from 'mobx-react-lite';
-import { blockStyleSmall, connectorStyle } from '../utils/blockStyles';
+import { blockStyleSmall } from '../utils/blockStyles';
 import appStore from '../utils/appStore';
 import { Flex, Progress, Typography } from 'antd';
 import {
@@ -8,22 +8,23 @@ import {
 	PlusCircleOutlined,
 } from '@ant-design/icons';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Edge, Handle, Position } from 'reactflow';
+import { Edge, Position } from 'reactflow';
+import Connector from './Connector';
+import RotationPanel from './RotationPanel';
 
 interface Props {
 	id: string;
-	data: { delay: number };
+	data: { delay: number; rotate: number };
 }
 
 const Delay: React.FC<Props> = observer(({ id, data }) => {
 	const { removeNode, edges, setEdgeActive, activeEdges, changeDelay } =
 		appStore;
-
 	const { delay } = data;
 
 	const [active, setActive] = useState<boolean>(false);
-
 	const [percent, setPercent] = useState<number>(0);
+	const [rotation, setRotation] = useState<number>(0);
 
 	const handleDelayChange = useCallback(
 		(diff: number) => {
@@ -86,7 +87,7 @@ const Delay: React.FC<Props> = observer(({ id, data }) => {
 		<Flex
 			vertical
 			style={blockStyleSmall}
-			justify='space-between'
+			justify='space-around'
 			align='center'
 		>
 			<Progress
@@ -109,25 +110,29 @@ const Delay: React.FC<Props> = observer(({ id, data }) => {
 				style={{ position: 'absolute', top: 10, right: 10 }}
 				onClick={handleRemoving}
 			/>
-			<Handle
+			<RotationPanel
+				id={id}
+				setRotation={setRotation}
+			/>
+			<Connector
 				id='a'
 				type='target'
 				position={'left' as Position}
-				style={{
+				active={incoming}
+				styles={{
 					top: '50%',
-					...connectorStyle,
-					background: incoming ? '#f00' : '#000',
 				}}
+				rotation={rotation}
 			/>
-			<Handle
+			<Connector
 				id='b'
 				type='source'
 				position={'right' as Position}
-				style={{
+				active={active}
+				styles={{
 					top: '50%',
-					...connectorStyle,
-					background: active ? '#f00' : '#000',
 				}}
+				rotation={rotation}
 			/>
 		</Flex>
 	);
