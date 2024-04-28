@@ -44,11 +44,3 @@ export const startStyle: CSSProperties = {
 	width: 100,
 	height: 50,
 };
-
-export const end: CSSProperties = {
-	border: '3px solid #000',
-	borderRadius: 10,
-	padding: 10,
-	width: 100,
-	height: 50,
-};

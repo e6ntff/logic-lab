@@ -12,35 +12,30 @@ interface Props {
 }
 
 const Not: React.FC<Props> = observer(({ id }) => {
-	const { removeNode, edges, nodeSignals, addNodeSignal, setEdgeActive } =
-		appStore;
+	const { removeNode, edges, activeEdges, setEdgeActive } = appStore;
 
 	const handleRemoving = useCallback(() => {
 		removeNode(id);
 	}, [id, removeNode]);
 
-	const [prevNodeId, prevEdgeId]: string[] = useMemo(() => {
-		const check = (edge: Edge<any>) => edge.target === id;
-		const node = edges.find(check)?.source || '';
-		const edge = edges.find(check)?.id || '';
-		return [node, edge];
-	}, [edges, id]);
+	const [prevEdgeId, nextEdgeId]: (string | undefined)[] = useMemo(
+		() => [
+			edges.find((edge: Edge<any>) => edge.target === id)?.id,
+			edges.find((edge: Edge<any>) => edge.source === id)?.id,
+		],
+		[edges, id]
+	);
 
 	useEffect(() => {
-		if (!prevNodeId) return;
-		try {
-			const input: boolean = nodeSignals[prevNodeId]?.output || false;
-			const output = !input;
-			addNodeSignal(id, input, output);
-			setEdgeActive(prevEdgeId, input);
-		} catch (error) {}
-		// eslint-disable-next-line
+		if (!prevEdgeId || !nextEdgeId) return;
+		const incoming: boolean = activeEdges[prevEdgeId];
+		const outgoing: boolean = !incoming;
+		setEdgeActive(nextEdgeId, outgoing);
 	}, [
-		prevNodeId,
-		// eslint-disable-next-line
-		nodeSignals[prevNodeId as string],
-		addNodeSignal,
-		id,
+		prevEdgeId,
+		nextEdgeId,
+		activeEdges[prevEdgeId as string],
+		setEdgeActive,
 	]);
 
 	return (

@@ -12,49 +12,34 @@ interface Props {
 }
 
 const Or: React.FC<Props> = observer(({ id }) => {
-	const { removeNode, edges, nodeSignals, addNodeSignal, setEdgeActive } =
-		appStore;
+	const { removeNode, edges, setEdgeActive, activeEdges } = appStore;
 
 	const handleRemoving = useCallback(() => {
 		removeNode(id);
 	}, [id, removeNode]);
 
-	const [prevNodeIds, prevEdgeIds]: string[][] = useMemo(() => {
-		const check = (edge: Edge<any>) => edge.target === id;
-		const prevNodes: string[] = edges
-			.filter(check)
-			.map((edge: Edge<any>) => edge.source || '');
-		const prevEdges: string[] = edges
-			.filter(check)
-			.map((edge: Edge<any>) => edge.id || '');
-		return [prevNodes, prevEdges];
-	}, [edges, id]);
+	const [prevEdgeIds, nextEdgeId]: [string[], string | undefined] = useMemo(
+		() => [
+			edges
+				.filter((edge: Edge<any>) => edge.target === id)
+				?.map((edge: Edge<any>) => edge.id)
+				.slice(0, 2),
+			edges.find((edge: Edge<any>) => edge.source === id)?.id,
+		],
+		[edges, id]
+	);
+
+	const incoming: [boolean, boolean] = useMemo(
+		() => [activeEdges[prevEdgeIds[0]], activeEdges[prevEdgeIds[1]]],
+		// eslint-disable-next-line
+		[activeEdges[prevEdgeIds[0]], activeEdges[prevEdgeIds[1]], prevEdgeIds]
+	);
 
 	useEffect(() => {
-		if (prevNodeIds.some((id: string | null) => id === '')) return;
-		if (prevNodeIds[0] === prevNodeIds[1]) return;
-		if (prevNodeIds.length !== 2) return;
-		try {
-			const inputs: [boolean, boolean] = [
-				nodeSignals[prevNodeIds[0]]?.output || false,
-				nodeSignals[prevNodeIds[1]]?.output || false,
-			];
-			const output = inputs[0] || inputs[1];
-			addNodeSignal(id, inputs, output);
-			prevEdgeIds.forEach((id: string, index: number) =>
-				setEdgeActive(id, inputs[index])
-			);
-		} catch (error) {}
-		// eslint-disable-next-line
-	}, [
-		prevNodeIds,
-		// eslint-disable-next-line
-		nodeSignals[prevNodeIds[0]],
-		// eslint-disable-next-line
-		nodeSignals[prevNodeIds[1]],
-		addNodeSignal,
-		id,
-	]);
+		if (!prevEdgeIds.length || !nextEdgeId) return;
+		const outgoing = incoming[0] || incoming[1];
+		setEdgeActive(nextEdgeId, outgoing);
+	}, [prevEdgeIds, nextEdgeId, incoming, setEdgeActive]);
 
 	return (
 		<Flex

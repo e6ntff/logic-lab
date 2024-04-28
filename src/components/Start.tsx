@@ -3,25 +3,40 @@ import { startStyle, connectorStyle } from '../utils/blockStyles';
 import Title from 'antd/es/typography/Title';
 import appStore from '../utils/appStore';
 import { Flex } from 'antd';
-import { CloseOutlined } from '@ant-design/icons';
-import { useCallback } from 'react';
-import { Handle, Position } from 'reactflow';
+import { CloseOutlined, MinusOutlined, PlusOutlined } from '@ant-design/icons';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { Edge, Handle, Position } from 'reactflow';
 
 interface Props {
 	id: string;
 }
 
 const Start: React.FC<Props> = observer(({ id }) => {
-	const { removeNode, nodeSignals, setStartSignal } = appStore;
+	const { removeNode, edges, setEdgeActive } = appStore;
+
+	const [active, setActive] = useState<boolean>(true);
 
 	const handleRemoving = useCallback(() => {
 		removeNode(id);
 	}, [id, removeNode]);
 
+	const nextEdgeId: string | undefined = useMemo(
+		() => edges.find((edge: Edge<any>) => edge.source === id)?.id,
+		[edges, id]
+	);
+
+	useEffect(() => {
+		try {
+			if (!nextEdgeId) return;
+			const outgoing = active;
+			setEdgeActive(nextEdgeId, outgoing);
+		} catch (error) {}
+	}, [setEdgeActive, id, nextEdgeId, active]);
+
 	const toggleStartSignal = useCallback(() => {
-		setStartSignal(!nodeSignals['start']?.output);
+		setActive((prev: boolean) => !prev);
 		// eslint-disable-next-line
-	}, [setStartSignal, nodeSignals['start'].output]);
+	}, [setActive]);
 
 	return (
 		<Flex
@@ -31,7 +46,7 @@ const Start: React.FC<Props> = observer(({ id }) => {
 			onClick={toggleStartSignal}
 		>
 			<Title style={{ color: '#000', margin: 0 }}>
-				{nodeSignals['start']?.output ? '+' : '-'}
+				{active ? <PlusOutlined /> : <MinusOutlined />}
 			</Title>
 			<CloseOutlined
 				style={{ position: 'absolute', top: 10, right: 10 }}
