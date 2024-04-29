@@ -64,7 +64,7 @@ const Flasher: React.FC<Props> = observer(({ id, data }) => {
 		<Flex
 			vertical
 			style={blockStyleSmall}
-			justify='space-between'
+			justify='space-around'
 			align='center'
 		>
 			<Switch

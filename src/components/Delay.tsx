@@ -131,7 +131,7 @@ const Delay: React.FC<Props> = observer(({ id, data }) => {
 				position={'right' as Position}
 				active={active}
 				styles={{
-					top: '50%',
+					top: 50,
 				}}
 				rotation={rotation}
 				nodeId={id}
