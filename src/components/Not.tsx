@@ -1,5 +1,5 @@
 import { observer } from 'mobx-react-lite';
-import { Edge, Position } from 'reactflow';
+import { Edge, Node, Position, getConnectedEdges } from 'reactflow';
 import { blockStyleSmall } from '../utils/blockStyles';
 import Title from 'antd/es/typography/Title';
 import appStore from '../utils/appStore';
@@ -15,7 +15,7 @@ interface Props {
 }
 
 const Not: React.FC<Props> = observer(({ id }) => {
-	const { removeNode, edges, activeEdges, setEdgeActive } = appStore;
+	const { removeNode, edges, activeEdges, setEdgeActive, nodes } = appStore;
 
 	const [rotation, setRotation] = useState<number>(0);
 
@@ -23,12 +23,22 @@ const Not: React.FC<Props> = observer(({ id }) => {
 		removeNode(id);
 	}, [id, removeNode]);
 
+	const node = useMemo(
+		() => nodes.find((node: Node<any, string | undefined>) => node.id === id),
+		[nodes, id]
+	);
+
+	const connectedEdges = useMemo(
+		() => (node ? getConnectedEdges([node], edges) : edges),
+		[edges, node]
+	);
+
 	const [prevEdgeId, nextEdgeId]: (string | undefined)[] = useMemo(
 		() => [
-			edges.find((edge: Edge<any>) => edge.target === id)?.id,
-			edges.find((edge: Edge<any>) => edge.source === id)?.id,
+			connectedEdges.find((edge: Edge<any>) => edge.target === id)?.id,
+			connectedEdges.find((edge: Edge<any>) => edge.source === id)?.id,
 		],
-		[edges, id]
+		[connectedEdges, id]
 	);
 
 	const incoming: boolean | null = useMemo(() => {

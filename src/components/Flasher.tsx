@@ -8,7 +8,7 @@ import {
 	PlusCircleOutlined,
 } from '@ant-design/icons';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Edge, Position } from 'reactflow';
+import { Edge, Node, Position, getConnectedEdges } from 'reactflow';
 import Connector from './Connector';
 import RotationPanel from './NodeUtils';
 
@@ -18,7 +18,7 @@ interface Props {
 }
 
 const Flasher: React.FC<Props> = observer(({ id, data }) => {
-	const { removeNode, edges, setEdgeActive, changeDelay } = appStore;
+	const { removeNode, edges, setEdgeActive, changeDelay, nodes } = appStore;
 
 	const { delay } = data;
 
@@ -47,9 +47,19 @@ const Flasher: React.FC<Props> = observer(({ id, data }) => {
 		removeNode(id);
 	}, [id, removeNode]);
 
+	const node = useMemo(
+		() => nodes.find((node: Node<any, string | undefined>) => node.id === id),
+		[nodes, id]
+	);
+
+	const connectedEdges = useMemo(
+		() => (node ? getConnectedEdges([node], edges) : edges),
+		[edges, node]
+	);
+
 	const nextEdgeId: string | undefined = useMemo(
-		() => edges.find((edge: Edge<any>) => edge.source === id)?.id,
-		[edges, id]
+		() => connectedEdges.find((edge: Edge<any>) => edge.source === id)?.id,
+		[connectedEdges, id]
 	);
 
 	useEffect(() => {

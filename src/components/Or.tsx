@@ -1,5 +1,5 @@
 import { observer } from 'mobx-react-lite';
-import { Edge, Position } from 'reactflow';
+import { Edge, Node, Position, getConnectedEdges } from 'reactflow';
 import { blockStyleLarge } from '../utils/blockStyles';
 import Title from 'antd/es/typography/Title';
 import appStore from '../utils/appStore';
@@ -14,21 +14,30 @@ interface Props {
 }
 
 const Or: React.FC<Props> = observer(({ id }) => {
-	const { edges, setEdgeActive, activeEdges } = appStore;	
+	const { edges, setEdgeActive, activeEdges, nodes } = appStore;
 
 	const [rotation, setRotation] = useState<number>(0);
 
+	const node = useMemo(
+		() => nodes.find((node: Node<any, string | undefined>) => node.id === id),
+		[nodes, id]
+	);
+
+	const connectedEdges = useMemo(
+		() => (node ? getConnectedEdges([node], edges) : edges),
+		[edges, node]
+	);
+
 	const [prevEdgeIds, nextEdgeId]: [string[], string | undefined] = useMemo(
 		() => [
-			edges
+			connectedEdges
 				.filter((edge: Edge<any>) => edge.target === id)
 				?.map((edge: Edge<any>) => edge.id)
 				.slice(0, 2),
-			edges.find((edge: Edge<any>) => edge.source === id)?.id,
+			connectedEdges.find((edge: Edge<any>) => edge.source === id)?.id,
 		],
-		[edges, id]
+		[id, connectedEdges]
 	);
-
 	const incoming: [boolean, boolean] | null = useMemo(
 		() => {
 			if (prevEdgeIds.length < 2) return null;

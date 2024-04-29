@@ -1,6 +1,6 @@
 import { observer } from 'mobx-react-lite';
-import { Edge, Position } from 'reactflow';
-import { blockStyleLarge } from '../utils/blockStyles';
+import { Edge, Node, Position, getConnectedEdges } from 'reactflow';
+import { blockStyleSmall } from '../utils/blockStyles';
 import Title from 'antd/es/typography/Title';
 import appStore from '../utils/appStore';
 import { Flex } from 'antd';
@@ -15,19 +15,29 @@ interface Props {
 }
 
 const Splitter: React.FC<Props> = observer(({ id }) => {
-	const { edges, setEdgeActive, activeEdges } = appStore;
+	const { edges, setEdgeActive, activeEdges, nodes } = appStore;
 
 	const [rotation, setRotation] = useState<number>(0);
 
+	const node = useMemo(
+		() => nodes.find((node: Node<any, string | undefined>) => node.id === id),
+		[nodes, id]
+	);
+
+	const connectedEdges = useMemo(
+		() => (node ? getConnectedEdges([node], edges) : edges),
+		[edges, node]
+	);
+
 	const [prevEdgeId, nextEdgeIds]: [string | undefined, string[]] = useMemo(
 		() => [
-			edges.find((edge: Edge<any>) => edge.target === id)?.id,
-			edges
+			connectedEdges.find((edge: Edge<any>) => edge.target === id)?.id,
+			connectedEdges
 				.filter((edge: Edge<any>) => edge.source === id)
 				?.map((edge: Edge<any>) => edge.id)
 				.slice(0, 2),
 		],
-		[edges, id]
+		[connectedEdges, id]
 	);
 
 	const incoming: boolean | null = useMemo(
@@ -47,7 +57,7 @@ const Splitter: React.FC<Props> = observer(({ id }) => {
 
 	return (
 		<Flex
-			style={{ ...blockStyleLarge(rotation), background: '#0f0' }}
+			style={{ ...blockStyleSmall, background: '#0f0' }}
 			justify='center'
 			align='center'
 		>
@@ -64,7 +74,7 @@ const Splitter: React.FC<Props> = observer(({ id }) => {
 				position={'left' as Position}
 				active={incoming}
 				styles={{
-					top: 110,
+					top: 50,
 				}}
 				rotation={rotation}
 				nodeId={id}
@@ -76,17 +86,6 @@ const Splitter: React.FC<Props> = observer(({ id }) => {
 				active={incoming}
 				styles={{
 					top: 50,
-				}}
-				rotation={rotation}
-				nodeId={id}
-			/>
-			<Connector
-				id='c'
-				type='source'
-				position={'right' as Position}
-				active={incoming}
-				styles={{
-					top: 170,
 				}}
 				rotation={rotation}
 				nodeId={id}

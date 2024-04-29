@@ -8,7 +8,6 @@ import End from '../components/End';
 import Splitter from '../components/Splitter';
 import Flasher from '../components/Flasher';
 import Delay from '../components/Delay';
-import Link from '../components/Link';
 
 export type nodeType =
 	| 'and'
@@ -17,7 +16,6 @@ export type nodeType =
 	| 'splitter'
 	| 'delay'
 	| 'flasher'
-	| 'link'
 	| 'start'
 	| 'end';
 
@@ -32,7 +30,6 @@ export const nodeTypes: NodeTypes = {
 	splitter: Splitter,
 	flasher: Flasher,
 	delay: Delay,
-	link: Link,
 };
 
 export const edgeTypes: EdgeTypes = { wire: Wire };

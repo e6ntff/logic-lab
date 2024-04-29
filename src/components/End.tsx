@@ -4,7 +4,7 @@ import appStore from '../utils/appStore';
 import { Flex } from 'antd';
 import { BulbOutlined, CloseOutlined } from '@ant-design/icons';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Edge, Position } from 'reactflow';
+import { Edge, Node, Position, getConnectedEdges } from 'reactflow';
 import Title from 'antd/es/typography/Title';
 import RotationPanel from './NodeUtils';
 import Connector from './Connector';
@@ -15,7 +15,7 @@ interface Props {
 }
 
 const End: React.FC<Props> = observer(({ id }) => {
-	const { removeNode, edges, setEdgeActive, activeEdges } = appStore;
+	const { removeNode, edges, setEdgeActive, activeEdges, nodes } = appStore;
 
 	const [active, setActive] = useState<boolean>(false);
 	const [rotation, setRotation] = useState<number>(0);
@@ -24,12 +24,22 @@ const End: React.FC<Props> = observer(({ id }) => {
 		removeNode(id);
 	}, [id, removeNode]);
 
+	const node = useMemo(
+		() => nodes.find((node: Node<any, string | undefined>) => node.id === id),
+		[nodes, id]
+	);
+
+	const connectedEdges = useMemo(
+		() => (node ? getConnectedEdges([node], edges) : edges),
+		[edges, node]
+	);
+
 	const prevEdgeIds: string[] = useMemo(
 		() =>
-			edges
+			connectedEdges
 				.filter((edge: Edge<any>) => edge.target === id)
 				?.map((edge: Edge<any>) => edge.id),
-		[edges, id]
+		[connectedEdges, id]
 	);
 
 	useEffect(() => {

@@ -8,7 +8,7 @@ import {
 	PlusCircleOutlined,
 } from '@ant-design/icons';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Edge, Position } from 'reactflow';
+import { Edge, Node, Position, getConnectedEdges } from 'reactflow';
 import Connector from './Connector';
 import RotationPanel from './NodeUtils';
 
@@ -18,7 +18,7 @@ interface Props {
 }
 
 const Delay: React.FC<Props> = observer(({ id, data }) => {
-	const { removeNode, edges, setEdgeActive, activeEdges, changeDelay } =
+	const { removeNode, edges, setEdgeActive, activeEdges, changeDelay, nodes } =
 		appStore;
 	const { delay } = data;
 
@@ -35,12 +35,22 @@ const Delay: React.FC<Props> = observer(({ id, data }) => {
 		[changeDelay, delay, id]
 	);
 
+	const node = useMemo(
+		() => nodes.find((node: Node<any, string | undefined>) => node.id === id),
+		[nodes, id]
+	);
+
+	const connectedEdges = useMemo(
+		() => (node ? getConnectedEdges([node], edges) : edges),
+		[edges, node]
+	);
+
 	const [prevEdgeId, nextEdgeId]: (string | undefined)[] = useMemo(
 		() => [
-			edges.find((edge: Edge<any>) => edge.target === id)?.id,
-			edges.find((edge: Edge<any>) => edge.source === id)?.id,
+			connectedEdges.find((edge: Edge<any>) => edge.target === id)?.id,
+			connectedEdges.find((edge: Edge<any>) => edge.source === id)?.id,
 		],
-		[edges, id]
+		[connectedEdges, id]
 	);
 
 	const incoming: boolean | null = useMemo(() => {

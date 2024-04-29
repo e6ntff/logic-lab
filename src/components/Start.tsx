@@ -3,7 +3,7 @@ import { blockStyleSmall } from '../utils/blockStyles';
 import appStore from '../utils/appStore';
 import { Flex, Switch } from 'antd';
 import { useEffect, useMemo, useState } from 'react';
-import { Edge, Position } from 'reactflow';
+import { Edge, Node, Position, getConnectedEdges } from 'reactflow';
 import RotationPanel from './NodeUtils';
 import Connector from './Connector';
 
@@ -13,17 +13,27 @@ interface Props {
 }
 
 const Start: React.FC<Props> = observer(({ id }) => {
-	const { edges, setEdgeActive } = appStore;
+	const { edges, setEdgeActive, nodes } = appStore;
 
 	const [active, setActive] = useState<boolean>(true);
 	const [rotation, setRotation] = useState<number>(0);
 
+	const node = useMemo(
+		() => nodes.find((node: Node<any, string | undefined>) => node.id === id),
+		[nodes, id]
+	);
+
+	const connectedEdges = useMemo(
+		() => (node ? getConnectedEdges([node], edges) : edges),
+		[edges, node]
+	);
+
 	const nextEdgeIds: string[] = useMemo(
 		() =>
-			edges
+			connectedEdges
 				.filter((edge: Edge<any>) => edge.source === id)
 				?.map((edge: Edge<any>) => edge.id),
-		[edges, id]
+		[connectedEdges, id]
 	);
 
 	useEffect(() => {
