@@ -4,9 +4,9 @@ import { blockStyleLarge } from '../utils/blockStyles';
 import Title from 'antd/es/typography/Title';
 import appStore from '../utils/appStore';
 import { Flex } from 'antd';
-import { CloseOutlined, ShareAltOutlined } from '@ant-design/icons';
-import { useCallback, useEffect, useMemo, useState } from 'react';
-import RotationPanel from './RotationPanel';
+import { ShareAltOutlined } from '@ant-design/icons';
+import { useEffect, useMemo, useState } from 'react';
+import RotationPanel from './NodeUtils';
 import Connector from './Connector';
 
 interface Props {
@@ -15,13 +15,9 @@ interface Props {
 }
 
 const Splitter: React.FC<Props> = observer(({ id }) => {
-	const { removeNode, edges, setEdgeActive, activeEdges } = appStore;
+	const { edges, setEdgeActive, activeEdges } = appStore;
 
 	const [rotation, setRotation] = useState<number>(0);
-
-	const handleRemoving = useCallback(() => {
-		removeNode(id);
-	}, [id, removeNode]);
 
 	const [prevEdgeId, nextEdgeIds]: [string | undefined, string[]] = useMemo(
 		() => [
@@ -58,10 +54,6 @@ const Splitter: React.FC<Props> = observer(({ id }) => {
 			<Title style={{ color: '#000', margin: 0 }}>
 				<ShareAltOutlined />
 			</Title>
-			<CloseOutlined
-				style={{ position: 'absolute', top: 10, right: 10 }}
-				onClick={handleRemoving}
-			/>
 			<RotationPanel
 				id={id}
 				setRotation={setRotation}

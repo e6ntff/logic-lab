@@ -4,10 +4,9 @@ import { blockStyleLarge } from '../utils/blockStyles';
 import Title from 'antd/es/typography/Title';
 import appStore from '../utils/appStore';
 import { Flex } from 'antd';
-import { CloseOutlined } from '@ant-design/icons';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import Connector from './Connector';
-import RotationPanel from './RotationPanel';
+import RotationPanel from './NodeUtils';
 
 interface Props {
 	id: string;
@@ -15,13 +14,9 @@ interface Props {
 }
 
 const And: React.FC<Props> = observer(({ id }) => {
-	const { removeNode, edges, setEdgeActive, activeEdges } = appStore;
+	const { edges, setEdgeActive, activeEdges } = appStore;
 
 	const [rotation, setRotation] = useState<number>(0);
-
-	const handleRemoving = useCallback(() => {
-		removeNode(id);
-	}, [id, removeNode]);
 
 	const [prevEdgeIds, nextEdgeId]: [string[], string | undefined] = useMemo(
 		() => [
@@ -67,10 +62,6 @@ const And: React.FC<Props> = observer(({ id }) => {
 			align='center'
 		>
 			<Title style={{ color: '#fff', margin: 0 }}>&</Title>
-			<CloseOutlined
-				style={{ position: 'absolute', top: 10, right: 10 }}
-				onClick={handleRemoving}
-			/>
 			<RotationPanel
 				id={id}
 				setRotation={setRotation}

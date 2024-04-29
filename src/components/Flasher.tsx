@@ -10,7 +10,7 @@ import {
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Edge, Position } from 'reactflow';
 import Connector from './Connector';
-import RotationPanel from './RotationPanel';
+import RotationPanel from './NodeUtils';
 
 interface Props {
 	id: string;
@@ -95,7 +95,7 @@ const Flasher: React.FC<Props> = observer(({ id, data }) => {
 				position={'right' as Position}
 				active={active}
 				styles={{
-					top: '50%',
+					top: 50,
 				}}
 				rotation={rotation}
 				nodeId={id}

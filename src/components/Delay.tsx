@@ -10,7 +10,7 @@ import {
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Edge, Position } from 'reactflow';
 import Connector from './Connector';
-import RotationPanel from './RotationPanel';
+import RotationPanel from './NodeUtils';
 
 interface Props {
 	id: string;
@@ -120,7 +120,7 @@ const Delay: React.FC<Props> = observer(({ id, data }) => {
 				position={'left' as Position}
 				active={incoming}
 				styles={{
-					top: '50%',
+					top: 50,
 				}}
 				rotation={rotation}
 				nodeId={id}

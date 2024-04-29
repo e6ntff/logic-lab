@@ -7,7 +7,7 @@ import { Flex } from 'antd';
 import { CloseOutlined } from '@ant-design/icons';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import Connector from './Connector';
-import RotationPanel from './RotationPanel';
+import RotationPanel from './NodeUtils';
 
 interface Props {
 	id: string;
@@ -75,7 +75,7 @@ const Not: React.FC<Props> = observer(({ id }) => {
 				position={'left' as Position}
 				active={activeConnectors.a}
 				styles={{
-					top: '50%',
+					top: 50,
 				}}
 				rotation={rotation}
 				nodeId={id}
@@ -86,7 +86,7 @@ const Not: React.FC<Props> = observer(({ id }) => {
 				position={'right' as Position}
 				active={activeConnectors.b}
 				styles={{
-					top: '50%',
+					top: 50,
 				}}
 				rotation={rotation}
 				nodeId={id}

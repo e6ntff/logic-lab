@@ -6,7 +6,7 @@ import { BulbOutlined, CloseOutlined } from '@ant-design/icons';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Edge, Position } from 'reactflow';
 import Title from 'antd/es/typography/Title';
-import RotationPanel from './RotationPanel';
+import RotationPanel from './NodeUtils';
 import Connector from './Connector';
 
 interface Props {
@@ -64,7 +64,7 @@ const End: React.FC<Props> = observer(({ id }) => {
 				position={'left' as Position}
 				type='target'
 				rotation={rotation}
-				styles={{ top: '50%' }}
+				styles={{ top: 50 }}
 				nodeId={id}
 			/>
 		</Flex>

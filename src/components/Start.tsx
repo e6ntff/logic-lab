@@ -3,9 +3,9 @@ import { blockStyleSmall } from '../utils/blockStyles';
 import appStore from '../utils/appStore';
 import { Flex, Switch } from 'antd';
 import { CloseOutlined } from '@ant-design/icons';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Edge, Position } from 'reactflow';
-import RotationPanel from './RotationPanel';
+import RotationPanel from './NodeUtils';
 import Connector from './Connector';
 
 interface Props {
@@ -14,14 +14,10 @@ interface Props {
 }
 
 const Start: React.FC<Props> = observer(({ id }) => {
-	const { removeNode, edges, setEdgeActive } = appStore;
+	const { edges, setEdgeActive } = appStore;
 
 	const [active, setActive] = useState<boolean>(true);
 	const [rotation, setRotation] = useState<number>(0);
-
-	const handleRemoving = useCallback(() => {
-		removeNode(id);
-	}, [id, removeNode]);
 
 	const nextEdgeId: string | undefined = useMemo(
 		() => edges.find((edge: Edge<any>) => edge.source === id)?.id,
@@ -46,10 +42,6 @@ const Start: React.FC<Props> = observer(({ id }) => {
 				onChange={setActive}
 				value={active}
 			/>
-			<CloseOutlined
-				style={{ position: 'absolute', top: 10, right: 10 }}
-				onClick={handleRemoving}
-			/>
 			<RotationPanel
 				id={id}
 				setRotation={setRotation}
@@ -60,7 +52,7 @@ const Start: React.FC<Props> = observer(({ id }) => {
 				position={'right' as Position}
 				active={active}
 				styles={{
-					top: '50%',
+					top: 50,
 				}}
 				rotation={rotation}
 				nodeId={id}

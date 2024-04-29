@@ -1,4 +1,9 @@
-import { RotateLeftOutlined, RotateRightOutlined } from '@ant-design/icons';
+import {
+	ArrowRightOutlined,
+	CloseOutlined,
+	RotateLeftOutlined,
+	RotateRightOutlined,
+} from '@ant-design/icons';
 import { observer } from 'mobx-react-lite';
 import appStore from '../utils/appStore';
 import {
@@ -15,8 +20,8 @@ interface Props {
 	setRotation: Dispatch<SetStateAction<number>>;
 }
 
-const RotationPanel: React.FC<Props> = observer(({ id, setRotation }) => {
-	const { rotateNode, nodes } = appStore;
+const NodeUtils: React.FC<Props> = observer(({ id, setRotation }) => {
+	const { rotateNode, nodes, removeNode } = appStore;
 
 	const rotation: number = useMemo(
 		() =>
@@ -27,19 +32,31 @@ const RotationPanel: React.FC<Props> = observer(({ id, setRotation }) => {
 
 	useEffect(() => {
 		setRotation(rotation);
-	}, [rotation, setRotation]);
+	}, [rotation, setRotation, id]);
 
 	const handleNodeRotation = useCallback(
 		(right: boolean) => {
-			let newRotation: number = rotation + (right ? 90 : -90);
+			let newRotation: number = (rotation + (right ? 90 : -90)) % 360;
 			if (newRotation === -90) newRotation = 270;
-			rotateNode(id, newRotation % 360);
+			rotateNode(id, newRotation);
 		},
 		[rotateNode, id, rotation]
 	);
 
 	return (
 		<>
+			<ArrowRightOutlined
+				style={{
+					position: 'absolute',
+					top: 10,
+					left: 10,
+					rotate: `${rotation}deg`,
+				}}
+			/>
+			<CloseOutlined
+				style={{ position: 'absolute', top: 10, right: 10 }}
+				onClick={() => removeNode(id)}
+			/>
 			<RotateRightOutlined
 				onClick={() => handleNodeRotation(true)}
 				style={{ position: 'absolute', bottom: 10, right: 10 }}
@@ -52,4 +69,4 @@ const RotationPanel: React.FC<Props> = observer(({ id, setRotation }) => {
 	);
 });
 
-export default RotationPanel;
+export default NodeUtils;
