@@ -32,7 +32,7 @@ class AppStore {
 		const targetNode = this.nodes.find(
 			(node: Node<any, string | undefined>) => node.id === changes.target
 		);
-		if (targetNode?.type !== 'end') {
+		if (targetNode?.type !== 'end' && targetNode?.type !== 'start') {
 			const alreadyConnected = this.edges.some(
 				(edge: Edge<any>) =>
 					(edge.source === changes.source &&

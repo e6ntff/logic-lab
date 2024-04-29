@@ -2,7 +2,6 @@ import { observer } from 'mobx-react-lite';
 import { blockStyleSmall } from '../utils/blockStyles';
 import appStore from '../utils/appStore';
 import { Flex, Switch } from 'antd';
-import { CloseOutlined } from '@ant-design/icons';
 import { useEffect, useMemo, useState } from 'react';
 import { Edge, Position } from 'reactflow';
 import RotationPanel from './NodeUtils';
@@ -19,18 +18,21 @@ const Start: React.FC<Props> = observer(({ id }) => {
 	const [active, setActive] = useState<boolean>(true);
 	const [rotation, setRotation] = useState<number>(0);
 
-	const nextEdgeId: string | undefined = useMemo(
-		() => edges.find((edge: Edge<any>) => edge.source === id)?.id,
+	const nextEdgeIds: string[] = useMemo(
+		() =>
+			edges
+				.filter((edge: Edge<any>) => edge.source === id)
+				?.map((edge: Edge<any>) => edge.id),
 		[edges, id]
 	);
 
 	useEffect(() => {
 		try {
-			if (!nextEdgeId) return;
-			const outgoing = active;
-			setEdgeActive(nextEdgeId, outgoing);
+			nextEdgeIds.forEach((id: string) => {
+				setEdgeActive(id, active);
+			});
 		} catch (error) {}
-	}, [setEdgeActive, id, nextEdgeId, active]);
+	}, [setEdgeActive, id, nextEdgeIds, active]);
 
 	return (
 		<Flex
