@@ -24,6 +24,7 @@ const App: React.FC = observer(() => {
 		>
 			<Panel />
 			<ReactFlow
+				minZoom={0.01}
 				fitView
 				snapToGrid
 				snapGrid={[20, 20]}
