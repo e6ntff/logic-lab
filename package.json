@@ -1,5 +1,6 @@
 {
 	"name": "logic-blocks",
+	"homepage": "https://e6ntff.github.io/logic-blocks/",
 	"version": "0.1.0",
 	"private": true,
 	"dependencies": {
@@ -26,6 +27,7 @@
 	"scripts": {
 		"start": "react-scripts start",
 		"build": "react-scripts build",
+		"predeploy": "react-scripts build",
 		"deploy": "gh-pages -d build"
 	},
 	"eslintConfig": {
