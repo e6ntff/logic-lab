@@ -29,27 +29,17 @@ class AppStore {
 	};
 
 	updateConnections = (changes: any) => {
-		const targetNode = this.nodes.find(
-			(node: Node<any, string | undefined>) => node.id === changes.target
+		const alreadyConnected = this.edges.some(
+			(edge: Edge<any>) =>
+				(edge.source === changes.source &&
+					edge.sourceHandle === changes.sourceHandle) ||
+				(edge.target === changes.target &&
+					edge.targetHandle === changes.targetHandle)
 		);
-		if (
-			targetNode?.type !== 'end' &&
-			targetNode?.type !== 'start' &&
-			targetNode?.type !== 'link'
-		) {
-			const alreadyConnected = this.edges.some(
-				(edge: Edge<any>) =>
-					(edge.source === changes.source &&
-						edge.sourceHandle === changes.sourceHandle) ||
-					(edge.target === changes.target &&
-						edge.targetHandle === changes.targetHandle)
-			);
-			if (alreadyConnected) return;
-		}
+		if (alreadyConnected) return;
 		changes = { ...changes, type: 'wire' };
 		this.edges = addEdge(changes, this.edges);
 	};
-
 	addNode = (type: nodeType, delay?: number) => {
 		const node: Node<any, string | undefined> = {
 			id: uniqid(),
