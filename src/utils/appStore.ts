@@ -29,14 +29,19 @@ class AppStore {
 	};
 
 	updateConnections = (changes: any) => {
-		const alreadyConnected = this.edges.some(
-			(edge: Edge<any>) =>
-				(edge.source === changes.source &&
-					edge.sourceHandle === changes.sourceHandle) ||
-				(edge.target === changes.target &&
-					edge.targetHandle === changes.targetHandle)
+		const targetNode = this.nodes.find(
+			(node: Node<any, string | undefined>) => node.id === changes.target
 		);
-		if (alreadyConnected) return;
+		if (targetNode?.type !== 'end') {
+			const alreadyConnected = this.edges.some(
+				(edge: Edge<any>) =>
+					(edge.source === changes.source &&
+						edge.sourceHandle === changes.sourceHandle) ||
+					(edge.target === changes.target &&
+						edge.targetHandle === changes.targetHandle)
+			);
+			if (alreadyConnected) return;
+		}
 		changes = { ...changes, type: 'wire' };
 		this.edges = addEdge(changes, this.edges);
 	};
@@ -51,7 +56,6 @@ class AppStore {
 			},
 			type: type,
 		};
-		// if (type === 'link') node.dragHandle = '.dragHandle';
 		this.nodes = [...this.nodes, node];
 	};
 

@@ -24,19 +24,22 @@ const End: React.FC<Props> = observer(({ id }) => {
 		removeNode(id);
 	}, [id, removeNode]);
 
-	const prevEdgeId: string | undefined = useMemo(
-		() => edges.find((edge: Edge<any>) => edge.target === id)?.id,
+	const prevEdgeIds: string[] = useMemo(
+		() =>
+			edges
+				.filter((edge: Edge<any>) => edge.target === id)
+				?.map((edge: Edge<any>) => edge.id),
 		[edges, id]
 	);
 
 	useEffect(() => {
 		try {
-			const incoming = activeEdges[prevEdgeId as string];
+			const incoming = prevEdgeIds.some((id: string) => activeEdges[id]);
 			setActive(incoming);
 		} catch (error) {
 			setActive(false);
 		}
-	}, [setEdgeActive, id, prevEdgeId, activeEdges]);
+	}, [setEdgeActive, id, prevEdgeIds, activeEdges]);
 
 	return (
 		<Flex

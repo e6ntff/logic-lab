@@ -44,7 +44,6 @@ const Link: React.FC<Props> = observer(({ id }) => {
 			style={{ ...linkStyle }}
 		>
 			<PlusCircleOutlined
-				className='dragHandle'
 				style={{ position: 'absolute', top: -20, left: -5 }}
 			/>
 			<CloseOutlined
