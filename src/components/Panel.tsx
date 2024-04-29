@@ -6,6 +6,7 @@ import {
 	BulbOutlined,
 	EllipsisOutlined,
 	HistoryOutlined,
+	LineOutlined,
 	ShareAltOutlined,
 } from '@ant-design/icons';
 
@@ -26,6 +27,9 @@ const Panel: React.FC = observer(() => {
 		>
 			<Button onClick={() => addNode('start')}>
 				<ApiOutlined />
+			</Button>
+			<Button onClick={() => addNode('link')}>
+				<LineOutlined />
 			</Button>
 			<Button onClick={() => addNode('and')}>&</Button>
 			<Button onClick={() => addNode('or')}>||</Button>

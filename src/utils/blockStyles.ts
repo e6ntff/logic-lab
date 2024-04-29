@@ -30,3 +30,12 @@ export const blockStyleSmall: CSSProperties = {
 	width: 70,
 	height: 70,
 };
+
+export const linkStyle: CSSProperties = {
+	background: '#fff',
+	border: '0px solid #000',
+	borderRadius: 10,
+	padding: 10,
+	width: 0,
+	height: 0,
+};

@@ -42,7 +42,7 @@ class AppStore {
 	};
 
 	addNode = (type: nodeType, delay?: number) => {
-		let node: Node<any, string | undefined> = {
+		const node: Node<any, string | undefined> = {
 			id: uniqid(),
 			position: { x: 0, y: 0 },
 			data: {
@@ -51,6 +51,7 @@ class AppStore {
 			},
 			type: type,
 		};
+		// if (type === 'link') node.dragHandle = '.dragHandle';
 		this.nodes = [...this.nodes, node];
 	};
 
