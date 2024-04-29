@@ -36,8 +36,6 @@ const Connector: React.FC<Props> = observer(
 			<Handle
 				id={id}
 				type={type}
-				isConnectableStart={type === 'source'}
-				isConnectableEnd={type === 'target'}
 				position={computedPosition}
 				style={{
 					...computedStyles,
