@@ -15,14 +15,15 @@ interface Props {
 const Link: React.FC<Props> = observer(({ id }) => {
 	const { edges, setEdgeActive, activeEdges, removeNode } = appStore;
 
-	const [prevEdgeId, nextEdgeId]: [string | undefined, string | undefined] =
-		useMemo(
-			() => [
-				edges.find((edge: Edge<any>) => edge.target === id)?.id,
-				edges.find((edge: Edge<any>) => edge.source === id)?.id,
-			],
-			[edges, id]
-		);
+	const [prevEdgeId, nextEdgeIds]: [string | undefined, string[]] = useMemo(
+		() => [
+			edges.find((edge: Edge<any>) => edge.target === id)?.id,
+			edges
+				.filter((edge: Edge<any>) => edge.source === id)
+				?.map((edge: Edge<any>) => edge.id),
+		],
+		[edges, id]
+	);
 
 	const incoming: boolean | null = useMemo(
 		() => {
@@ -34,8 +35,10 @@ const Link: React.FC<Props> = observer(({ id }) => {
 	);
 
 	useEffect(() => {
-		nextEdgeId && setEdgeActive(nextEdgeId, incoming || false);
-	}, [nextEdgeId, incoming, setEdgeActive]);
+		nextEdgeIds.forEach((id: string) => {
+			setEdgeActive(id, incoming || false);
+		});
+	}, [nextEdgeIds, incoming, setEdgeActive]);
 
 	return (
 		<Flex
