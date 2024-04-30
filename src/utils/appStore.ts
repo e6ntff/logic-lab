@@ -29,14 +29,6 @@ class AppStore {
 	};
 
 	updateConnections = (changes: any) => {
-		const alreadyConnected = this.edges.some(
-			(edge: Edge<any>) =>
-				(edge.source === changes.source &&
-					edge.sourceHandle === changes.sourceHandle) ||
-				(edge.target === changes.target &&
-					edge.targetHandle === changes.targetHandle)
-		);
-		if (alreadyConnected) return;
 		changes = { ...changes, type: 'wire' };
 		this.edges = addEdge(changes, this.edges);
 	};

@@ -1,5 +1,5 @@
 import { observer } from 'mobx-react-lite';
-import { blockStyleSmall } from '../utils/blockStyles';
+import { blockStyle } from '../utils/blockStyles';
 import appStore from '../utils/appStore';
 import { Flex, Switch, Typography } from 'antd';
 import {
@@ -57,23 +57,26 @@ const Flasher: React.FC<Props> = observer(({ id, data }) => {
 		[edges, node]
 	);
 
-	const nextEdgeId: string | undefined = useMemo(
-		() => connectedEdges.find((edge: Edge<any>) => edge.source === id)?.id,
+	const nextEdgeIds: string[] = useMemo(
+		() =>
+			connectedEdges
+				.filter((edge: Edge<any>) => edge.source === id)
+				?.map((edge: Edge<any>) => edge.id),
 		[connectedEdges, id]
 	);
 
 	useEffect(() => {
 		try {
-			if (!nextEdgeId) return;
-			const outgoing = active;
-			setEdgeActive(nextEdgeId, outgoing);
+			nextEdgeIds.forEach((id: string) => {
+				setEdgeActive(id, active);
+			});
 		} catch (error) {}
-	}, [setEdgeActive, id, nextEdgeId, active]);
+	}, [setEdgeActive, id, nextEdgeIds, active]);
 
 	return (
 		<Flex
 			vertical
-			style={blockStyleSmall}
+			style={blockStyle}
 			justify='space-around'
 			align='center'
 		>
@@ -104,9 +107,6 @@ const Flasher: React.FC<Props> = observer(({ id, data }) => {
 				type='source'
 				position={'right' as Position}
 				active={active}
-				styles={{
-					top: 50,
-				}}
 				rotation={rotation}
 				nodeId={id}
 			/>

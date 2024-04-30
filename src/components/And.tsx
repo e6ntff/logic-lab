@@ -1,6 +1,6 @@
 import { observer } from 'mobx-react-lite';
 import { Edge, Node, Position, getConnectedEdges } from 'reactflow';
-import { blockStyleLarge } from '../utils/blockStyles';
+import { blockStyle } from '../utils/blockStyles';
 import Title from 'antd/es/typography/Title';
 import appStore from '../utils/appStore';
 import { Flex } from 'antd';
@@ -32,42 +32,28 @@ const And: React.FC<Props> = observer(({ id }) => {
 		() => [
 			connectedEdges
 				.filter((edge: Edge<any>) => edge.target === id)
-				?.map((edge: Edge<any>) => edge.id)
-				.slice(0, 2),
+				?.map((edge: Edge<any>) => edge.id),
 			connectedEdges.find((edge: Edge<any>) => edge.source === id)?.id,
 		],
 		[id, connectedEdges]
 	);
 
-	const incoming: [boolean, boolean] = useMemo(
-		() => [activeEdges[prevEdgeIds[0]], activeEdges[prevEdgeIds[1]]],
+	const active: boolean | null = useMemo(
+		() =>
+			prevEdgeIds.length > 0 &&
+			prevEdgeIds.every((id: string) => activeEdges[id]),
 		// eslint-disable-next-line
-		[activeEdges[prevEdgeIds[0]], activeEdges[prevEdgeIds[1]], prevEdgeIds]
+		[activeEdges, prevEdgeIds]
 	);
-
-	const outgoing: boolean | null = useMemo(() => {
-		if (incoming === null) return null;
-		return incoming[0] && incoming[1];
-	}, [incoming]);
 
 	useEffect(() => {
 		if (!nextEdgeId) return;
-		setEdgeActive(nextEdgeId, outgoing || false);
-	}, [prevEdgeIds, nextEdgeId, incoming, outgoing, setEdgeActive]);
-
-	const activeConnectors: { [key: string]: boolean | null } = useMemo(() => {
-		const result: { [key: string]: boolean } = {};
-		prevEdgeIds.forEach((id: string) => {
-			const prevEdge = edges.find((edge: Edge<any>) => edge.id === id);
-			if (prevEdge?.targetHandle)
-				result[prevEdge.targetHandle] = activeEdges[id];
-		});
-		return { ...result, c: outgoing };
-	}, [prevEdgeIds, activeEdges, edges, outgoing]);
+		setEdgeActive(nextEdgeId, active || false);
+	}, [prevEdgeIds, nextEdgeId, active, setEdgeActive]);
 
 	return (
 		<Flex
-			style={{ ...blockStyleLarge(rotation), background: '#f00' }}
+			style={{ ...blockStyle, background: '#f00' }}
 			justify='center'
 			align='center'
 		>
@@ -80,32 +66,16 @@ const And: React.FC<Props> = observer(({ id }) => {
 				id='a'
 				type='target'
 				position={'left' as Position}
-				active={activeConnectors.a}
-				styles={{
-					top: 50,
-				}}
+				active={active}
 				rotation={rotation}
 				nodeId={id}
+				maxConnections={Infinity}
 			/>
 			<Connector
 				id='b'
-				type='target'
-				position={'left' as Position}
-				active={activeConnectors.b}
-				styles={{
-					top: 170,
-				}}
-				rotation={rotation}
-				nodeId={id}
-			/>
-			<Connector
-				id='c'
 				type='source'
 				position={'right' as Position}
-				active={activeConnectors.c}
-				styles={{
-					top: 110,
-				}}
+				active={active}
 				rotation={rotation}
 				nodeId={id}
 			/>

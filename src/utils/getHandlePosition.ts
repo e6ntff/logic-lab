@@ -1,35 +1,6 @@
-import { CSSProperties } from 'react';
 import { Position } from 'reactflow';
 
-const getHandlePosition = (
-	position: Position,
-	rotation: number,
-	styles: CSSProperties
-) => {
-	const { top, left } = styles;
-
-	switch (rotation) {
-		case 90: {
-			if (typeof top === 'string' || !top) break;
-			styles = {
-				...styles,
-				left: top,
-				top: left,
-			};
-			break;
-		}
-		case 270: {
-			if (typeof top === 'string') break;
-			styles = {
-				...styles,
-				left: top,
-				top: left,
-			};
-			break;
-		}
-		default:
-			break;
-	}
+const getHandlePosition = (position: Position, rotation: number) => {
 	switch (position) {
 		case 'top':
 			if (rotation === 90) {
@@ -68,7 +39,7 @@ const getHandlePosition = (
 			}
 			break;
 	}
-	return { computedStyles: styles, computedPosition: position };
+	return position;
 };
 
 export default getHandlePosition;

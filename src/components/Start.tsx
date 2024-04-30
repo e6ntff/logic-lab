@@ -1,5 +1,5 @@
 import { observer } from 'mobx-react-lite';
-import { blockStyleSmall } from '../utils/blockStyles';
+import { blockStyle } from '../utils/blockStyles';
 import appStore from '../utils/appStore';
 import { Flex, Switch } from 'antd';
 import { useEffect, useMemo, useState } from 'react';
@@ -46,7 +46,7 @@ const Start: React.FC<Props> = observer(({ id }) => {
 
 	return (
 		<Flex
-			style={blockStyleSmall}
+			style={blockStyle}
 			justify='center'
 			align='center'
 		>
@@ -63,9 +63,6 @@ const Start: React.FC<Props> = observer(({ id }) => {
 				type='source'
 				position={'right' as Position}
 				active={active}
-				styles={{
-					top: 50,
-				}}
 				rotation={rotation}
 				nodeId={id}
 			/>

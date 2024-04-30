@@ -1,5 +1,5 @@
 import { observer } from 'mobx-react-lite';
-import { blockStyleSmall } from '../utils/blockStyles';
+import { blockStyle } from '../utils/blockStyles';
 import appStore from '../utils/appStore';
 import { Flex, Progress, Typography } from 'antd';
 import {
@@ -53,14 +53,11 @@ const Delay: React.FC<Props> = observer(({ id, data }) => {
 		[connectedEdges, id]
 	);
 
-	const incoming: boolean | null = useMemo(() => {
-		try {
-			return prevEdgeId ? activeEdges[prevEdgeId] : null;
-		} catch (error) {
-			return false;
-		}
+	const incoming: boolean | null = useMemo(
+		() => (prevEdgeId ? activeEdges[prevEdgeId] : null),
 		// eslint-disable-next-line
-	}, [activeEdges[prevEdgeId as string]]);
+		[activeEdges[prevEdgeId as string]]
+	);
 
 	useEffect(() => {
 		const timerId = setTimeout(() => setActive(incoming || false), delay);
@@ -88,15 +85,14 @@ const Delay: React.FC<Props> = observer(({ id, data }) => {
 	useEffect(() => {
 		try {
 			if (!nextEdgeId) return;
-			const outgoing = active;
-			setEdgeActive(nextEdgeId, outgoing);
+			setEdgeActive(nextEdgeId, active);
 		} catch (error) {}
 	}, [setEdgeActive, id, nextEdgeId, active]);
 
 	return (
 		<Flex
 			vertical
-			style={blockStyleSmall}
+			style={blockStyle}
 			justify='space-around'
 			align='center'
 		>
@@ -129,9 +125,6 @@ const Delay: React.FC<Props> = observer(({ id, data }) => {
 				type='target'
 				position={'left' as Position}
 				active={incoming}
-				styles={{
-					top: 50,
-				}}
 				rotation={rotation}
 				nodeId={id}
 			/>
@@ -140,9 +133,6 @@ const Delay: React.FC<Props> = observer(({ id, data }) => {
 				type='source'
 				position={'right' as Position}
 				active={active}
-				styles={{
-					top: 50,
-				}}
 				rotation={rotation}
 				nodeId={id}
 			/>

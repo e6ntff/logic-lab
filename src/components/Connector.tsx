@@ -1,9 +1,12 @@
 import { observer } from 'mobx-react-lite';
-import { CSSProperties, useEffect, useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 import {
+	Edge,
 	Handle,
 	HandleType,
 	Position,
+	getConnectedEdges,
+	useStore,
 	useUpdateNodeInternals,
 } from 'reactflow';
 import getHandlePosition from '../utils/getHandlePosition';
@@ -16,21 +19,36 @@ interface Props {
 	position: Position;
 	rotation: number;
 	nodeId: string;
-	styles: CSSProperties;
+	maxConnections?: number;
 }
 
+const selector = (s: any) => ({
+	nodeInternals: s.nodeInternals,
+	edges: s.edges,
+});
+
 const Connector: React.FC<Props> = observer(
-	({ active, type, id, position, rotation, styles, nodeId }) => {
+	({ active, type, id, position, rotation, nodeId, maxConnections = 1 }) => {
 		const updateNodeInternals = useUpdateNodeInternals();
 
-		const { computedStyles, computedPosition } = useMemo(
-			() => getHandlePosition(position, rotation, styles),
-			[position, rotation, styles]
+		const computedPosition = useMemo(
+			() => getHandlePosition(position, rotation),
+			[position, rotation]
 		);
 
 		useEffect(() => {
 			updateNodeInternals(nodeId);
 		}, [computedPosition, nodeId, updateNodeInternals]);
+
+		const { nodeInternals, edges } = useStore(selector);
+
+		const isHandleConnectable = useMemo(() => {
+			const node = nodeInternals.get(nodeId);
+			const connectedEdges = getConnectedEdges([node], edges).filter(
+				(edge: Edge<any>) => edge[type] === nodeId
+			);
+			return connectedEdges.length < maxConnections;
+		}, [nodeInternals, edges, nodeId, maxConnections, type]);
 
 		return (
 			<Handle
@@ -38,10 +56,10 @@ const Connector: React.FC<Props> = observer(
 				type={type}
 				position={computedPosition}
 				style={{
-					...computedStyles,
 					...connectorStyle,
 					background: active ? '#f00' : '#000',
 				}}
+				isConnectable={isHandleConnectable}
 			/>
 		);
 	}

@@ -1,6 +1,6 @@
 import { observer } from 'mobx-react-lite';
 import { Edge, Node, Position, getConnectedEdges } from 'reactflow';
-import { blockStyleSmall } from '../utils/blockStyles';
+import { blockStyle } from '../utils/blockStyles';
 import Title from 'antd/es/typography/Title';
 import appStore from '../utils/appStore';
 import { Flex } from 'antd';
@@ -34,30 +34,26 @@ const Splitter: React.FC<Props> = observer(({ id }) => {
 			connectedEdges.find((edge: Edge<any>) => edge.target === id)?.id,
 			connectedEdges
 				.filter((edge: Edge<any>) => edge.source === id)
-				?.map((edge: Edge<any>) => edge.id)
-				.slice(0, 2),
+				?.map((edge: Edge<any>) => edge.id),
 		],
-		[connectedEdges, id]
+		[id, connectedEdges]
 	);
 
-	const incoming: boolean | null = useMemo(
-		() => {
-			if (!prevEdgeId) return null;
-			return activeEdges[prevEdgeId];
-		},
+	const active: boolean | null = useMemo(
+		() => prevEdgeId !== undefined && activeEdges[prevEdgeId],
 		// eslint-disable-next-line
-		[activeEdges[prevEdgeId as string], prevEdgeId]
+		[activeEdges, prevEdgeId]
 	);
 
 	useEffect(() => {
 		nextEdgeIds.forEach((id: string) => {
-			setEdgeActive(id, incoming || false);
+			setEdgeActive(id, active || false);
 		});
-	}, [nextEdgeIds, incoming, setEdgeActive]);
+	}, [prevEdgeId, nextEdgeIds, active, setEdgeActive]);
 
 	return (
 		<Flex
-			style={{ ...blockStyleSmall, background: '#0f0' }}
+			style={{ ...blockStyle, background: '#0f0' }}
 			justify='center'
 			align='center'
 		>
@@ -72,23 +68,19 @@ const Splitter: React.FC<Props> = observer(({ id }) => {
 				id='a'
 				type='target'
 				position={'left' as Position}
-				active={incoming}
-				styles={{
-					top: 50,
-				}}
+				active={active}
 				rotation={rotation}
 				nodeId={id}
+				maxConnections={1}
 			/>
 			<Connector
 				id='b'
 				type='source'
 				position={'right' as Position}
-				active={incoming}
-				styles={{
-					top: 50,
-				}}
+				active={active}
 				rotation={rotation}
 				nodeId={id}
+				maxConnections={Infinity}
 			/>
 		</Flex>
 	);

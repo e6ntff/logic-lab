@@ -1,6 +1,6 @@
 import { observer } from 'mobx-react-lite';
 import { Edge, Node, Position, getConnectedEdges } from 'reactflow';
-import { blockStyleSmall } from '../utils/blockStyles';
+import { blockStyle } from '../utils/blockStyles';
 import Title from 'antd/es/typography/Title';
 import appStore from '../utils/appStore';
 import { Flex } from 'antd';
@@ -17,6 +17,7 @@ interface Props {
 const Not: React.FC<Props> = observer(({ id }) => {
 	const { removeNode, edges, activeEdges, setEdgeActive, nodes } = appStore;
 
+	const [active, setActive] = useState<boolean>(false);
 	const [rotation, setRotation] = useState<number>(0);
 
 	const handleRemoving = useCallback(() => {
@@ -41,32 +42,15 @@ const Not: React.FC<Props> = observer(({ id }) => {
 		[connectedEdges, id]
 	);
 
-	const incoming: boolean | null = useMemo(() => {
-		try {
-			return prevEdgeId ? activeEdges[prevEdgeId] : null;
-		} catch (error) {
-			return false;
-		}
-		// eslint-disable-next-line
-	}, [activeEdges[prevEdgeId as string]]);
-
-	const outgoing: boolean | null = useMemo(
-		() => (incoming !== null ? !incoming : null),
-		[incoming]
-	);
-
 	useEffect(() => {
-		setEdgeActive(nextEdgeId as string, outgoing || false);
-	}, [nextEdgeId, setEdgeActive, outgoing]);
-
-	const activeConnectors = useMemo(
-		() => ({ a: incoming, b: outgoing }),
-		[incoming, outgoing]
-	);
+		const active = prevEdgeId ? !activeEdges[prevEdgeId] : false;
+		setActive(active);
+		nextEdgeId && setEdgeActive(nextEdgeId, active);
+	}, [prevEdgeId, activeEdges, nextEdgeId, setEdgeActive]);
 
 	return (
 		<Flex
-			style={blockStyleSmall}
+			style={blockStyle}
 			justify='center'
 			align='center'
 		>
@@ -83,10 +67,7 @@ const Not: React.FC<Props> = observer(({ id }) => {
 				id='a'
 				type='target'
 				position={'left' as Position}
-				active={activeConnectors.a}
-				styles={{
-					top: 50,
-				}}
+				active={!active}
 				rotation={rotation}
 				nodeId={id}
 			/>
@@ -94,10 +75,7 @@ const Not: React.FC<Props> = observer(({ id }) => {
 				id='b'
 				type='source'
 				position={'right' as Position}
-				active={activeConnectors.b}
-				styles={{
-					top: 50,
-				}}
+				active={active}
 				rotation={rotation}
 				nodeId={id}
 			/>
