@@ -2,11 +2,7 @@ import { observer } from 'mobx-react-lite';
 import { blockStyle } from '../utils/blockStyles';
 import appStore from '../utils/appStore';
 import { Flex, Typography } from 'antd';
-import {
-	CloseOutlined,
-	MinusCircleOutlined,
-	PlusCircleOutlined,
-} from '@ant-design/icons';
+import { CloseOutlined, LeftOutlined, RightOutlined } from '@ant-design/icons';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Edge, Node, Position, getConnectedEdges } from 'reactflow';
 import Connector from './Connector';
@@ -81,15 +77,12 @@ const Delay: React.FC<Props> = observer(({ id, data }) => {
 			justify='space-around'
 			align='center'
 		>
-			<Flex
-				align='center'
-				gap={4}
-			>
-				<MinusCircleOutlined onClick={() => handleDelayChange(-100)} />
-				<PlusCircleOutlined onClick={() => handleDelayChange(100)} />
-				<Typography.Text>
-					{(Math.floor(delay / 100) / 10).toFixed(1)}
-				</Typography.Text>
+			<Flex gap={4}>
+				<Flex align='center'>
+					<LeftOutlined onClick={() => handleDelayChange(-100)} />
+					<Typography.Text>{(delay / 1000).toFixed(1)}</Typography.Text>
+					<RightOutlined onClick={() => handleDelayChange(100)} />
+				</Flex>
 			</Flex>
 			<CloseOutlined
 				style={{ position: 'absolute', top: 10, right: 10 }}
