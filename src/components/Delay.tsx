@@ -60,7 +60,9 @@ const Delay: React.FC<Props> = observer(({ id, data }) => {
 	);
 
 	useEffect(() => {
-		const timerId = setTimeout(() => setActive(incoming || false), delay);
+		let timerId: NodeJS.Timeout;
+		if (incoming) timerId = setTimeout(() => setActive(true), delay);
+		if (!incoming) timerId = setTimeout(() => setActive(false), delay);
 		const percentId = setInterval(
 			() =>
 				setPercent((prev: number) => {
