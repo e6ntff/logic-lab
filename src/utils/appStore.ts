@@ -32,12 +32,20 @@ class AppStore {
 		changes = { ...changes, type: 'wire' };
 		this.edges = addEdge(changes, this.edges);
 	};
-	addNode = (type: nodeType, delay?: number) => {
+
+	addNode = (
+		type: nodeType,
+		props?: {
+			delay?: number;
+			plusDelay?: number;
+			minusDelay?: number;
+		}
+	) => {
 		const node: Node<any, string | undefined> = {
 			id: uniqid(),
 			position: { x: 0, y: 0 },
 			data: {
-				delay: delay,
+				...props,
 				rotate: 0,
 			},
 			type: type,
@@ -50,6 +58,22 @@ class AppStore {
 			(node: Node<any, string | undefined>) => node.id === id
 		);
 		if (node?.data) node.data.delay = delay;
+		this.updateNodes([node]);
+	};
+
+	changePlusDelay = (id: string, delay: number) => {
+		const node = this.nodes.find(
+			(node: Node<any, string | undefined>) => node.id === id
+		);
+		if (node?.data) node.data.plusDelay = delay;
+		this.updateNodes([node]);
+	};
+
+	changeMinusDelay = (id: string, delay: number) => {
+		const node = this.nodes.find(
+			(node: Node<any, string | undefined>) => node.id === id
+		);
+		if (node?.data) node.data.minusDelay = delay;
 		this.updateNodes([node]);
 	};
 
