@@ -1,7 +1,7 @@
 import { observer } from 'mobx-react-lite';
 import { blockStyle } from '../utils/blockStyles';
 import appStore from '../utils/appStore';
-import { Flex, Progress, Typography } from 'antd';
+import { Flex, Typography } from 'antd';
 import {
 	CloseOutlined,
 	MinusCircleOutlined,
@@ -23,7 +23,6 @@ const Delay: React.FC<Props> = observer(({ id, data }) => {
 	const { delay } = data;
 
 	const [active, setActive] = useState<boolean>(false);
-	const [percent, setPercent] = useState<number>(0);
 	const [rotation, setRotation] = useState<number>(0);
 
 	const handleDelayChange = useCallback(
@@ -60,24 +59,8 @@ const Delay: React.FC<Props> = observer(({ id, data }) => {
 	);
 
 	useEffect(() => {
-		let timerId: NodeJS.Timeout;
-		if (incoming) timerId = setTimeout(() => setActive(true), delay);
-		if (!incoming) timerId = setTimeout(() => setActive(false), delay);
-		const percentId = setInterval(
-			() =>
-				setPercent((prev: number) => {
-					const percent = prev + (incoming ? 1 : -1);
-					if (percent < 0) return prev;
-					if (percent > 100) return prev;
-					return percent;
-				}),
-			delay / 100
-		);
-
-		return () => {
-			clearTimeout(timerId);
-			clearInterval(percentId);
-		};
+		if (incoming) setTimeout(() => setActive(true), delay);
+		if (!incoming) setTimeout(() => setActive(false), delay);
 	}, [incoming, delay]);
 
 	const handleRemoving = useCallback(() => {
@@ -98,12 +81,6 @@ const Delay: React.FC<Props> = observer(({ id, data }) => {
 			justify='space-around'
 			align='center'
 		>
-			<Progress
-				showInfo={false}
-				percent={percent}
-				strokeColor='#f00'
-				trailColor='#aaa'
-			/>
 			<Flex
 				align='center'
 				gap={4}
