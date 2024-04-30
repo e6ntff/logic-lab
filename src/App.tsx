@@ -27,7 +27,7 @@ const App: React.FC = observer(() => {
 				minZoom={0.01}
 				fitView
 				snapToGrid
-				snapGrid={[20, 20]}
+				snapGrid={[25, 25]}
 				nodeTypes={nodeTypes}
 				edgeTypes={edgeTypes}
 				onNodesChange={updateNodes}
@@ -36,7 +36,7 @@ const App: React.FC = observer(() => {
 				nodes={nodes}
 				edges={edges}
 			>
-				<Background />
+				<Background gap={[25, 25]} />
 				<Controls />
 			</ReactFlow>
 		</ConfigProvider>

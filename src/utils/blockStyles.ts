@@ -14,15 +14,6 @@ export const blockStyle: CSSProperties = {
 	border: '5px solid #000',
 	borderRadius: 10,
 	padding: 10,
-	width: 70,
-	height: 70,
-};
-
-export const linkStyle: CSSProperties = {
-	background: '#fff',
-	border: '0px solid #000',
-	borderRadius: 10,
-	padding: 10,
-	width: 0,
-	height: 0,
+	width: 95,
+	height: 95,
 };
