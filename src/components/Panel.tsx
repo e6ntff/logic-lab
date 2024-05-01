@@ -7,6 +7,7 @@ import {
 	DisconnectOutlined,
 	EllipsisOutlined,
 	HistoryOutlined,
+	PlayCircleOutlined,
 	ShareAltOutlined,
 } from '@ant-design/icons';
 
@@ -27,6 +28,9 @@ const Panel: React.FC = observer(() => {
 		>
 			<Button onClick={() => addNode('start')}>
 				<ApiOutlined />
+			</Button>
+			<Button onClick={() => addNode('button', { delay: 1000 })}>
+				<PlayCircleOutlined />
 			</Button>
 			<Button onClick={() => addNode('switch')}>
 				<DisconnectOutlined />
