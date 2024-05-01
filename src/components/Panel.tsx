@@ -4,6 +4,7 @@ import appStore from '../utils/appStore';
 import {
 	ApiOutlined,
 	BulbOutlined,
+	DisconnectOutlined,
 	EllipsisOutlined,
 	HistoryOutlined,
 	ShareAltOutlined,
@@ -26,6 +27,9 @@ const Panel: React.FC = observer(() => {
 		>
 			<Button onClick={() => addNode('start')}>
 				<ApiOutlined />
+			</Button>
+			<Button onClick={() => addNode('switch')}>
+				<DisconnectOutlined />
 			</Button>
 			<Button onClick={() => addNode('and')}>&</Button>
 			<Button onClick={() => addNode('or')}>||</Button>
