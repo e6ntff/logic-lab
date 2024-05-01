@@ -7,17 +7,17 @@ import { Flex } from 'antd';
 import { MinusOutlined } from '@ant-design/icons';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import Connector from './Connector';
-import RotationPanel from './NodeUtils';
+import NodeUtils from './NodeUtils';
 
 interface Props {
 	id: string;
-	data: { rotate: number };
+	data: { rotation: number };
 }
 
-const Switch: React.FC<Props> = observer(({ id }) => {
+const Switch: React.FC<Props> = observer(({ id, data }) => {
 	const { edges, activeEdges, setEdgeActive, nodes } = appStore;
 
-	const [rotation, setRotation] = useState<number>(0);
+	const { rotation } = data;
 	const [turnedOn, setTurnedOn] = useState<boolean>(true);
 
 	const toggleTurnedOn = useCallback(
@@ -65,10 +65,7 @@ const Switch: React.FC<Props> = observer(({ id }) => {
 					style={{ rotate: `${rotation + (turnedOn ? 0 : 90)}deg` }}
 				/>
 			</Title>
-			<RotationPanel
-				id={id}
-				setRotation={setRotation}
-			/>
+			<NodeUtils id={id} />
 			<Connector
 				id='a'
 				type='target'

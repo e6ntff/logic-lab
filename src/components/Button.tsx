@@ -10,29 +10,19 @@ import {
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Edge, Node, Position, getConnectedEdges } from 'reactflow';
 import Connector from './Connector';
-import RotationPanel from './NodeUtils';
+import NodeUtils from './NodeUtils';
 
 interface Props {
 	id: string;
-	data: { delay: number; rotate: number };
+	data: { delay: number; rotation: number };
 }
 
 const Button: React.FC<Props> = observer(({ id, data }) => {
-	const { edges, setEdgeActive, changeDelay, nodes } = appStore;
+	const { edges, setEdgeActive, nodes, setNodeParameters } = appStore;
 
-	const { delay } = data;
+	const { delay, rotation } = data;
 
 	const [active, setActive] = useState<boolean>(false);
-	const [rotation, setRotation] = useState<number>(0);
-
-	const handleDelayChange = useCallback(
-		(diff: number) => {
-			const newDelay = delay + diff;
-			if (newDelay > 10000 || newDelay < 100) return;
-			changeDelay(id, newDelay);
-		},
-		[changeDelay, delay, id]
-	);
 
 	useEffect(() => {
 		if (active) setTimeout(() => setActive(false), delay);
@@ -57,6 +47,15 @@ const Button: React.FC<Props> = observer(({ id, data }) => {
 		nextEdgeId && setEdgeActive(nextEdgeId, active);
 	}, [setEdgeActive, id, nextEdgeId, active]);
 
+	const handleDelayChange = useCallback(
+		(diff: number) => {
+			const newDelay = delay + diff;
+			if (newDelay > 10000 || newDelay < 100) return;
+			setNodeParameters(node, { delay: newDelay });
+		},
+		[setNodeParameters, delay, node]
+	);
+
 	return (
 		<Flex
 			vertical
@@ -74,10 +73,7 @@ const Button: React.FC<Props> = observer(({ id, data }) => {
 					<RightOutlined onClick={() => handleDelayChange(100)} />
 				</Flex>
 			</Flex>
-			<RotationPanel
-				id={id}
-				setRotation={setRotation}
-			/>
+			<NodeUtils id={id} />
 			<Connector
 				id='a'
 				type='source'

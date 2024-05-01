@@ -2,33 +2,24 @@ import { observer } from 'mobx-react-lite';
 import { blockStyle } from '../utils/blockStyles';
 import appStore from '../utils/appStore';
 import { Flex, Typography } from 'antd';
-import { CloseOutlined, LeftOutlined, RightOutlined } from '@ant-design/icons';
+import { LeftOutlined, RightOutlined } from '@ant-design/icons';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Edge, Node, Position, getConnectedEdges } from 'reactflow';
 import Connector from './Connector';
-import RotationPanel from './NodeUtils';
+import NodeUtils from './NodeUtils';
 
 interface Props {
 	id: string;
-	data: { delay: number; rotate: number };
+	data: { delay: number; rotation: number };
 }
 
 const Delay: React.FC<Props> = observer(({ id, data }) => {
-	const { removeNode, edges, setEdgeActive, activeEdges, changeDelay, nodes } =
+	const { edges, setEdgeActive, activeEdges, setNodeParameters, nodes } =
 		appStore;
-	const { delay } = data;
+
+	const { delay, rotation } = data;
 
 	const [active, setActive] = useState<boolean>(false);
-	const [rotation, setRotation] = useState<number>(0);
-
-	const handleDelayChange = useCallback(
-		(diff: number) => {
-			const newDelay = delay + diff;
-			if (newDelay > 10000 || newDelay < 100) return;
-			changeDelay(id, newDelay);
-		},
-		[changeDelay, delay, id]
-	);
 
 	const node = useMemo(
 		() => nodes.find((node: Node<any, string | undefined>) => node.id === id),
@@ -59,16 +50,18 @@ const Delay: React.FC<Props> = observer(({ id, data }) => {
 		if (!incoming) setTimeout(() => setActive(false), delay);
 	}, [incoming, delay]);
 
-	const handleRemoving = useCallback(() => {
-		removeNode(id);
-	}, [id, removeNode]);
+	const handleDelayChange = useCallback(
+		(diff: number) => {
+			const newDelay = delay + diff;
+			if (newDelay > 10000 || newDelay < 100) return;
+			setNodeParameters(node, { delay: newDelay });
+		},
+		[setNodeParameters, delay, node]
+	);
 
 	useEffect(() => {
-		try {
-			if (!nextEdgeId) return;
-			setEdgeActive(nextEdgeId, active);
-		} catch (error) {}
-	}, [setEdgeActive, id, nextEdgeId, active]);
+		nextEdgeId && setEdgeActive(nextEdgeId, active);
+	}, [setEdgeActive, nextEdgeId, active]);
 
 	return (
 		<Flex
@@ -84,14 +77,7 @@ const Delay: React.FC<Props> = observer(({ id, data }) => {
 					<RightOutlined onClick={() => handleDelayChange(100)} />
 				</Flex>
 			</Flex>
-			<CloseOutlined
-				style={{ position: 'absolute', top: 10, right: 10 }}
-				onClick={handleRemoving}
-			/>
-			<RotationPanel
-				id={id}
-				setRotation={setRotation}
-			/>
+			<NodeUtils id={id} />
 			<Connector
 				id='a'
 				type='target'

@@ -4,19 +4,19 @@ import { blockStyle } from '../utils/blockStyles';
 import Title from 'antd/es/typography/Title';
 import appStore from '../utils/appStore';
 import { Flex } from 'antd';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo } from 'react';
 import Connector from './Connector';
 import RotationPanel from './NodeUtils';
 
 interface Props {
 	id: string;
-	data: { rotate: number };
+	data: { rotation: number };
 }
 
-const And: React.FC<Props> = observer(({ id }) => {
+const And: React.FC<Props> = observer(({ id, data }) => {
 	const { edges, setEdgeActive, activeEdges, nodes } = appStore;
 
-	const [rotation, setRotation] = useState<number>(0);
+	const { rotation } = data;
 
 	const node = useMemo(
 		() => nodes.find((node: Node<any, string | undefined>) => node.id === id),
@@ -57,10 +57,7 @@ const And: React.FC<Props> = observer(({ id }) => {
 			align='center'
 		>
 			<Title style={{ color: '#fff', margin: 0 }}>&</Title>
-			<RotationPanel
-				id={id}
-				setRotation={setRotation}
-			/>
+			<RotationPanel id={id} />
 			<Connector
 				id='a'
 				type='target'

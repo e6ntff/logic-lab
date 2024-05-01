@@ -46,43 +46,27 @@ class AppStore {
 			position: { x: 0, y: 0 },
 			data: {
 				...props,
-				rotate: 0,
+				rotation: 0,
 			},
 			type: type,
 		};
 		this.nodes = [...this.nodes, node];
 	};
 
-	changeDelay = (id: string, delay: number) => {
-		const node = this.nodes.find(
-			(node: Node<any, string | undefined>) => node.id === id
-		);
-		if (node?.data) node.data.delay = delay;
-		this.updateNodes([node]);
-	};
-
-	changePlusDelay = (id: string, delay: number) => {
-		const node = this.nodes.find(
-			(node: Node<any, string | undefined>) => node.id === id
-		);
-		if (node?.data) node.data.plusDelay = delay;
-		this.updateNodes([node]);
-	};
-
-	changeMinusDelay = (id: string, delay: number) => {
-		const node = this.nodes.find(
-			(node: Node<any, string | undefined>) => node.id === id
-		);
-		if (node?.data) node.data.minusDelay = delay;
-		this.updateNodes([node]);
-	};
-
-	rotateNode = (id: string, deg: number) => {
-		const node = this.nodes.find(
-			(node: Node<any, string | undefined>) => node.id === id
-		);
-		if (node?.data) node.data.rotate = deg;
-		this.updateNodes([node]);
+	setNodeParameters = (
+		node: Node<any, string | undefined> | undefined,
+		parameters: {
+			rotation?: number;
+			delay?: number;
+			plusDelay?: number;
+			minusDelay?: number;
+			turnedOn?: boolean;
+		}
+	) => {
+		if (node) {
+			node.data = { ...node.data, ...parameters };
+			this.updateNodes([node]);
+		}
 	};
 
 	removeNode = (id: string) => {

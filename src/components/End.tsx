@@ -2,27 +2,24 @@ import { observer } from 'mobx-react-lite';
 import { blockStyle } from '../utils/blockStyles';
 import appStore from '../utils/appStore';
 import { Flex } from 'antd';
-import { BulbOutlined, CloseOutlined } from '@ant-design/icons';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { BulbOutlined } from '@ant-design/icons';
+import { useEffect, useMemo, useState } from 'react';
 import { Edge, Node, Position, getConnectedEdges } from 'reactflow';
 import Title from 'antd/es/typography/Title';
-import RotationPanel from './NodeUtils';
+import NodeUtils from './NodeUtils';
 import Connector from './Connector';
 
 interface Props {
 	id: string;
-	data: { rotate: number };
+	data: { rotation: number };
 }
 
-const End: React.FC<Props> = observer(({ id }) => {
-	const { removeNode, edges, activeEdges, nodes } = appStore;
+const End: React.FC<Props> = observer(({ id, data }) => {
+	const { edges, activeEdges, nodes } = appStore;
+
+	const { rotation } = data;
 
 	const [active, setActive] = useState<boolean>(false);
-	const [rotation, setRotation] = useState<number>(0);
-
-	const handleRemoving = useCallback(() => {
-		removeNode(id);
-	}, [id, removeNode]);
 
 	const node = useMemo(
 		() => nodes.find((node: Node<any, string | undefined>) => node.id === id),
@@ -57,14 +54,7 @@ const End: React.FC<Props> = observer(({ id }) => {
 			<Title style={{ color: '#000', margin: 0 }}>
 				<BulbOutlined />
 			</Title>
-			<CloseOutlined
-				style={{ position: 'absolute', top: 10, right: 10 }}
-				onClick={handleRemoving}
-			/>
-			<RotationPanel
-				id={id}
-				setRotation={setRotation}
-			/>
+			<NodeUtils id={id} />
 			<Connector
 				id='a'
 				type='target'

@@ -4,19 +4,20 @@ import appStore from '../utils/appStore';
 import { Flex, Switch } from 'antd';
 import { useEffect, useMemo, useState } from 'react';
 import { Edge, Node, Position, getConnectedEdges } from 'reactflow';
-import RotationPanel from './NodeUtils';
+import NodeUtils from './NodeUtils';
 import Connector from './Connector';
 
 interface Props {
 	id: string;
-	data: { rotate: number };
+	data: { rotation: number };
 }
 
-const Start: React.FC<Props> = observer(({ id }) => {
+const Start: React.FC<Props> = observer(({ id, data }) => {
 	const { edges, setEdgeActive, nodes } = appStore;
 
+	const { rotation } = data;
+
 	const [active, setActive] = useState<boolean>(true);
-	const [rotation, setRotation] = useState<number>(0);
 
 	const node = useMemo(
 		() => nodes.find((node: Node<any, string | undefined>) => node.id === id),
@@ -54,10 +55,7 @@ const Start: React.FC<Props> = observer(({ id }) => {
 				onChange={setActive}
 				value={active}
 			/>
-			<RotationPanel
-				id={id}
-				setRotation={setRotation}
-			/>
+			<NodeUtils id={id} />
 			<Connector
 				id='a'
 				type='source'

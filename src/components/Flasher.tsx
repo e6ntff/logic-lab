@@ -3,7 +3,6 @@ import { blockStyle } from '../utils/blockStyles';
 import appStore from '../utils/appStore';
 import { Flex, Switch, Typography } from 'antd';
 import {
-	CloseOutlined,
 	LeftOutlined,
 	MinusCircleOutlined,
 	PlusCircleOutlined,
@@ -12,45 +11,19 @@ import {
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Edge, Node, Position, getConnectedEdges } from 'reactflow';
 import Connector from './Connector';
-import RotationPanel from './NodeUtils';
+import NodeUtils from './NodeUtils';
 
 interface Props {
 	id: string;
-	data: { plusDelay: number; minusDelay: number; rotate: number };
+	data: { plusDelay: number; minusDelay: number; rotation: number };
 }
 
 const Flasher: React.FC<Props> = observer(({ id, data }) => {
-	const {
-		removeNode,
-		edges,
-		setEdgeActive,
-		changePlusDelay,
-		changeMinusDelay,
-		nodes,
-	} = appStore;
+	const { edges, setEdgeActive, setNodeParameters, nodes } = appStore;
 
-	const { plusDelay, minusDelay } = data;
+	const { plusDelay, minusDelay, rotation } = data;
 
 	const [active, setActive] = useState<boolean>(true);
-	const [rotation, setRotation] = useState<number>(0);
-
-	const handlePlusDelayChange = useCallback(
-		(diff: number) => {
-			const newDelay = plusDelay + diff;
-			if (newDelay > 10000 || newDelay < 100) return;
-			changePlusDelay(id, newDelay);
-		},
-		[changePlusDelay, plusDelay, id]
-	);
-
-	const handleMinusDelayChange = useCallback(
-		(diff: number) => {
-			const newDelay = minusDelay + diff;
-			if (newDelay > 10000 || newDelay < 100) return;
-			changeMinusDelay(id, newDelay);
-		},
-		[changeMinusDelay, minusDelay, id]
-	);
 
 	useEffect(() => {
 		let timerId: NodeJS.Timer;
@@ -66,10 +39,6 @@ const Flasher: React.FC<Props> = observer(({ id, data }) => {
 		return () => clearInterval(timerId);
 	}, [minusDelay, active]);
 
-	const handleRemoving = useCallback(() => {
-		removeNode(id);
-	}, [id, removeNode]);
-
 	const node = useMemo(
 		() => nodes.find((node: Node<any, string | undefined>) => node.id === id),
 		[nodes, id]
@@ -80,21 +49,32 @@ const Flasher: React.FC<Props> = observer(({ id, data }) => {
 		[edges, node]
 	);
 
-	const nextEdgeIds: string[] = useMemo(
-		() =>
-			connectedEdges
-				.filter((edge: Edge<any>) => edge.source === id)
-				?.map((edge: Edge<any>) => edge.id),
+	const nextEdgeId: string | undefined = useMemo(
+		() => connectedEdges.find((edge: Edge<any>) => edge.source === id)?.id,
 		[connectedEdges, id]
 	);
 
+	const handlePlusDelayChange = useCallback(
+		(diff: number) => {
+			const newDelay = plusDelay + diff;
+			if (newDelay > 10000 || newDelay < 100) return;
+			setNodeParameters(node, { plusDelay: newDelay });
+		},
+		[setNodeParameters, plusDelay, node]
+	);
+
+	const handleMinusDelayChange = useCallback(
+		(diff: number) => {
+			const newDelay = minusDelay + diff;
+			if (newDelay > 10000 || newDelay < 100) return;
+			setNodeParameters(node, { minusDelay: newDelay });
+		},
+		[setNodeParameters, minusDelay, node]
+	);
+
 	useEffect(() => {
-		try {
-			nextEdgeIds.forEach((id: string) => {
-				setEdgeActive(id, active);
-			});
-		} catch (error) {}
-	}, [setEdgeActive, id, nextEdgeIds, active]);
+		nextEdgeId && setEdgeActive(nextEdgeId, active);
+	}, [setEdgeActive, id, nextEdgeId, active]);
 
 	return (
 		<Flex
@@ -125,14 +105,7 @@ const Flasher: React.FC<Props> = observer(({ id, data }) => {
 					</Flex>
 				</Flex>
 			</Flex>
-			<CloseOutlined
-				style={{ position: 'absolute', top: 10, right: 10 }}
-				onClick={handleRemoving}
-			/>
-			<RotationPanel
-				id={id}
-				setRotation={setRotation}
-			/>
+			<NodeUtils id={id} />
 			<Connector
 				id='a'
 				type='source'
