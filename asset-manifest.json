@@ -1,13 +1,13 @@
 {
   "files": {
     "main.css": "/logic-blocks/static/css/main.4e9fba80.css",
-    "main.js": "/logic-blocks/static/js/main.1291a982.js",
+    "main.js": "/logic-blocks/static/js/main.9fc61cd1.js",
     "index.html": "/logic-blocks/index.html",
     "main.4e9fba80.css.map": "/logic-blocks/static/css/main.4e9fba80.css.map",
-    "main.1291a982.js.map": "/logic-blocks/static/js/main.1291a982.js.map"
+    "main.9fc61cd1.js.map": "/logic-blocks/static/js/main.9fc61cd1.js.map"
   },
   "entrypoints": [
     "static/css/main.4e9fba80.css",
-    "static/js/main.1291a982.js"
+    "static/js/main.9fc61cd1.js"
   ]
 }
