@@ -47,8 +47,7 @@ const And: React.FC<Props> = observer(({ id }) => {
 	);
 
 	useEffect(() => {
-		if (!nextEdgeId) return;
-		setEdgeActive(nextEdgeId, active || false);
+		nextEdgeId && setEdgeActive(nextEdgeId, active || false);
 	}, [prevEdgeIds, nextEdgeId, active, setEdgeActive]);
 
 	return (

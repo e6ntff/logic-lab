@@ -4,8 +4,7 @@ import { blockStyle } from '../utils/blockStyles';
 import Title from 'antd/es/typography/Title';
 import appStore from '../utils/appStore';
 import { Flex } from 'antd';
-import { CloseOutlined } from '@ant-design/icons';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import Connector from './Connector';
 import RotationPanel from './NodeUtils';
 
@@ -15,14 +14,9 @@ interface Props {
 }
 
 const Not: React.FC<Props> = observer(({ id }) => {
-	const { removeNode, edges, activeEdges, setEdgeActive, nodes } = appStore;
+	const { edges, activeEdges, setEdgeActive, nodes } = appStore;
 
-	const [active, setActive] = useState<boolean>(false);
 	const [rotation, setRotation] = useState<number>(0);
-
-	const handleRemoving = useCallback(() => {
-		removeNode(id);
-	}, [id, removeNode]);
 
 	const node = useMemo(
 		() => nodes.find((node: Node<any, string | undefined>) => node.id === id),
@@ -42,11 +36,15 @@ const Not: React.FC<Props> = observer(({ id }) => {
 		[connectedEdges, id]
 	);
 
+	const active: boolean | null = useMemo(
+		() => (prevEdgeId ? !activeEdges[prevEdgeId] : null),
+		// eslint-disable-next-line
+		[activeEdges, prevEdgeId]
+	);
+
 	useEffect(() => {
-		const active = prevEdgeId ? !activeEdges[prevEdgeId] : false;
-		setActive(active);
-		nextEdgeId && setEdgeActive(nextEdgeId, active);
-	}, [prevEdgeId, activeEdges, nextEdgeId, setEdgeActive]);
+		nextEdgeId && setEdgeActive(nextEdgeId, active || false);
+	}, [prevEdgeId, nextEdgeId, setEdgeActive, active]);
 
 	return (
 		<Flex
@@ -55,10 +53,6 @@ const Not: React.FC<Props> = observer(({ id }) => {
 			align='center'
 		>
 			<Title style={{ color: '#000', margin: 0 }}>!</Title>
-			<CloseOutlined
-				style={{ position: 'absolute', top: 10, right: 10 }}
-				onClick={handleRemoving}
-			/>
 			<RotationPanel
 				id={id}
 				setRotation={setRotation}
@@ -67,7 +61,7 @@ const Not: React.FC<Props> = observer(({ id }) => {
 				id='a'
 				type='target'
 				position={'left' as Position}
-				active={!active}
+				active={!active && active !== null}
 				rotation={rotation}
 				nodeId={id}
 			/>
