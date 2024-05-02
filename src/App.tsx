@@ -10,24 +10,14 @@ import 'reactflow/dist/style.css';
 import { edgeTypes, nodeTypes } from './utils/types';
 import appStore from './utils/appStore';
 import Panel from './components/Panel';
-import { ConfigProvider } from 'antd';
+import MessageButton from './components/MessageButton';
 
 const App: React.FC = observer(() => {
 	const { nodes, edges, updateNodes, updateEdges, updateConnections } =
 		appStore;
 
 	return (
-		<ConfigProvider
-			theme={{
-				components: {
-					Progress: {
-						motionDurationSlow: '0s',
-						motionEaseInOutCirc: 'linear',
-						motionEaseOutQuint: 'linear',
-					},
-				},
-			}}
-		>
+		<>
 			<Panel />
 			<ReactFlow
 				minZoom={0.01}
@@ -49,13 +39,15 @@ const App: React.FC = observer(() => {
 				/>
 				<Controls />
 				<MiniMap
+					position={'top-right'}
 					inversePan
 					pannable
 					zoomable
 					zoomStep={1.25}
 				/>
 			</ReactFlow>
-		</ConfigProvider>
+			<MessageButton />
+		</>
 	);
 });
 
