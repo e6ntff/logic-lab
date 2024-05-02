@@ -10,10 +10,12 @@ import Flasher from '../components/Flasher';
 import Delay from '../components/Delay';
 import Switch from '../components/Switch';
 import ButtonAntd from '../components/Button';
+import Xor from '../components/Xor';
 
 export type nodeType =
 	| 'and'
 	| 'or'
+	| 'xor'
 	| 'not'
 	| 'splitter'
 	| 'delay'
@@ -28,6 +30,7 @@ export type edgeType = 'wire';
 export const nodeTypes: NodeTypes = {
 	and: And,
 	or: Or,
+	xor: Xor,
 	not: Not,
 	start: Start,
 	end: End,

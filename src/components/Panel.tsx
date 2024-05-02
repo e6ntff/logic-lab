@@ -37,6 +37,7 @@ const Panel: React.FC = observer(() => {
 			</Button>
 			<Button onClick={() => addNode('and')}>&</Button>
 			<Button onClick={() => addNode('or')}>||</Button>
+			<Button onClick={() => addNode('xor')}>⊕</Button>
 			<Button onClick={() => addNode('not')}>!</Button>
 			<Button onClick={() => addNode('splitter')}>
 				<ShareAltOutlined />
