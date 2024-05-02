@@ -1,5 +1,11 @@
 import { observer } from 'mobx-react-lite';
-import ReactFlow, { Background, Controls } from 'reactflow';
+import ReactFlow, {
+	Background,
+	BackgroundVariant,
+	Controls,
+	MiniMap,
+	SelectionMode,
+} from 'reactflow';
 import 'reactflow/dist/style.css';
 import { edgeTypes, nodeTypes } from './utils/types';
 import appStore from './utils/appStore';
@@ -35,9 +41,19 @@ const App: React.FC = observer(() => {
 				onConnect={updateConnections}
 				nodes={nodes}
 				edges={edges}
+				selectionMode={SelectionMode.Partial}
 			>
-				<Background gap={[25, 25]} />
+				<Background
+					gap={[25, 25]}
+					variant={BackgroundVariant.Lines}
+				/>
 				<Controls />
+				<MiniMap
+					inversePan
+					pannable
+					zoomable
+					zoomStep={1.25}
+				/>
 			</ReactFlow>
 		</ConfigProvider>
 	);
