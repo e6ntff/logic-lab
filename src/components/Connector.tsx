@@ -11,6 +11,7 @@ import {
 } from 'reactflow';
 import getHandlePosition from '../utils/getHandlePosition';
 import { connectorStyle } from '../utils/blockStyles';
+import { Flex, Typography } from 'antd';
 
 interface Props {
 	active: boolean | null;
@@ -60,7 +61,23 @@ const Connector: React.FC<Props> = observer(
 					background: active ? '#f00' : '#000',
 				}}
 				isConnectable={isHandleConnectable}
-			/>
+			>
+				<Flex
+					style={{
+						position: 'absolute',
+						inset: 0,
+						inlineSize: '100%',
+						blockSize: '100%',
+						pointerEvents: 'none',
+					}}
+					justify='center'
+					align='center'
+				>
+					<Typography.Text style={{ color: '#fff' }}>
+						{maxConnections === Infinity ? '∞' : maxConnections}
+					</Typography.Text>
+				</Flex>
+			</Handle>
 		);
 	}
 );
