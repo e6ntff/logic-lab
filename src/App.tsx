@@ -33,7 +33,7 @@ const App: React.FC = observer(() => {
 				minZoom={0.01}
 				fitView
 				snapToGrid
-				snapGrid={[25, 25]}
+				snapGrid={[30, 30]}
 				nodeTypes={nodeTypes}
 				edgeTypes={edgeTypes}
 				onNodesChange={updateNodes}
@@ -44,7 +44,7 @@ const App: React.FC = observer(() => {
 				selectionMode={SelectionMode.Partial}
 			>
 				<Background
-					gap={[25, 25]}
+					gap={[30, 30]}
 					variant={BackgroundVariant.Lines}
 				/>
 				<Controls />

@@ -14,6 +14,6 @@ export const blockStyle: CSSProperties = {
 	border: '5px solid #000',
 	borderRadius: 10,
 	padding: 10,
-	width: 95,
-	height: 95,
+	width: 90,
+	height: 90,
 };
