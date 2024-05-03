@@ -18,7 +18,7 @@ const Start: React.FC<Props> = observer(({ id, data }) => {
 
 	const { rotation, active } = data;
 
-	const { nextEdgeIds } = GetEdges(id, { prev: true, next: true });
+	const { nextEdgeIds } = GetEdges(id, { prev: false, next: true });
 
 	useEffect(() => {
 		try {

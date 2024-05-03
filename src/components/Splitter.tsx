@@ -51,7 +51,6 @@ const Splitter: React.FC<Props> = observer(({ id, data }) => {
 				active={active}
 				rotation={rotation}
 				nodeId={id}
-				maxConnections={1}
 			/>
 			<Connector
 				id='b'

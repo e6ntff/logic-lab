@@ -20,7 +20,7 @@ const End: React.FC<Props> = observer(({ id, data }) => {
 
 	const { rotation } = data;
 
-	const { prevEdgeIds } = GetEdges(id, { prev: true, next: true });
+	const { prevEdgeIds } = GetEdges(id, { prev: true, next: false });
 
 	const incoming = useMemo(
 		() => (prevEdgeIds[0] ? activeEdges[prevEdgeIds[0]] : false),
