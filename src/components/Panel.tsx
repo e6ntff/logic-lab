@@ -2,12 +2,12 @@ import { Button, Flex } from 'antd';
 import { observer } from 'mobx-react-lite';
 import appStore from '../utils/appStore';
 import {
-	ApiOutlined,
 	BulbOutlined,
 	DisconnectOutlined,
 	EllipsisOutlined,
 	HistoryOutlined,
 	PlayCircleOutlined,
+	PoweroffOutlined,
 	ShareAltOutlined,
 } from '@ant-design/icons';
 
@@ -27,7 +27,7 @@ const Panel: React.FC = observer(() => {
 			}}
 		>
 			<Button onClick={() => addNode('start', { active: true })}>
-				<ApiOutlined />
+				<PoweroffOutlined />
 			</Button>
 			<Button onClick={() => addNode('button', { active: false, delay: 1000 })}>
 				<PlayCircleOutlined />
