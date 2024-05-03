@@ -36,6 +36,7 @@ class AppStore {
 	addNode = (
 		type: nodeType,
 		props?: {
+			active?: boolean;
 			delay?: number;
 			plusDelay?: number;
 			minusDelay?: number;
@@ -54,15 +55,18 @@ class AppStore {
 	};
 
 	setNodeParameters = (
-		node: Node<any, string | undefined> | undefined,
+		id: string,
 		parameters: {
 			rotation?: number;
+			active?: boolean;
 			delay?: number;
 			plusDelay?: number;
 			minusDelay?: number;
-			turnedOn?: boolean;
 		}
 	) => {
+		const node = this.nodes.find(
+			(node: Node<any, string | undefined>) => node.id === id
+		);
 		if (node) {
 			node.data = { ...node.data, ...parameters };
 			this.updateNodes([node]);

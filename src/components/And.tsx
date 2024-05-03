@@ -1,5 +1,5 @@
 import { observer } from 'mobx-react-lite';
-import { Edge, Node, Position, getConnectedEdges } from 'reactflow';
+import { Position } from 'reactflow';
 import { blockStyle } from '../utils/blockStyles';
 import Title from 'antd/es/typography/Title';
 import appStore from '../utils/appStore';
@@ -7,6 +7,7 @@ import { Flex } from 'antd';
 import { useEffect, useMemo } from 'react';
 import Connector from './Connector';
 import RotationPanel from './NodeUtils';
+import GetEdges from '../utils/getEdges';
 
 interface Props {
 	id: string;
@@ -14,29 +15,11 @@ interface Props {
 }
 
 const And: React.FC<Props> = observer(({ id, data }) => {
-	const { edges, setEdgeActive, activeEdges, nodes } = appStore;
+	const { setEdgeActive, activeEdges } = appStore;
 
 	const { rotation } = data;
 
-	const node = useMemo(
-		() => nodes.find((node: Node<any, string | undefined>) => node.id === id),
-		[nodes, id]
-	);
-
-	const connectedEdges = useMemo(
-		() => (node ? getConnectedEdges([node], edges) : edges),
-		[edges, node]
-	);
-
-	const [prevEdgeIds, nextEdgeId]: [string[], string | undefined] = useMemo(
-		() => [
-			connectedEdges
-				.filter((edge: Edge<any>) => edge.target === id)
-				?.map((edge: Edge<any>) => edge.id),
-			connectedEdges.find((edge: Edge<any>) => edge.source === id)?.id,
-		],
-		[id, connectedEdges]
-	);
+	const { prevEdgeIds, nextEdgeIds } = GetEdges(id, { prev: true, next: true });
 
 	const active: boolean | null = useMemo(
 		() =>
@@ -47,8 +30,8 @@ const And: React.FC<Props> = observer(({ id, data }) => {
 	);
 
 	useEffect(() => {
-		nextEdgeId && setEdgeActive(nextEdgeId, active || false);
-	}, [prevEdgeIds, nextEdgeId, active, setEdgeActive]);
+		nextEdgeIds[0] && setEdgeActive(nextEdgeIds[0], active || false);
+	}, [prevEdgeIds, nextEdgeIds, active, setEdgeActive]);
 
 	return (
 		<Flex

@@ -1,5 +1,5 @@
 import { observer } from 'mobx-react-lite';
-import { Edge, Node, Position, getConnectedEdges } from 'reactflow';
+import { Position } from 'reactflow';
 import { blockStyle } from '../utils/blockStyles';
 import Title from 'antd/es/typography/Title';
 import appStore from '../utils/appStore';
@@ -8,6 +8,7 @@ import { ShareAltOutlined } from '@ant-design/icons';
 import { useEffect, useMemo } from 'react';
 import NodeUtils from './NodeUtils';
 import Connector from './Connector';
+import GetEdges from '../utils/getEdges';
 
 interface Props {
 	id: string;
@@ -15,41 +16,23 @@ interface Props {
 }
 
 const Splitter: React.FC<Props> = observer(({ id, data }) => {
-	const { edges, setEdgeActive, activeEdges, nodes } = appStore;
+	const { setEdgeActive, activeEdges } = appStore;
 
 	const { rotation } = data;
 
-	const node = useMemo(
-		() => nodes.find((node: Node<any, string | undefined>) => node.id === id),
-		[nodes, id]
-	);
-
-	const connectedEdges = useMemo(
-		() => (node ? getConnectedEdges([node], edges) : edges),
-		[edges, node]
-	);
-
-	const [prevEdgeId, nextEdgeIds]: [string | undefined, string[]] = useMemo(
-		() => [
-			connectedEdges.find((edge: Edge<any>) => edge.target === id)?.id,
-			connectedEdges
-				.filter((edge: Edge<any>) => edge.source === id)
-				?.map((edge: Edge<any>) => edge.id),
-		],
-		[id, connectedEdges]
-	);
+	const { prevEdgeIds, nextEdgeIds } = GetEdges(id, { prev: true, next: true });
 
 	const active: boolean | null = useMemo(
-		() => prevEdgeId !== undefined && activeEdges[prevEdgeId],
+		() => prevEdgeIds[0] !== undefined && activeEdges[prevEdgeIds[0]],
 		// eslint-disable-next-line
-		[activeEdges, prevEdgeId]
+		[activeEdges, prevEdgeIds]
 	);
 
 	useEffect(() => {
 		nextEdgeIds.forEach((id: string) => {
 			setEdgeActive(id, active || false);
 		});
-	}, [prevEdgeId, nextEdgeIds, active, setEdgeActive]);
+	}, [nextEdgeIds, active, setEdgeActive]);
 
 	return (
 		<Flex

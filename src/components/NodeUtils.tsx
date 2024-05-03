@@ -28,9 +28,9 @@ const NodeUtils: React.FC<Props> = observer(({ id }) => {
 		(right: boolean) => {
 			let newRotation: number = (rotation + (right ? 90 : -90)) % 360;
 			if (newRotation === -90) newRotation = 270;
-			setNodeParameters(node, { rotation: newRotation });
+			setNodeParameters(id, { rotation: newRotation });
 		},
-		[setNodeParameters, node, rotation]
+		[setNodeParameters, id, rotation]
 	);
 
 	return (

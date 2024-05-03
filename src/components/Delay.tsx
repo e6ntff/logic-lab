@@ -3,65 +3,49 @@ import { blockStyle } from '../utils/blockStyles';
 import appStore from '../utils/appStore';
 import { Flex, Typography } from 'antd';
 import { LeftOutlined, RightOutlined } from '@ant-design/icons';
-import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Edge, Node, Position, getConnectedEdges } from 'reactflow';
+import { useCallback, useEffect, useMemo } from 'react';
+import { Position } from 'reactflow';
 import Connector from './Connector';
 import NodeUtils from './NodeUtils';
+import GetEdges from '../utils/getEdges';
 
 interface Props {
 	id: string;
-	data: { delay: number; rotation: number };
+	data: { delay: number; rotation: number; active: boolean };
 }
 
 const Delay: React.FC<Props> = observer(({ id, data }) => {
-	const { edges, setEdgeActive, activeEdges, setNodeParameters, nodes } =
-		appStore;
+	const { setEdgeActive, activeEdges, setNodeParameters } = appStore;
 
-	const { delay, rotation } = data;
+	const { delay, rotation, active } = data;
 
-	const [active, setActive] = useState<boolean>(false);
-
-	const node = useMemo(
-		() => nodes.find((node: Node<any, string | undefined>) => node.id === id),
-		[nodes, id]
-	);
-
-	const connectedEdges = useMemo(
-		() => (node ? getConnectedEdges([node], edges) : edges),
-		[edges, node]
-	);
-
-	const [prevEdgeId, nextEdgeId]: (string | undefined)[] = useMemo(
-		() => [
-			connectedEdges.find((edge: Edge<any>) => edge.target === id)?.id,
-			connectedEdges.find((edge: Edge<any>) => edge.source === id)?.id,
-		],
-		[connectedEdges, id]
-	);
+	const { prevEdgeIds, nextEdgeIds } = GetEdges(id, { prev: true, next: true });
 
 	const incoming: boolean | null = useMemo(
-		() => (prevEdgeId ? activeEdges[prevEdgeId] : null),
+		() => (prevEdgeIds[0] ? activeEdges[prevEdgeIds[0]] : null),
 		// eslint-disable-next-line
-		[activeEdges[prevEdgeId as string]]
+		[activeEdges[prevEdgeIds[0] as string]]
 	);
 
 	useEffect(() => {
-		if (incoming) setTimeout(() => setActive(true), delay);
-		if (!incoming) setTimeout(() => setActive(false), delay);
-	}, [incoming, delay]);
+		if (incoming)
+			setTimeout(() => setNodeParameters(id, { active: true }), delay);
+		if (!incoming)
+			setTimeout(() => setNodeParameters(id, { active: false }), delay);
+	}, [incoming, delay, id, setNodeParameters]);
 
 	const handleDelayChange = useCallback(
 		(diff: number) => {
 			const newDelay = delay + diff;
 			if (newDelay > 10000 || newDelay < 100) return;
-			setNodeParameters(node, { delay: newDelay });
+			setNodeParameters(id, { delay: newDelay });
 		},
-		[setNodeParameters, delay, node]
+		[setNodeParameters, delay, id]
 	);
 
 	useEffect(() => {
-		nextEdgeId && setEdgeActive(nextEdgeId, active);
-	}, [setEdgeActive, nextEdgeId, active]);
+		nextEdgeIds[0] && setEdgeActive(nextEdgeIds[0], active);
+	}, [setEdgeActive, nextEdgeIds, active]);
 
 	return (
 		<Flex

@@ -1,57 +1,42 @@
 import { observer } from 'mobx-react-lite';
-import { Edge, Node, Position, getConnectedEdges } from 'reactflow';
+import { Position } from 'reactflow';
 import { blockStyle } from '../utils/blockStyles';
 import Title from 'antd/es/typography/Title';
 import appStore from '../utils/appStore';
 import { Flex } from 'antd';
 import { MinusOutlined } from '@ant-design/icons';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo } from 'react';
 import Connector from './Connector';
 import NodeUtils from './NodeUtils';
+import GetEdges from '../utils/getEdges';
 
 interface Props {
 	id: string;
-	data: { rotation: number };
+	data: { rotation: number; active: boolean };
 }
 
 const Switch: React.FC<Props> = observer(({ id, data }) => {
-	const { edges, activeEdges, setEdgeActive, nodes } = appStore;
+	const { activeEdges, setEdgeActive, setNodeParameters } = appStore;
 
-	const { rotation } = data;
-	const [turnedOn, setTurnedOn] = useState<boolean>(true);
+	const { rotation, active } = data;
 
-	const toggleTurnedOn = useCallback(
-		() => setTurnedOn((on: boolean) => !on),
-		[setTurnedOn]
+	const toggleSwitch = useCallback(
+		() => setNodeParameters(id, { active: !active }),
+		[setNodeParameters, active, id]
 	);
 
-	const node = useMemo(
-		() => nodes.find((node: Node<any, string | undefined>) => node.id === id),
-		[nodes, id]
-	);
+	const { prevEdgeIds, nextEdgeIds } = GetEdges(id, { prev: true, next: true });
 
-	const connectedEdges = useMemo(
-		() => (node ? getConnectedEdges([node], edges) : edges),
-		[edges, node]
-	);
-
-	const [prevEdgeId, nextEdgeId]: (string | undefined)[] = useMemo(
-		() => [
-			connectedEdges.find((edge: Edge<any>) => edge.target === id)?.id,
-			connectedEdges.find((edge: Edge<any>) => edge.source === id)?.id,
-		],
-		[connectedEdges, id]
-	);
-
-	const active: boolean | null = useMemo(
-		() => (prevEdgeId ? activeEdges[prevEdgeId] : null),
+	const incoming: boolean | null = useMemo(
+		() => (prevEdgeIds[0] ? activeEdges[prevEdgeIds[0]] : null),
 		// eslint-disable-next-line
-		[activeEdges, prevEdgeId]
+		[activeEdges, prevEdgeIds]
 	);
 
 	useEffect(() => {
-		nextEdgeId && setEdgeActive(nextEdgeId, (active && turnedOn) || false);
-	}, [prevEdgeId, nextEdgeId, setEdgeActive, active, turnedOn]);
+		nextEdgeIds[0] &&
+			setEdgeActive(nextEdgeIds[0], (incoming && active) || false);
+	}, [prevEdgeIds, nextEdgeIds, setEdgeActive, incoming, active]);
 
 	return (
 		<Flex
@@ -61,8 +46,8 @@ const Switch: React.FC<Props> = observer(({ id, data }) => {
 		>
 			<Title style={{ color: '#000', margin: 0 }}>
 				<MinusOutlined
-					onClick={toggleTurnedOn}
-					style={{ rotate: `${rotation + (turnedOn ? 0 : 90)}deg` }}
+					onClick={toggleSwitch}
+					style={{ rotate: `${rotation + (active ? 0 : 90)}deg` }}
 				/>
 			</Title>
 			<NodeUtils id={id} />
@@ -70,7 +55,7 @@ const Switch: React.FC<Props> = observer(({ id, data }) => {
 				id='a'
 				type='target'
 				position={'left' as Position}
-				active={active}
+				active={incoming}
 				rotation={rotation}
 				nodeId={id}
 			/>
@@ -78,7 +63,7 @@ const Switch: React.FC<Props> = observer(({ id, data }) => {
 				id='b'
 				type='source'
 				position={'right' as Position}
-				active={active && turnedOn}
+				active={incoming && active}
 				rotation={rotation}
 				nodeId={id}
 			/>

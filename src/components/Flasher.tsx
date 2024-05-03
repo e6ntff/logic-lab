@@ -8,73 +8,72 @@ import {
 	PlusCircleOutlined,
 	RightOutlined,
 } from '@ant-design/icons';
-import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Edge, Node, Position, getConnectedEdges } from 'reactflow';
+import { useCallback, useEffect } from 'react';
+import { Position } from 'reactflow';
 import Connector from './Connector';
 import NodeUtils from './NodeUtils';
+import GetEdges from '../utils/getEdges';
 
 interface Props {
 	id: string;
-	data: { plusDelay: number; minusDelay: number; rotation: number };
+	data: {
+		plusDelay: number;
+		minusDelay: number;
+		rotation: number;
+		active: boolean;
+	};
 }
 
 const Flasher: React.FC<Props> = observer(({ id, data }) => {
-	const { edges, setEdgeActive, setNodeParameters, nodes } = appStore;
+	const { setEdgeActive, setNodeParameters } = appStore;
 
-	const { plusDelay, minusDelay, rotation } = data;
-
-	const [active, setActive] = useState<boolean>(true);
+	const { plusDelay, minusDelay, rotation, active } = data;
 
 	useEffect(() => {
 		let timerId: NodeJS.Timer;
-		if (active) timerId = setInterval(() => setActive(false), plusDelay);
+		if (active)
+			timerId = setInterval(
+				() => setNodeParameters(id, { active: false }),
+				plusDelay
+			);
 
 		return () => clearInterval(timerId);
-	}, [plusDelay, active]);
+	}, [plusDelay, active, setNodeParameters, id]);
 
 	useEffect(() => {
 		let timerId: NodeJS.Timer;
-		if (!active) timerId = setInterval(() => setActive(true), minusDelay);
+		if (!active)
+			timerId = setInterval(
+				() => setNodeParameters(id, { active: true }),
+				minusDelay
+			);
 
 		return () => clearInterval(timerId);
-	}, [minusDelay, active]);
+	}, [minusDelay, active, setNodeParameters, id]);
 
-	const node = useMemo(
-		() => nodes.find((node: Node<any, string | undefined>) => node.id === id),
-		[nodes, id]
-	);
-
-	const connectedEdges = useMemo(
-		() => (node ? getConnectedEdges([node], edges) : edges),
-		[edges, node]
-	);
-
-	const nextEdgeId: string | undefined = useMemo(
-		() => connectedEdges.find((edge: Edge<any>) => edge.source === id)?.id,
-		[connectedEdges, id]
-	);
+	const { nextEdgeIds } = GetEdges(id, { prev: true, next: true });
 
 	const handlePlusDelayChange = useCallback(
 		(diff: number) => {
 			const newDelay = plusDelay + diff;
 			if (newDelay > 10000 || newDelay < 100) return;
-			setNodeParameters(node, { plusDelay: newDelay });
+			setNodeParameters(id, { plusDelay: newDelay });
 		},
-		[setNodeParameters, plusDelay, node]
+		[setNodeParameters, plusDelay, id]
 	);
 
 	const handleMinusDelayChange = useCallback(
 		(diff: number) => {
 			const newDelay = minusDelay + diff;
 			if (newDelay > 10000 || newDelay < 100) return;
-			setNodeParameters(node, { minusDelay: newDelay });
+			setNodeParameters(id, { minusDelay: newDelay });
 		},
-		[setNodeParameters, minusDelay, node]
+		[setNodeParameters, minusDelay, id]
 	);
 
 	useEffect(() => {
-		nextEdgeId && setEdgeActive(nextEdgeId, active);
-	}, [setEdgeActive, id, nextEdgeId, active]);
+		nextEdgeIds[0] && setEdgeActive(nextEdgeIds[0], active);
+	}, [setEdgeActive, id, nextEdgeIds, active]);
 
 	return (
 		<Flex

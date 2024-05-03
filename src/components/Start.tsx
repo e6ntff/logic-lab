@@ -2,40 +2,23 @@ import { observer } from 'mobx-react-lite';
 import { blockStyle } from '../utils/blockStyles';
 import appStore from '../utils/appStore';
 import { Flex, Switch } from 'antd';
-import { useEffect, useMemo, useState } from 'react';
-import { Edge, Node, Position, getConnectedEdges } from 'reactflow';
+import { useCallback, useEffect } from 'react';
+import { Position } from 'reactflow';
 import NodeUtils from './NodeUtils';
 import Connector from './Connector';
+import GetEdges from '../utils/getEdges';
 
 interface Props {
 	id: string;
-	data: { rotation: number };
+	data: { rotation: number; active: boolean };
 }
 
 const Start: React.FC<Props> = observer(({ id, data }) => {
-	const { edges, setEdgeActive, nodes } = appStore;
+	const { setEdgeActive, setNodeParameters } = appStore;
 
-	const { rotation } = data;
+	const { rotation, active } = data;
 
-	const [active, setActive] = useState<boolean>(true);
-
-	const node = useMemo(
-		() => nodes.find((node: Node<any, string | undefined>) => node.id === id),
-		[nodes, id]
-	);
-
-	const connectedEdges = useMemo(
-		() => (node ? getConnectedEdges([node], edges) : edges),
-		[edges, node]
-	);
-
-	const nextEdgeIds: string[] = useMemo(
-		() =>
-			connectedEdges
-				.filter((edge: Edge<any>) => edge.source === id)
-				?.map((edge: Edge<any>) => edge.id),
-		[connectedEdges, id]
-	);
+	const { nextEdgeIds } = GetEdges(id, { prev: true, next: true });
 
 	useEffect(() => {
 		try {
@@ -45,6 +28,11 @@ const Start: React.FC<Props> = observer(({ id, data }) => {
 		} catch (error) {}
 	}, [setEdgeActive, id, nextEdgeIds, active]);
 
+	const handleSwitchChange = useCallback(
+		(active: boolean) => setNodeParameters(id, { active: active }),
+		[setNodeParameters, id]
+	);
+
 	return (
 		<Flex
 			style={blockStyle}
@@ -52,7 +40,7 @@ const Start: React.FC<Props> = observer(({ id, data }) => {
 			align='center'
 		>
 			<Switch
-				onChange={setActive}
+				onChange={handleSwitchChange}
 				value={active}
 			/>
 			<NodeUtils id={id} />

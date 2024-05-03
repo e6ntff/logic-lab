@@ -7,53 +7,40 @@ import {
 	PlayCircleOutlined,
 	RightOutlined,
 } from '@ant-design/icons';
-import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Edge, Node, Position, getConnectedEdges } from 'reactflow';
+import { useCallback, useEffect } from 'react';
+import { Position } from 'reactflow';
 import Connector from './Connector';
 import NodeUtils from './NodeUtils';
+import GetEdges from '../utils/getEdges';
 
 interface Props {
 	id: string;
-	data: { delay: number; rotation: number };
+	data: { delay: number; rotation: number; active: boolean };
 }
 
 const Button: React.FC<Props> = observer(({ id, data }) => {
-	const { edges, setEdgeActive, nodes, setNodeParameters } = appStore;
+	const { setEdgeActive, setNodeParameters } = appStore;
 
-	const { delay, rotation } = data;
+	const { delay, rotation, active } = data;
 
-	const [active, setActive] = useState<boolean>(false);
-
-	useEffect(() => {
-		if (active) setTimeout(() => setActive(false), delay);
-	}, [delay, active]);
-
-	const node = useMemo(
-		() => nodes.find((node: Node<any, string | undefined>) => node.id === id),
-		[nodes, id]
-	);
-
-	const connectedEdges = useMemo(
-		() => (node ? getConnectedEdges([node], edges) : edges),
-		[edges, node]
-	);
-
-	const nextEdgeId: string | undefined = useMemo(
-		() => connectedEdges.find((edge: Edge<any>) => edge.source === id)?.id,
-		[connectedEdges, id]
-	);
+	const { nextEdgeIds } = GetEdges(id, { prev: true, next: true });
 
 	useEffect(() => {
-		nextEdgeId && setEdgeActive(nextEdgeId, active);
-	}, [setEdgeActive, id, nextEdgeId, active]);
+		if (active)
+			setTimeout(() => setNodeParameters(id, { active: false }), delay);
+	}, [delay, active, setNodeParameters, id]);
+
+	useEffect(() => {
+		nextEdgeIds[0] && setEdgeActive(nextEdgeIds[0], active);
+	}, [setEdgeActive, id, nextEdgeIds, active]);
 
 	const handleDelayChange = useCallback(
 		(diff: number) => {
 			const newDelay = delay + diff;
 			if (newDelay > 10000 || newDelay < 100) return;
-			setNodeParameters(node, { delay: newDelay });
+			setNodeParameters(id, { delay: newDelay });
 		},
-		[setNodeParameters, delay, node]
+		[setNodeParameters, delay, id]
 	);
 
 	return (
@@ -63,7 +50,7 @@ const Button: React.FC<Props> = observer(({ id, data }) => {
 			justify='space-around'
 			align='center'
 		>
-			<ButtonAntd onClick={() => setActive(true)}>
+			<ButtonAntd onClick={() => setNodeParameters(id, { active: true })}>
 				<PlayCircleOutlined />
 			</ButtonAntd>
 			<Flex gap={4}>

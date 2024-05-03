@@ -26,13 +26,13 @@ const Panel: React.FC = observer(() => {
 				blockSize: 'min-content',
 			}}
 		>
-			<Button onClick={() => addNode('start')}>
+			<Button onClick={() => addNode('start', { active: true })}>
 				<ApiOutlined />
 			</Button>
-			<Button onClick={() => addNode('button', { delay: 1000 })}>
+			<Button onClick={() => addNode('button', { active: false, delay: 1000 })}>
 				<PlayCircleOutlined />
 			</Button>
-			<Button onClick={() => addNode('switch')}>
+			<Button onClick={() => addNode('switch', { active: true })}>
 				<DisconnectOutlined />
 			</Button>
 			<Button onClick={() => addNode('and')}>&</Button>
@@ -44,12 +44,16 @@ const Panel: React.FC = observer(() => {
 			</Button>
 			<Button
 				onClick={() =>
-					addNode('flasher', { plusDelay: 1000, minusDelay: 1000 })
+					addNode('flasher', {
+						active: true,
+						plusDelay: 1000,
+						minusDelay: 1000,
+					})
 				}
 			>
 				<HistoryOutlined />
 			</Button>
-			<Button onClick={() => addNode('delay', { delay: 1000 })}>
+			<Button onClick={() => addNode('delay', { active: false, delay: 1000 })}>
 				<EllipsisOutlined />
 			</Button>
 			<Button onClick={() => addNode('end')}>
