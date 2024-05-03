@@ -30,25 +30,27 @@ const Panel: React.FC = observer(() => {
 				blockSize: 'min-content',
 			}}
 		>
-			<Button onClick={() => addNode('start', { active: true })}>
+			<Button onClick={() => addNode(null, 'start', { active: true })}>
 				<PoweroffOutlined />
 			</Button>
-			<Button onClick={() => addNode('button', { active: false, delay: 1000 })}>
+			<Button
+				onClick={() => addNode(null, 'button', { active: false, delay: 1000 })}
+			>
 				<PlayCircleOutlined />
 			</Button>
-			<Button onClick={() => addNode('switch', { active: true })}>
+			<Button onClick={() => addNode(null, 'switch', { active: true })}>
 				<DisconnectOutlined />
 			</Button>
-			<Button onClick={() => addNode('and')}>&</Button>
-			<Button onClick={() => addNode('or')}>||</Button>
-			<Button onClick={() => addNode('xor')}>⊕</Button>
-			<Button onClick={() => addNode('not')}>!</Button>
-			<Button onClick={() => addNode('splitter')}>
+			<Button onClick={() => addNode(null, 'and')}>&</Button>
+			<Button onClick={() => addNode(null, 'or')}>||</Button>
+			<Button onClick={() => addNode(null, 'xor')}>⊕</Button>
+			<Button onClick={() => addNode(null, 'not')}>!</Button>
+			<Button onClick={() => addNode(null, 'splitter')}>
 				<ShareAltOutlined />
 			</Button>
 			<Button
 				onClick={() =>
-					addNode('flasher', {
+					addNode(null, 'flasher', {
 						active: true,
 						plusDelay: 1000,
 						minusDelay: 1000,
@@ -57,15 +59,17 @@ const Panel: React.FC = observer(() => {
 			>
 				<HistoryOutlined />
 			</Button>
-			<Button onClick={() => addNode('delay', { active: false, delay: 1000 })}>
+			<Button
+				onClick={() => addNode(null, 'delay', { active: false, delay: 1000 })}
+			>
 				<EllipsisOutlined />
 			</Button>
 			<TransmitterPanel
-				addIn={() => addNode('transmitterIn', { remoteId: 0 })}
-				addOut={() => addNode('transmitterOut', { remoteId: 0 })}
-				addReceiver={() => addNode('receiver', { remoteId: 0 })}
+				addIn={() => addNode(null, 'transmitterIn', { remoteId: 0 })}
+				addOut={() => addNode(null, 'transmitterOut', { remoteId: 0 })}
+				addReceiver={() => addNode(null, 'receiver', { remoteId: 0 })}
 			/>
-			<Button onClick={() => addNode('end')}>
+			<Button onClick={() => addNode(null, 'end')}>
 				<BulbOutlined />
 			</Button>
 		</Flex>

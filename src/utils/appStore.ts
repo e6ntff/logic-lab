@@ -10,9 +10,8 @@ import uniqid from 'uniqid';
 import { nodeType } from './types';
 
 class AppStore {
-	nodes: Node<any, string | undefined>[] = JSON.parse(
-		localStorage.getItem('nodes') || '[]'
-	);
+	loading: number = 0;
+	nodes: Node<any, string | undefined>[] = [];
 	edges: Edge<any>[] = JSON.parse(localStorage.getItem('edges') || '[]');
 	activeEdges: { [key: string]: boolean } = {};
 	remoteConnections: {
@@ -21,6 +20,14 @@ class AppStore {
 			out: boolean;
 		};
 	} = {};
+
+	setLoaded = (value: number) => {
+		this.loading = value;
+	};
+
+	setNodes = (nodes: typeof this.nodes) => {
+		this.nodes = nodes;
+	};
 
 	setRemoteConnectionValues = (
 		id: number,
@@ -54,7 +61,8 @@ class AppStore {
 	};
 
 	addNode = (
-		type: nodeType,
+		existing?: Node<any, string | undefined> | null,
+		type?: nodeType,
 		props?: {
 			remoteId?: number;
 			active?: boolean;
@@ -63,7 +71,7 @@ class AppStore {
 			minusDelay?: number;
 		}
 	) => {
-		const node: Node<any, string | undefined> = {
+		const node: Node<any, string | undefined> = existing || {
 			id: uniqid(),
 			position: { x: 0, y: 0 },
 			data: {

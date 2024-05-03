@@ -12,13 +12,45 @@ import appStore from './utils/appStore';
 import Panel from './components/Panel';
 import MessageButton from './components/MessageButton';
 import FpsScreen from './components/FpsScreen';
+import { useEffect } from 'react';
+import getNodes from './utils/getNodes';
+import { Flex, Progress } from 'antd';
 
 const App: React.FC = observer(() => {
-	const { nodes, edges, updateNodes, updateEdges, updateConnections } =
+	const { loading, nodes, edges, updateNodes, updateEdges, updateConnections } =
 		appStore;
+
+	useEffect(() => {
+		getNodes();
+		// eslint-disable-next-line
+	}, []);
 
 	return (
 		<>
+			{loading < 1 && (
+				<Flex
+					vertical
+					gap={16}
+					justify='center'
+					align='center'
+					style={{
+						zIndex: 99999,
+						background: '#fff',
+						inlineSize: '100%',
+						blockSize: '100%',
+						position: 'absolute',
+						inset: 0,
+					}}
+				>
+					<Progress
+						type='circle'
+						percent={loading * 100}
+						format={(value: number | undefined) => (
+							<>{`${Math.round(value || 0)}%`}</>
+						)}
+					/>
+				</Flex>
+			)}
 			<Panel />
 			<ReactFlow
 				minZoom={0.01}
