@@ -11,6 +11,9 @@ import Delay from '../components/Delay';
 import Switch from '../components/Switch';
 import ButtonAntd from '../components/Button';
 import Xor from '../components/Xor';
+import TransmitterIn from '../components/TransmitterIn';
+import TransmitterOut from '../components/TransmitterOut';
+import Receiver from '../components/Receiver';
 
 export type nodeType =
 	| 'and'
@@ -23,6 +26,9 @@ export type nodeType =
 	| 'button'
 	| 'switch'
 	| 'start'
+	| 'transmitterIn'
+	| 'transmitterOut'
+	| 'receiver'
 	| 'end';
 
 export type edgeType = 'wire';
@@ -39,6 +45,9 @@ export const nodeTypes: NodeTypes = {
 	delay: Delay,
 	switch: Switch,
 	button: ButtonAntd,
+	transmitterIn: TransmitterIn,
+	transmitterOut: TransmitterOut,
+	receiver: Receiver,
 };
 
 export const edgeTypes: EdgeTypes = { wire: Wire };

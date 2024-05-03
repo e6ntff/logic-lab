@@ -15,6 +15,26 @@ class AppStore {
 	);
 	edges: Edge<any>[] = JSON.parse(localStorage.getItem('edges') || '[]');
 	activeEdges: { [key: string]: boolean } = {};
+	remoteConnections: {
+		[key: number]: {
+			in: boolean;
+			out: boolean;
+		};
+	} = {};
+
+	setRemoteConnectionValues = (
+		id: number,
+		type: 'in' | 'out',
+		value: boolean
+	) => {
+		this.remoteConnections = {
+			...this.remoteConnections,
+			[id]: {
+				...this.remoteConnections[id],
+				[type]: value,
+			},
+		};
+	};
 
 	setEdgeActive = (id: string, active: boolean) => {
 		this.activeEdges = { ...this.activeEdges, [id]: active };
@@ -36,6 +56,7 @@ class AppStore {
 	addNode = (
 		type: nodeType,
 		props?: {
+			remoteId?: number;
 			active?: boolean;
 			delay?: number;
 			plusDelay?: number;
@@ -62,6 +83,7 @@ class AppStore {
 			delay?: number;
 			plusDelay?: number;
 			minusDelay?: number;
+			remoteId?: number;
 		}
 	) => {
 		const node = this.nodes.find(

@@ -1,11 +1,15 @@
-import { Button, Flex } from 'antd';
+import { Button, Flex, Tooltip } from 'antd';
 import { observer } from 'mobx-react-lite';
 import appStore from '../utils/appStore';
 import {
+	ApiOutlined,
 	BulbOutlined,
+	CloudOutlined,
 	DisconnectOutlined,
 	EllipsisOutlined,
 	HistoryOutlined,
+	LoginOutlined,
+	LogoutOutlined,
 	PlayCircleOutlined,
 	PoweroffOutlined,
 	ShareAltOutlined,
@@ -56,6 +60,11 @@ const Panel: React.FC = observer(() => {
 			<Button onClick={() => addNode('delay', { active: false, delay: 1000 })}>
 				<EllipsisOutlined />
 			</Button>
+			<TransmitterPanel
+				addIn={() => addNode('transmitterIn', { remoteId: 0 })}
+				addOut={() => addNode('transmitterOut', { remoteId: 0 })}
+				addReceiver={() => addNode('receiver', { remoteId: 0 })}
+			/>
 			<Button onClick={() => addNode('end')}>
 				<BulbOutlined />
 			</Button>
@@ -64,3 +73,45 @@ const Panel: React.FC = observer(() => {
 });
 
 export default Panel;
+
+interface PanelProps {
+	addIn: () => void;
+	addOut: () => void;
+	addReceiver: () => void;
+}
+
+const TransmitterPanel: React.FC<PanelProps> = observer(
+	({ addIn, addOut, addReceiver }) => {
+		return (
+			<Tooltip
+				placement='right'
+				trigger='click'
+				overlayInnerStyle={{ background: '#0000', boxShadow: 'none' }}
+				arrow={false}
+				title={
+					<Flex
+						vertical
+						align='start'
+						gap={8}
+					>
+						<Flex gap={8}>
+							<Button onClick={addIn}>
+								<LoginOutlined />
+							</Button>
+							<Button onClick={addOut}>
+								<LogoutOutlined />
+							</Button>
+						</Flex>
+						<Button onClick={addReceiver}>
+							<ApiOutlined />
+						</Button>
+					</Flex>
+				}
+			>
+				<Button>
+					<CloudOutlined />
+				</Button>
+			</Tooltip>
+		);
+	}
+);
