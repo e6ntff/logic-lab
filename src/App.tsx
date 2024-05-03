@@ -11,6 +11,7 @@ import { edgeTypes, nodeTypes } from './utils/types';
 import appStore from './utils/appStore';
 import Panel from './components/Panel';
 import MessageButton from './components/MessageButton';
+import FpsScreen from './components/FpsScreen';
 
 const App: React.FC = observer(() => {
 	const { nodes, edges, updateNodes, updateEdges, updateConnections } =
@@ -47,6 +48,7 @@ const App: React.FC = observer(() => {
 				/>
 			</ReactFlow>
 			<MessageButton />
+			<FpsScreen />
 		</>
 	);
 });
