@@ -43,13 +43,27 @@ const Connector: React.FC<Props> = observer(
 
 		const { nodeInternals, edges } = useStore(selector);
 
+		const node = useMemo(
+			() => nodeInternals.get(nodeId),
+			[nodeInternals, nodeId]
+		);
+
+		const connectedEdges = useMemo(
+			() =>
+				getConnectedEdges([node], edges).filter(
+					(edge: Edge<any>) => edge[type] === nodeId
+				),
+			[edges, node, type, nodeId]
+		);
+
 		const isHandleConnectable = useMemo(() => {
-			const node = nodeInternals.get(nodeId);
-			const connectedEdges = getConnectedEdges([node], edges).filter(
-				(edge: Edge<any>) => edge[type] === nodeId
-			);
 			return connectedEdges.length < maxConnections;
-		}, [nodeInternals, edges, nodeId, maxConnections, type]);
+		}, [connectedEdges, maxConnections]);
+
+		const text = useMemo(() => {
+			if (maxConnections === Infinity) return '∞';
+			return `${connectedEdges.length}/${maxConnections}`;
+		}, [maxConnections, connectedEdges]);
 
 		return (
 			<Handle
@@ -73,9 +87,7 @@ const Connector: React.FC<Props> = observer(
 					justify='center'
 					align='center'
 				>
-					<Typography.Text style={{ color: '#fff' }}>
-						{maxConnections === Infinity ? '∞' : maxConnections}
-					</Typography.Text>
+					<Typography.Text style={{ color: '#fff' }}>{text}</Typography.Text>
 				</Flex>
 			</Handle>
 		);
