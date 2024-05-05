@@ -8,54 +8,53 @@ import {
 	PlusCircleOutlined,
 	RightOutlined,
 } from '@ant-design/icons';
-import { useCallback, useEffect } from 'react';
+import { useCallback, useEffect, useMemo } from 'react';
 import { Position } from 'reactflow';
 import Connector from './Connector';
 import NodeUtils from './NodeUtils';
 import GetEdges from '../utils/getEdges';
+import getNodeParameters from '../utils/getNodeParameters';
 
 interface Props {
 	id: string;
-	data: {
-		plusDelay: number;
-		minusDelay: number;
-		rotation: number;
-		active: boolean;
-	};
 }
 
-const Flasher: React.FC<Props> = observer(({ id, data }) => {
-	const { setEdgeActive, setNodeParameters } = appStore;
+const Flasher: React.FC<Props> = observer(({ id }) => {
+	const { setEdgeActive, setNodeParameters, nodesData } = appStore;
 
-	const { plusDelay, minusDelay, rotation, active } = data;
+	const { plusDelay, minusDelay, active } = useMemo(
+		() => getNodeParameters(id),
+		// eslint-disable-next-line
+		[nodesData[id]]
+	);
 
 	useEffect(() => {
 		let timerId: NodeJS.Timer;
 		if (active)
-			timerId = setInterval(
+			timerId = setTimeout(
 				() => setNodeParameters(id, { active: false }),
 				plusDelay
 			);
 
-		return () => clearInterval(timerId);
+		return () => clearTimeout(timerId);
 	}, [plusDelay, active, setNodeParameters, id]);
 
 	useEffect(() => {
 		let timerId: NodeJS.Timer;
 		if (!active)
-			timerId = setInterval(
+			timerId = setTimeout(
 				() => setNodeParameters(id, { active: true }),
 				minusDelay
 			);
 
-		return () => clearInterval(timerId);
+		return () => clearTimeout(timerId);
 	}, [minusDelay, active, setNodeParameters, id]);
 
 	const { nextEdgeIds } = GetEdges(id, { prev: true, next: true });
 
 	const handlePlusDelayChange = useCallback(
 		(diff: number) => {
-			const newDelay = plusDelay + diff;
+			const newDelay = (plusDelay || 0) + diff;
 			if (newDelay > 10000 || newDelay < 100) return;
 			setNodeParameters(id, { plusDelay: newDelay });
 		},
@@ -64,7 +63,7 @@ const Flasher: React.FC<Props> = observer(({ id, data }) => {
 
 	const handleMinusDelayChange = useCallback(
 		(diff: number) => {
-			const newDelay = minusDelay + diff;
+			const newDelay = (minusDelay || 0) + diff;
 			if (newDelay > 10000 || newDelay < 100) return;
 			setNodeParameters(id, { minusDelay: newDelay });
 		},
@@ -72,7 +71,7 @@ const Flasher: React.FC<Props> = observer(({ id, data }) => {
 	);
 
 	useEffect(() => {
-		nextEdgeIds[0] && setEdgeActive(nextEdgeIds[0], active);
+		nextEdgeIds[0] && setEdgeActive(nextEdgeIds[0], active || false);
 	}, [setEdgeActive, id, nextEdgeIds, active]);
 
 	return (
@@ -91,7 +90,9 @@ const Flasher: React.FC<Props> = observer(({ id, data }) => {
 					<PlusCircleOutlined />
 					<Flex align='center'>
 						<LeftOutlined onClick={() => handlePlusDelayChange(-100)} />
-						<Typography.Text>{(plusDelay / 1000).toFixed(1)}</Typography.Text>
+						<Typography.Text>
+							{((plusDelay || 0) / 1000).toFixed(1)}
+						</Typography.Text>
 						<RightOutlined onClick={() => handlePlusDelayChange(100)} />
 					</Flex>
 				</Flex>
@@ -99,7 +100,9 @@ const Flasher: React.FC<Props> = observer(({ id, data }) => {
 					<MinusCircleOutlined />
 					<Flex align='center'>
 						<LeftOutlined onClick={() => handleMinusDelayChange(-100)} />
-						<Typography.Text>{(minusDelay / 1000).toFixed(1)}</Typography.Text>
+						<Typography.Text>
+							{((minusDelay || 0) / 1000).toFixed(1)}
+						</Typography.Text>
 						<RightOutlined onClick={() => handleMinusDelayChange(100)} />
 					</Flex>
 				</Flex>
@@ -109,8 +112,7 @@ const Flasher: React.FC<Props> = observer(({ id, data }) => {
 				id='a'
 				type='source'
 				position={'right' as Position}
-				active={active}
-				rotation={rotation}
+				active={active || false}
 				nodeId={id}
 			/>
 		</Flex>

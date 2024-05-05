@@ -1,6 +1,9 @@
 import { Position } from 'reactflow';
 
-const getHandlePosition = (position: Position, rotation: number) => {
+const getHandlePosition = (
+	position: Position,
+	rotation: number | undefined
+) => {
 	switch (position) {
 		case 'top':
 			if (rotation === 90) {

@@ -3,8 +3,6 @@ import appStore from './appStore';
 const getNodes = () => {
 	const { setNodes, addNode, setLoaded } = appStore;
 
-	const delayStep = 50;
-
 	setLoaded(0);
 
 	const nodes: typeof appStore.nodes = JSON.parse(
@@ -22,7 +20,7 @@ const getNodes = () => {
 		setTimeout(() => {
 			addNode(node);
 			setLoaded(++index / nodes.length || 0);
-		}, delayStep * index);
+		});
 	});
 };
 

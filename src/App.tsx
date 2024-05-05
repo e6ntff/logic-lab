@@ -4,7 +4,10 @@ import ReactFlow, {
 	BackgroundVariant,
 	Controls,
 	MiniMap,
+	Node,
 	SelectionMode,
+	Viewport,
+	useOnViewportChange,
 } from 'reactflow';
 import 'reactflow/dist/style.css';
 import { edgeTypes, nodeTypes } from './utils/types';
@@ -12,13 +15,27 @@ import appStore from './utils/appStore';
 import Panel from './components/Panel';
 import MessageButton from './components/MessageButton';
 import FpsScreen from './components/FpsScreen';
-import { useEffect } from 'react';
+import React, { useCallback, useEffect } from 'react';
 import getNodes from './utils/getNodes';
 import { Flex, Progress } from 'antd';
 
 const App: React.FC = observer(() => {
-	const { loading, nodes, edges, updateNodes, updateEdges, updateConnections } =
-		appStore;
+	const {
+		loading,
+		nodes,
+		edges,
+		updateNodes,
+		updateEdges,
+		updateConnections,
+		removeNode,
+		viewport,
+	} = appStore;
+
+	const handleNodesDeleting = useCallback(
+		(nodes: Node<any, string | undefined>[]) =>
+			nodes.forEach(({ id }: Node<any, string | undefined>) => removeNode(id)),
+		[removeNode]
+	);
 
 	useEffect(() => {
 		getNodes();
@@ -53,8 +70,8 @@ const App: React.FC = observer(() => {
 			)}
 			<Panel />
 			<ReactFlow
+				defaultViewport={viewport}
 				minZoom={0.01}
-				fitView
 				snapToGrid
 				snapGrid={[30, 30]}
 				nodeTypes={nodeTypes}
@@ -62,10 +79,12 @@ const App: React.FC = observer(() => {
 				onNodesChange={updateNodes}
 				onEdgesChange={updateEdges}
 				onConnect={updateConnections}
+				onNodesDelete={handleNodesDeleting}
 				nodes={nodes}
 				edges={edges}
 				selectionMode={SelectionMode.Partial}
 			>
+				<ViewportChangeHandler />
 				<Background
 					gap={[30, 30]}
 					variant={BackgroundVariant.Lines}
@@ -86,3 +105,21 @@ const App: React.FC = observer(() => {
 });
 
 export default App;
+
+const ViewportChangeHandler: React.FC = observer(() => {
+	const { setViewport } = appStore;
+
+	const save = useCallback(
+		(viewport: Viewport) => {
+			sessionStorage.setItem('viewport', JSON.stringify(viewport));
+			setViewport(viewport);
+		},
+		[setViewport]
+	);
+
+	useOnViewportChange({
+		onEnd: save,
+	});
+
+	return null;
+});

@@ -5,32 +5,34 @@ import {
 	Handle,
 	HandleType,
 	Position,
-	getConnectedEdges,
-	useStore,
 	useUpdateNodeInternals,
 } from 'reactflow';
 import getHandlePosition from '../utils/getHandlePosition';
 import { connectorStyle } from '../utils/blockStyles';
 import { Flex, Typography } from 'antd';
+import appStore from '../utils/appStore';
+import GetNodeParameters from '../utils/getNodeParameters';
 
 interface Props {
 	active: boolean | null;
 	type: HandleType;
 	id: string;
 	position: Position;
-	rotation: number;
 	nodeId: string;
 	maxConnections?: number;
 }
 
-const selector = (s: any) => ({
-	nodeInternals: s.nodeInternals,
-	edges: s.edges,
-});
-
 const Connector: React.FC<Props> = observer(
-	({ active, type, id, position, rotation, nodeId, maxConnections = 1 }) => {
+	({ active, type, id, position, nodeId, maxConnections = 1 }) => {
 		const updateNodeInternals = useUpdateNodeInternals();
+
+		const { nodesData, connections } = appStore;
+
+		const { rotation } = useMemo(
+			() => GetNodeParameters(id),
+			// eslint-disable-next-line
+			[nodesData[id]]
+		);
 
 		const computedPosition = useMemo(
 			() => getHandlePosition(position, rotation),
@@ -41,20 +43,20 @@ const Connector: React.FC<Props> = observer(
 			updateNodeInternals(nodeId);
 		}, [computedPosition, nodeId, updateNodeInternals]);
 
-		const { nodeInternals, edges } = useStore(selector);
+		const connectedEdges = useMemo(() => {
+			let prev: Edge<any>[] = [];
+			let next: Edge<any>[] = [];
+			try {
+				prev = Object.values(connections[nodeId]?.prev);
+			} catch (error) {}
 
-		const node = useMemo(
-			() => nodeInternals.get(nodeId),
-			[nodeInternals, nodeId]
-		);
-
-		const connectedEdges = useMemo(
-			() =>
-				getConnectedEdges([node], edges).filter(
-					(edge: Edge<any>) => edge[type] === nodeId
-				),
-			[edges, node, type, nodeId]
-		);
+			try {
+				next = Object.values(connections[nodeId]?.next);
+			} catch (error) {}
+			return [...prev, ...next].filter((edge: Edge<any>) => {
+				return edge[type] === nodeId;
+			});
+		}, [nodeId, connections, type]);
 
 		const isHandleConnectable = useMemo(() => {
 			return connectedEdges.length < maxConnections;

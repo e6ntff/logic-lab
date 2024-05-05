@@ -7,26 +7,25 @@ import {
 import { observer } from 'mobx-react-lite';
 import appStore from '../utils/appStore';
 import { useCallback, useMemo } from 'react';
-import { Node } from 'reactflow';
 import { Flex } from 'antd';
+import GetNodeParameters from '../utils/getNodeParameters';
 
 interface Props {
 	id: string;
 }
 
 const NodeUtils: React.FC<Props> = observer(({ id }) => {
-	const { setNodeParameters, nodes, removeNode } = appStore;
+	const { setNodeParameters, removeNode, nodesData } = appStore;
 
-	const node: Node<any, string | undefined> | undefined = useMemo(
-		() => nodes.find((node: Node<any, string | undefined>) => node.id === id),
-		[nodes, id]
+	const { rotation } = useMemo(
+		() => GetNodeParameters(id),
+		// eslint-disable-next-line
+		[nodesData[id]]
 	);
-
-	const rotation = useMemo(() => node?.data?.rotation, [node]);
 
 	const handleNodeRotation = useCallback(
 		(right: boolean) => {
-			let newRotation: number = (rotation + (right ? 90 : -90)) % 360;
+			let newRotation: number = ((rotation || 0) + (right ? 90 : -90)) % 360;
 			if (newRotation === -90) newRotation = 270;
 			setNodeParameters(id, { rotation: newRotation });
 		},

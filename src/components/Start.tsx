@@ -2,28 +2,32 @@ import { observer } from 'mobx-react-lite';
 import { blockStyle } from '../utils/blockStyles';
 import appStore from '../utils/appStore';
 import { Flex, Switch } from 'antd';
-import { useCallback, useEffect } from 'react';
+import { useCallback, useEffect, useMemo } from 'react';
 import { Position } from 'reactflow';
 import NodeUtils from './NodeUtils';
 import Connector from './Connector';
 import GetEdges from '../utils/getEdges';
+import GetNodeParameters from '../utils/getNodeParameters';
 
 interface Props {
 	id: string;
-	data: { rotation: number; active: boolean };
 }
 
-const Start: React.FC<Props> = observer(({ id, data }) => {
-	const { setEdgeActive, setNodeParameters } = appStore;
+const Start: React.FC<Props> = observer(({ id }) => {
+	const { setEdgeActive, setNodeParameters, nodesData } = appStore;
 
-	const { rotation, active } = data;
+	const { active } = useMemo(
+		() => GetNodeParameters(id),
+		// eslint-disable-next-line
+		[nodesData[id]]
+	);
 
 	const { nextEdgeIds } = GetEdges(id, { prev: false, next: true });
 
 	useEffect(() => {
 		try {
 			nextEdgeIds.forEach((id: string) => {
-				setEdgeActive(id, active);
+				setEdgeActive(id, active || false);
 			});
 		} catch (error) {}
 	}, [setEdgeActive, id, nextEdgeIds, active]);
@@ -48,8 +52,7 @@ const Start: React.FC<Props> = observer(({ id, data }) => {
 				id='a'
 				type='source'
 				position={'right' as Position}
-				active={active}
-				rotation={rotation}
+				active={active || false}
 				nodeId={id}
 			/>
 		</Flex>

@@ -11,17 +11,14 @@ import GetEdges from '../utils/getEdges';
 
 interface Props {
 	id: string;
-	data: { rotation: number };
 }
 
-const And: React.FC<Props> = observer(({ id, data }) => {
+const And: React.FC<Props> = observer(({ id }) => {
 	const { setEdgeActive, activeEdges } = appStore;
-
-	const { rotation } = data;
 
 	const { prevEdgeIds, nextEdgeIds } = GetEdges(id, { prev: true, next: true });
 
-	const active: boolean | null = useMemo(
+	const active: boolean = useMemo(
 		() =>
 			prevEdgeIds.length > 0 &&
 			prevEdgeIds.every((id: string) => activeEdges[id]),
@@ -46,7 +43,6 @@ const And: React.FC<Props> = observer(({ id, data }) => {
 				type='target'
 				position={'left' as Position}
 				active={active}
-				rotation={rotation}
 				nodeId={id}
 				maxConnections={Infinity}
 			/>
@@ -55,7 +51,6 @@ const And: React.FC<Props> = observer(({ id, data }) => {
 				type='source'
 				position={'right' as Position}
 				active={active}
-				rotation={rotation}
 				nodeId={id}
 			/>
 		</Flex>

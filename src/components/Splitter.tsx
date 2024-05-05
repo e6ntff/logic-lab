@@ -12,13 +12,10 @@ import GetEdges from '../utils/getEdges';
 
 interface Props {
 	id: string;
-	data: { rotation: number };
 }
 
-const Splitter: React.FC<Props> = observer(({ id, data }) => {
+const Splitter: React.FC<Props> = observer(({ id }) => {
 	const { setEdgeActive, activeEdges } = appStore;
-
-	const { rotation } = data;
 
 	const { prevEdgeIds, nextEdgeIds } = GetEdges(id, { prev: true, next: true });
 
@@ -40,7 +37,7 @@ const Splitter: React.FC<Props> = observer(({ id, data }) => {
 			justify='center'
 			align='center'
 		>
-			<Title style={{ color: '#000', margin: 0 }}>
+			<Title style={{ margin: 0 }}>
 				<ShareAltOutlined />
 			</Title>
 			<NodeUtils id={id} />
@@ -49,7 +46,6 @@ const Splitter: React.FC<Props> = observer(({ id, data }) => {
 				type='target'
 				position={'left' as Position}
 				active={active}
-				rotation={rotation}
 				nodeId={id}
 			/>
 			<Connector
@@ -57,7 +53,6 @@ const Splitter: React.FC<Props> = observer(({ id, data }) => {
 				type='source'
 				position={'right' as Position}
 				active={active}
-				rotation={rotation}
 				nodeId={id}
 				maxConnections={Infinity}
 			/>

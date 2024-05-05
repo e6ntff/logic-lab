@@ -8,16 +8,20 @@ import { Position } from 'reactflow';
 import Connector from './Connector';
 import NodeUtils from './NodeUtils';
 import GetEdges from '../utils/getEdges';
+import GetNodeParameters from '../utils/getNodeParameters';
 
 interface Props {
 	id: string;
-	data: { delay: number; rotation: number; active: boolean };
 }
 
-const Delay: React.FC<Props> = observer(({ id, data }) => {
-	const { setEdgeActive, activeEdges, setNodeParameters } = appStore;
+const Delay: React.FC<Props> = observer(({ id }) => {
+	const { setEdgeActive, activeEdges, setNodeParameters, nodesData } = appStore;
 
-	const { delay, rotation, active } = data;
+	const { delay, active } = useMemo(
+		() => GetNodeParameters(id),
+		// eslint-disable-next-line
+		[nodesData[id]]
+	);
 
 	const { prevEdgeIds, nextEdgeIds } = GetEdges(id, { prev: true, next: true });
 
@@ -36,7 +40,7 @@ const Delay: React.FC<Props> = observer(({ id, data }) => {
 
 	const handleDelayChange = useCallback(
 		(diff: number) => {
-			const newDelay = delay + diff;
+			const newDelay = (delay || 0) + diff;
 			if (newDelay > 10000 || newDelay < 100) return;
 			setNodeParameters(id, { delay: newDelay });
 		},
@@ -44,7 +48,7 @@ const Delay: React.FC<Props> = observer(({ id, data }) => {
 	);
 
 	useEffect(() => {
-		nextEdgeIds[0] && setEdgeActive(nextEdgeIds[0], active);
+		nextEdgeIds[0] && setEdgeActive(nextEdgeIds[0], active || false);
 	}, [setEdgeActive, nextEdgeIds, active]);
 
 	return (
@@ -57,7 +61,7 @@ const Delay: React.FC<Props> = observer(({ id, data }) => {
 			<Flex gap={4}>
 				<Flex align='center'>
 					<LeftOutlined onClick={() => handleDelayChange(-100)} />
-					<Typography.Text>{(delay / 1000).toFixed(1)}</Typography.Text>
+					<Typography.Text>{((delay || 0) / 1000).toFixed(1)}</Typography.Text>
 					<RightOutlined onClick={() => handleDelayChange(100)} />
 				</Flex>
 			</Flex>
@@ -67,15 +71,13 @@ const Delay: React.FC<Props> = observer(({ id, data }) => {
 				type='target'
 				position={'left' as Position}
 				active={incoming}
-				rotation={rotation}
 				nodeId={id}
 			/>
 			<Connector
 				id='b'
 				type='source'
 				position={'right' as Position}
-				active={active}
-				rotation={rotation}
+				active={active || false}
 				nodeId={id}
 			/>
 		</Flex>

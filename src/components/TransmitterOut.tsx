@@ -10,19 +10,20 @@ import Connector from './Connector';
 import GetEdges from '../utils/getEdges';
 import { LogoutOutlined } from '@ant-design/icons';
 import RemoteSelect from './RemoteSelect';
+import GetNodeParameters from '../utils/getNodeParameters';
 
 interface Props {
 	id: string;
-	data: {
-		rotation: number;
-		remoteId: number;
-	};
 }
 
-const TransmitterOut: React.FC<Props> = observer(({ id, data }) => {
-	const { activeEdges, setRemoteConnectionValues } = appStore;
+const TransmitterOut: React.FC<Props> = observer(({ id }) => {
+	const { activeEdges, setRemoteConnectionValues, nodesData } = appStore;
 
-	const { rotation, remoteId } = data;
+	const { remoteId } = useMemo(
+		() => GetNodeParameters(id),
+		// eslint-disable-next-line
+		[nodesData[id]]
+	);
 
 	const { prevEdgeIds } = GetEdges(id, {
 		prev: true,
@@ -35,9 +36,9 @@ const TransmitterOut: React.FC<Props> = observer(({ id, data }) => {
 	);
 
 	useEffect(() => {
-		setRemoteConnectionValues(remoteId, 'out', active);
+		setRemoteConnectionValues(remoteId as number, 'out', active);
 
-		return () => setRemoteConnectionValues(remoteId, 'out', active);
+		return () => setRemoteConnectionValues(remoteId as number, 'out', active);
 	}, [remoteId, active, setRemoteConnectionValues]);
 
 	return (
@@ -54,12 +55,12 @@ const TransmitterOut: React.FC<Props> = observer(({ id, data }) => {
 					vertical
 					align='center'
 				>
-					<Title style={{ color: '#000', margin: 0 }}>
+					<Title style={{ margin: 0 }}>
 						<LogoutOutlined />
 					</Title>
 					<RemoteSelect
 						nodeId={id}
-						remoteId={remoteId}
+						remoteId={remoteId as number}
 					/>
 				</Flex>
 			</Flex>
@@ -69,7 +70,6 @@ const TransmitterOut: React.FC<Props> = observer(({ id, data }) => {
 				type='target'
 				position={'left' as Position}
 				active={active}
-				rotation={rotation}
 				nodeId={id}
 			/>
 		</Flex>

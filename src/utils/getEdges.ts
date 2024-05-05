@@ -1,43 +1,29 @@
 import { useMemo } from 'react';
-import { Edge, getConnectedEdges, useStore } from 'reactflow';
-
-const selector = (s: any) => ({
-	nodeInternals: s.nodeInternals,
-	edges: s.edges,
-});
+import appStore from './appStore';
 
 const GetEdges = (
 	id: string,
 	{ prev, next }: { prev: boolean; next: boolean }
 ) => {
-	const { nodeInternals, edges } = useStore(selector);
+	const { connections } = appStore;
 
-	const node = nodeInternals.get(id);
+	const prevEdgeIds: string[] = useMemo(() => {
+		if (!prev) return [];
+		try {
+			return Object.keys(connections[id].prev);
+		} catch (error) {
+			return [];
+		}
+	}, [id, connections, prev]);
 
-	const connectedEdges = useMemo(
-		() => (node ? getConnectedEdges([node], edges) : edges),
-		[edges, node]
-	);
-
-	const prevEdgeIds: string[] = useMemo(
-		() =>
-			prev
-				? connectedEdges
-						.filter((edge: Edge<any>) => edge.target === id)
-						?.map((edge: Edge<any>) => edge.id)
-				: [],
-		[id, connectedEdges, prev]
-	);
-
-	const nextEdgeIds: string[] = useMemo(
-		() =>
-			next
-				? connectedEdges
-						.filter((edge: Edge<any>) => edge.source === id)
-						?.map((edge: Edge<any>) => edge.id)
-				: [],
-		[id, connectedEdges, next]
-	);
+	const nextEdgeIds: string[] = useMemo(() => {
+		if (!next) return [];
+		try {
+			return Object.keys(connections[id].next);
+		} catch (error) {
+			return [];
+		}
+	}, [id, connections, next]);
 
 	return { prevEdgeIds, nextEdgeIds };
 };

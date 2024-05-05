@@ -10,24 +10,26 @@ import NodeUtils from './NodeUtils';
 import Connector from './Connector';
 import GetEdges from '../utils/getEdges';
 import RemoteSelect from './RemoteSelect';
+import GetNodeParameters from '../utils/getNodeParameters';
 
 interface Props {
 	id: string;
-	data: {
-		rotation: number;
-		remoteId: number;
-	};
 }
 
-const Receiver: React.FC<Props> = observer(({ id, data }) => {
+const Receiver: React.FC<Props> = observer(({ id }) => {
 	const {
 		setEdgeActive,
 		activeEdges,
 		remoteConnections,
 		setRemoteConnectionValues,
+		nodesData,
 	} = appStore;
 
-	const { rotation, remoteId } = data;
+	const { remoteId } = useMemo(
+		() => GetNodeParameters(id),
+		// eslint-disable-next-line
+		[nodesData[id]]
+	);
 
 	const { prevEdgeIds, nextEdgeIds } = GetEdges(id, {
 		prev: true,
@@ -40,13 +42,13 @@ const Receiver: React.FC<Props> = observer(({ id, data }) => {
 	);
 
 	const active: boolean = useMemo(() => {
-		return remoteConnections[remoteId]?.out;
+		return remoteConnections[remoteId as number]?.out;
 	}, [remoteConnections, remoteId]);
 
 	useEffect(() => {
-		setRemoteConnectionValues(remoteId, 'in', incoming);
+		setRemoteConnectionValues(remoteId as number, 'in', incoming);
 
-		return () => setRemoteConnectionValues(remoteId, 'in', incoming);
+		return () => setRemoteConnectionValues(remoteId as number, 'in', incoming);
 	}, [remoteId, incoming, setRemoteConnectionValues]);
 
 	useEffect(() => {
@@ -63,12 +65,12 @@ const Receiver: React.FC<Props> = observer(({ id, data }) => {
 				vertical
 				align='center'
 			>
-				<Title style={{ color: '#000', margin: 0 }}>
+				<Title style={{ margin: 0 }}>
 					<ApiOutlined />
 				</Title>
 				<RemoteSelect
 					nodeId={id}
-					remoteId={remoteId}
+					remoteId={remoteId as number}
 				/>
 			</Flex>
 			<NodeUtils id={id} />
@@ -77,7 +79,6 @@ const Receiver: React.FC<Props> = observer(({ id, data }) => {
 				type='target'
 				position={'left' as Position}
 				active={incoming}
-				rotation={rotation}
 				nodeId={id}
 			/>
 			<Connector
@@ -85,7 +86,6 @@ const Receiver: React.FC<Props> = observer(({ id, data }) => {
 				type='source'
 				position={'right' as Position}
 				active={active}
-				rotation={rotation}
 				nodeId={id}
 			/>
 		</Flex>

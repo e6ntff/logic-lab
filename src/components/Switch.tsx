@@ -9,16 +9,20 @@ import { useCallback, useEffect, useMemo } from 'react';
 import Connector from './Connector';
 import NodeUtils from './NodeUtils';
 import GetEdges from '../utils/getEdges';
+import GetNodeParameters from '../utils/getNodeParameters';
 
 interface Props {
 	id: string;
-	data: { rotation: number; active: boolean };
 }
 
-const Switch: React.FC<Props> = observer(({ id, data }) => {
-	const { activeEdges, setEdgeActive, setNodeParameters } = appStore;
+const Switch: React.FC<Props> = observer(({ id }) => {
+	const { activeEdges, setEdgeActive, setNodeParameters, nodesData } = appStore;
 
-	const { rotation, active } = data;
+	const { rotation, active } = useMemo(
+		() => GetNodeParameters(id),
+		// eslint-disable-next-line
+		[nodesData[id]]
+	);
 
 	const toggleSwitch = useCallback(
 		() => setNodeParameters(id, { active: !active }),
@@ -47,7 +51,7 @@ const Switch: React.FC<Props> = observer(({ id, data }) => {
 			<Title style={{ color: '#000', margin: 0 }}>
 				<MinusOutlined
 					onClick={toggleSwitch}
-					style={{ rotate: `${rotation + (active ? 0 : 90)}deg` }}
+					style={{ rotate: `${rotation || 0 + (active ? 0 : 90)}deg` }}
 				/>
 			</Title>
 			<NodeUtils id={id} />
@@ -56,15 +60,13 @@ const Switch: React.FC<Props> = observer(({ id, data }) => {
 				type='target'
 				position={'left' as Position}
 				active={incoming}
-				rotation={rotation}
 				nodeId={id}
 			/>
 			<Connector
 				id='b'
 				type='source'
 				position={'right' as Position}
-				active={incoming && active}
-				rotation={rotation}
+				active={(incoming && active) || false}
 				nodeId={id}
 			/>
 		</Flex>
