@@ -1,21 +1,22 @@
-import { Flex, Radio } from 'antd';
+import { Flex, Radio, RadioChangeEvent } from 'antd';
 import { observer } from 'mobx-react-lite';
 import appStore from '../utils/appStore';
 import { useCallback } from 'react';
-import { CheckboxChangeEvent } from 'antd/es/checkbox';
 
 interface Props {
 	nodeId: string;
 	remoteId: number;
+	type?: 'in' | 'out';
 }
 
-const RemoteSelect: React.FC<Props> = observer(({ nodeId, remoteId }) => {
-	const { setNodeParameters } = appStore;
+const RemoteSelect: React.FC<Props> = observer(({ nodeId, remoteId, type }) => {
+	const { setNodeParameters, remoteConnections } = appStore;
 
 	const handleRemoteIdChange = useCallback(
-		(event: CheckboxChangeEvent) =>
-			setNodeParameters(nodeId, { remoteId: event.target.value || 0 }),
-		[setNodeParameters, nodeId]
+		(event: RadioChangeEvent) =>
+			type &&
+			setNodeParameters(nodeId, { remote: { type, id: event.target.value } }),
+		[setNodeParameters, nodeId, type]
 	);
 
 	return (
@@ -34,6 +35,12 @@ const RemoteSelect: React.FC<Props> = observer(({ nodeId, remoteId }) => {
 				>
 					{new Array(5).fill(null).map((_: null, index: number) => (
 						<Radio
+							disabled={
+								type
+									? remoteConnections.used[type].includes(index) &&
+									  index !== remoteId
+									: false
+							}
 							key={index}
 							style={{ margin: 0 }}
 							value={index}

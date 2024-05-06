@@ -65,9 +65,11 @@ const Panel: React.FC = observer(() => {
 				<EllipsisOutlined />
 			</Button>
 			<TransmitterPanel
-				addIn={() => addNode(null, 'transmitterIn', { remoteId: 0 })}
-				addOut={() => addNode(null, 'transmitterOut', { remoteId: 0 })}
-				addReceiver={() => addNode(null, 'receiver', { remoteId: 0 })}
+				addIn={() => addNode(null, 'transmitterIn', { remote: { type: 'in' } })}
+				addOut={() =>
+					addNode(null, 'transmitterOut', { remote: { type: 'out' } })
+				}
+				addReceiver={() => addNode(null, 'receiver')}
 			/>
 			<Button onClick={() => addNode(null, 'end')}>
 				<BulbOutlined />

@@ -29,6 +29,8 @@ const App: React.FC = observer(() => {
 		updateConnections,
 		removeNode,
 		viewport,
+		nodesData,
+		setRemoteConnectionUsed,
 	} = appStore;
 
 	const handleNodesDeleting = useCallback(
@@ -41,6 +43,17 @@ const App: React.FC = observer(() => {
 		getNodes();
 		// eslint-disable-next-line
 	}, []);
+
+	useEffect(() => {
+		const used: { in: number[]; out: number[] } = { in: [], out: [] };
+		for (const key in nodesData) {
+			const remote = nodesData[key]?.remote;
+			remote?.type &&
+				remote?.id !== undefined &&
+				used[remote.type].push(remote.id);
+		}
+		setRemoteConnectionUsed(used);
+	}, [setRemoteConnectionUsed, nodesData]);
 
 	return (
 		<>
@@ -71,7 +84,8 @@ const App: React.FC = observer(() => {
 			<Panel />
 			<ReactFlow
 				defaultViewport={viewport}
-				minZoom={0.01}
+				minZoom={0.1}
+				maxZoom={1}
 				snapToGrid
 				snapGrid={[30, 30]}
 				nodeTypes={nodeTypes}
@@ -83,9 +97,24 @@ const App: React.FC = observer(() => {
 				nodes={nodes}
 				edges={edges}
 				selectionMode={SelectionMode.Partial}
+				translateExtent={[
+					[-2500, -2500],
+					[2500, 2500],
+				]}
+				nodeExtent={[
+					[-2500, -2500],
+					[2500, 2500],
+				]}
 			>
 				<ViewportChangeHandler />
 				<Background
+					id='0'
+					gap={[120, 120]}
+					lineWidth={3}
+					variant={BackgroundVariant.Lines}
+				/>
+				<Background
+					id='1'
 					gap={[30, 30]}
 					variant={BackgroundVariant.Lines}
 				/>

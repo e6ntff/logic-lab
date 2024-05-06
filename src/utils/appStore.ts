@@ -32,17 +32,21 @@ class AppStore {
 			delay?: number;
 			plusDelay?: number;
 			minusDelay?: number;
-			remoteId?: number;
+			remote?: { type?: 'in' | 'out'; id?: number };
 		};
 	} = JSON.parse(localStorage.getItem('nodesData') || '{}');
 	edges: Edge<any>[] = JSON.parse(localStorage.getItem('edges') || '[]');
 	activeEdges: { [key: string]: boolean } = {};
 	remoteConnections: {
+		used: { in: number[]; out: number[] };
 		[key: number]: {
 			in: boolean;
 			out: boolean;
 		};
-	} = JSON.parse(localStorage.getItem('remoteConnections') || '{}');
+	} = JSON.parse(
+		localStorage.getItem('remoteConnections') ||
+			'{ "used": { "in": [], "out": [] } }'
+	);
 
 	setViewport = (viewport: Viewport) => {
 		this.viewport = viewport;
@@ -67,6 +71,13 @@ class AppStore {
 				...this.remoteConnections[id],
 				[type]: value,
 			},
+		};
+	};
+
+	setRemoteConnectionUsed = (values: typeof this.remoteConnections.used) => {
+		this.remoteConnections = {
+			...this.remoteConnections,
+			used: values,
 		};
 	};
 
@@ -152,17 +163,7 @@ class AppStore {
 			};
 	};
 
-	setNodeParameters = (
-		id: string,
-		parameters: {
-			rotation?: number;
-			active?: boolean;
-			delay?: number;
-			plusDelay?: number;
-			minusDelay?: number;
-			remoteId?: number;
-		}
-	) => {
+	setNodeParameters = (id: string, parameters: (typeof this.nodesData)[0]) => {
 		try {
 			this.nodesData = {
 				...this.nodesData,

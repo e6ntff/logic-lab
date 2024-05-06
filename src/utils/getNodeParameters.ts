@@ -9,7 +9,7 @@ const GetNodeParameters = (id: string) => {
 		delay: nodesData[id]?.delay ?? 0,
 		plusDelay: nodesData[id]?.plusDelay ?? 0,
 		minusDelay: nodesData[id]?.minusDelay ?? 0,
-		remoteId: nodesData[id]?.remoteId ?? 0,
+		remote: nodesData[id]?.remote ?? {},
 	};
 };
 

@@ -12,7 +12,7 @@ export const connectorStyle: CSSProperties = {
 export const blockStyle: CSSProperties = {
 	background: '#fff',
 	border: '5px solid #000',
-	borderRadius: 10,
+	borderRadius: 15,
 	padding: 10,
 	width: 90,
 	height: 90,

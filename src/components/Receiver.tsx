@@ -25,7 +25,7 @@ const Receiver: React.FC<Props> = observer(({ id }) => {
 		nodesData,
 	} = appStore;
 
-	const { remoteId } = useMemo(
+	const { remote } = useMemo(
 		() => GetNodeParameters(id),
 		// eslint-disable-next-line
 		[nodesData[id]]
@@ -42,14 +42,14 @@ const Receiver: React.FC<Props> = observer(({ id }) => {
 	);
 
 	const active: boolean = useMemo(() => {
-		return remoteConnections[remoteId as number]?.out;
-	}, [remoteConnections, remoteId]);
+		return remoteConnections[remote?.id as number]?.out;
+	}, [remoteConnections, remote?.id]);
 
 	useEffect(() => {
-		setRemoteConnectionValues(remoteId as number, 'in', incoming);
+		setRemoteConnectionValues(remote?.id as number, 'in', incoming);
 
-		return () => setRemoteConnectionValues(remoteId as number, 'in', incoming);
-	}, [remoteId, incoming, setRemoteConnectionValues]);
+		return () => setRemoteConnectionValues(remote?.id as number, 'in', false);
+	}, [remote?.id, incoming, setRemoteConnectionValues]);
 
 	useEffect(() => {
 		setEdgeActive(nextEdgeIds[0], active);
@@ -70,7 +70,7 @@ const Receiver: React.FC<Props> = observer(({ id }) => {
 				</Title>
 				<RemoteSelect
 					nodeId={id}
-					remoteId={remoteId as number}
+					remoteId={remote?.id as number}
 				/>
 			</Flex>
 			<NodeUtils id={id} />

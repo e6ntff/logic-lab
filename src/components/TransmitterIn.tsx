@@ -19,7 +19,7 @@ interface Props {
 const TransmitterIn: React.FC<Props> = observer(({ id }) => {
 	const { setEdgeActive, remoteConnections, nodesData } = appStore;
 
-	const { remoteId } = useMemo(
+	const { remote } = useMemo(
 		() => GetNodeParameters(id),
 		// eslint-disable-next-line
 		[nodesData[id]]
@@ -30,8 +30,8 @@ const TransmitterIn: React.FC<Props> = observer(({ id }) => {
 	});
 
 	const active: boolean | null = useMemo(() => {
-		return remoteConnections[remoteId as number]?.in;
-	}, [remoteConnections, remoteId]);
+		return remoteConnections[remote?.id as number]?.in;
+	}, [remoteConnections, remote?.id]);
 
 	useEffect(() => {
 		setEdgeActive(nextEdgeIds[0], active || false);
@@ -52,7 +52,8 @@ const TransmitterIn: React.FC<Props> = observer(({ id }) => {
 				</Title>
 				<RemoteSelect
 					nodeId={id}
-					remoteId={remoteId as number}
+					remoteId={remote?.id as number}
+					type='in'
 				/>
 			</Flex>
 			<NodeUtils id={id} />
