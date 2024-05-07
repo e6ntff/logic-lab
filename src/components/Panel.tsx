@@ -21,7 +21,7 @@ const Panel: React.FC = observer(() => {
 	return (
 		<Flex
 			vertical
-			gap={16}
+			gap={8}
 			style={{
 				position: 'absolute',
 				inset: 0,

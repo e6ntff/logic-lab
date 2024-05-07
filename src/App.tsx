@@ -2,7 +2,6 @@ import { observer } from 'mobx-react-lite';
 import ReactFlow, {
 	Background,
 	BackgroundVariant,
-	Controls,
 	MiniMap,
 	Node,
 	SelectionMode,
@@ -105,12 +104,12 @@ const App: React.FC = observer(() => {
 				edges={edges}
 				selectionMode={SelectionMode.Partial}
 				translateExtent={[
-					[-2500, -2500],
-					[2500, 2500],
+					[-10000, -10000],
+					[10000, 10000],
 				]}
 				nodeExtent={[
-					[-2500, -2500],
-					[2500, 2500],
+					[-10000, -10000],
+					[10000, 10000],
 				]}
 			>
 				<ViewportChangeHandler />
@@ -125,7 +124,6 @@ const App: React.FC = observer(() => {
 					gap={[30, 30]}
 					variant={BackgroundVariant.Lines}
 				/>
-				<Controls />
 				<MiniMap
 					position={'top-right'}
 					inversePan
@@ -154,7 +152,7 @@ const ViewportChangeHandler: React.FC = observer(() => {
 	);
 
 	useOnViewportChange({
-		onEnd: save,
+		onChange: save,
 	});
 
 	return null;

@@ -59,6 +59,7 @@ const MessageButton: React.FC = observer(() => {
 			<FloatButton
 				onClick={openModal}
 				icon={<SendOutlined />}
+				style={{ insetInlineStart: 24, insetInlineEnd: 'unset' }}
 			/>
 			<Modal
 				open={isModalOpened}
