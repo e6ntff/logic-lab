@@ -52,8 +52,7 @@ const TransmitterIn: React.FC<Props> = observer(({ id }) => {
 				</Title>
 				<RemoteSelect
 					nodeId={id}
-					remoteId={remote?.id as number}
-					type='in'
+					remote={remote}
 				/>
 			</Flex>
 			<NodeUtils id={id} />

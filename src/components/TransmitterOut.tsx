@@ -62,8 +62,7 @@ const TransmitterOut: React.FC<Props> = observer(({ id }) => {
 					</Title>
 					<RemoteSelect
 						nodeId={id}
-						remoteId={remote?.id as number}
-						type='out'
+						remote={remote}
 					/>
 				</Flex>
 			</Flex>

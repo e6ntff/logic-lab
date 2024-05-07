@@ -45,12 +45,19 @@ const App: React.FC = observer(() => {
 	}, []);
 
 	useEffect(() => {
-		const used: { in: number[]; out: number[] } = { in: [], out: [] };
+		const used: { in: number[]; out: number[]; receiver: number[] } = {
+			in: [],
+			out: [],
+			receiver: [],
+		};
 		for (const key in nodesData) {
 			const remote = nodesData[key]?.remote;
-			remote?.type &&
-				remote?.id !== undefined &&
+			if (remote?.id === null || !remote) continue;
+			if (remote?.type) {
 				used[remote.type].push(remote.id);
+			} else {
+				used.receiver.push(remote.id);
+			}
 		}
 		setRemoteConnectionUsed(used);
 	}, [setRemoteConnectionUsed, nodesData]);

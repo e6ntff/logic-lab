@@ -70,7 +70,7 @@ const Receiver: React.FC<Props> = observer(({ id }) => {
 				</Title>
 				<RemoteSelect
 					nodeId={id}
-					remoteId={remote?.id as number}
+					remote={remote}
 				/>
 			</Flex>
 			<NodeUtils id={id} />

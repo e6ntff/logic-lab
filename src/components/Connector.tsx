@@ -29,9 +29,9 @@ const Connector: React.FC<Props> = observer(
 		const { nodesData, connections } = appStore;
 
 		const { rotation } = useMemo(
-			() => GetNodeParameters(id),
+			() => GetNodeParameters(nodeId),
 			// eslint-disable-next-line
-			[nodesData[id]]
+			[nodesData[nodeId]]
 		);
 
 		const computedPosition = useMemo(

@@ -5,18 +5,31 @@ import { useCallback } from 'react';
 
 interface Props {
 	nodeId: string;
-	remoteId: number;
-	type?: 'in' | 'out';
+	remote: { type?: 'in' | 'out'; id: number | null };
 }
 
-const RemoteSelect: React.FC<Props> = observer(({ nodeId, remoteId, type }) => {
+const RemoteSelect: React.FC<Props> = observer(({ nodeId, remote }) => {
 	const { setNodeParameters, remoteConnections } = appStore;
 
+	const { type, id } = remote;
+
 	const handleRemoteIdChange = useCallback(
-		(event: RadioChangeEvent) =>
-			type &&
-			setNodeParameters(nodeId, { remote: { type, id: event.target.value } }),
+		(event: RadioChangeEvent) => {
+			const value = event.target.value;
+			if (value === undefined) return;
+			setNodeParameters(nodeId, { remote: { type, id: value } });
+		},
 		[setNodeParameters, nodeId, type]
+	);
+
+	const getIsButtonDisabled = useCallback(
+		(index: number) => {
+			if (index === id) return false;
+			return type
+				? remoteConnections.used[type].includes(index)
+				: remoteConnections.used.receiver.includes(index);
+		},
+		[type, id, remoteConnections.used]
 	);
 
 	return (
@@ -27,7 +40,7 @@ const RemoteSelect: React.FC<Props> = observer(({ nodeId, remoteId, type }) => {
 		>
 			<Radio.Group
 				onChange={handleRemoteIdChange}
-				value={remoteId}
+				value={id}
 			>
 				<Flex
 					justify='center'
@@ -35,12 +48,7 @@ const RemoteSelect: React.FC<Props> = observer(({ nodeId, remoteId, type }) => {
 				>
 					{new Array(5).fill(null).map((_: null, index: number) => (
 						<Radio
-							disabled={
-								type
-									? remoteConnections.used[type].includes(index) &&
-									  index !== remoteId
-									: false
-							}
+							disabled={getIsButtonDisabled(index)}
 							key={index}
 							style={{ margin: 0 }}
 							value={index}

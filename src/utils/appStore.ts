@@ -32,13 +32,13 @@ class AppStore {
 			delay?: number;
 			plusDelay?: number;
 			minusDelay?: number;
-			remote?: { type?: 'in' | 'out'; id?: number };
+			remote?: { type?: 'in' | 'out'; id: number | null };
 		};
 	} = JSON.parse(localStorage.getItem('nodesData') || '{}');
 	edges: Edge<any>[] = JSON.parse(localStorage.getItem('edges') || '[]');
 	activeEdges: { [key: string]: boolean } = {};
 	remoteConnections: {
-		used: { in: number[]; out: number[] };
+		used: { in: number[]; out: number[]; receiver: number[] };
 		[key: number]: {
 			in: boolean;
 			out: boolean;
