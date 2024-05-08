@@ -93,7 +93,7 @@ const App: React.FC = observer(() => {
 				minZoom={0.1}
 				maxZoom={1}
 				snapToGrid
-				snapGrid={[30, 30]}
+				snapGrid={[35, 35]}
 				nodeTypes={nodeTypes}
 				edgeTypes={edgeTypes}
 				onNodesChange={updateNodes}
@@ -115,13 +115,13 @@ const App: React.FC = observer(() => {
 				<ViewportChangeHandler />
 				<Background
 					id='0'
-					gap={[120, 120]}
+					gap={[140, 140]}
 					lineWidth={3}
 					variant={BackgroundVariant.Lines}
 				/>
 				<Background
 					id='1'
-					gap={[30, 30]}
+					gap={[35, 35]}
 					variant={BackgroundVariant.Lines}
 				/>
 				<MiniMap
