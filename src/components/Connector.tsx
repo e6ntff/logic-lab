@@ -41,6 +41,7 @@ const Connector: React.FC<Props> = observer(
 
 		useEffect(() => {
 			updateNodeInternals(nodeId);
+			return () => updateNodeInternals(nodeId);
 		}, [computedPosition, nodeId, updateNodeInternals]);
 
 		const connectedEdges = useMemo(() => {

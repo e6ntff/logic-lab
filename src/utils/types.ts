@@ -11,8 +11,7 @@ import Delay from '../components/Delay';
 import Switch from '../components/Switch';
 import ButtonAntd from '../components/Button';
 import Xor from '../components/Xor';
-import TransmitterIn from '../components/TransmitterIn';
-import TransmitterOut from '../components/TransmitterOut';
+import Transmitter from '../components/Transmitter';
 import Receiver from '../components/Receiver';
 
 export type nodeType =
@@ -26,8 +25,7 @@ export type nodeType =
 	| 'button'
 	| 'switch'
 	| 'start'
-	| 'transmitterIn'
-	| 'transmitterOut'
+	| 'transmitter'
 	| 'receiver'
 	| 'end';
 
@@ -45,8 +43,7 @@ export const nodeTypes: NodeTypes = {
 	delay: Delay,
 	switch: Switch,
 	button: ButtonAntd,
-	transmitterIn: TransmitterIn,
-	transmitterOut: TransmitterOut,
+	transmitter: Transmitter,
 	receiver: Receiver,
 };
 

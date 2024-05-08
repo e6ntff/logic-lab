@@ -33,6 +33,7 @@ class AppStore {
 			plusDelay?: number;
 			minusDelay?: number;
 			remote?: { type?: 'in' | 'out'; id: number | null };
+			mode?: 'in' | 'out' | 'all';
 		};
 	} = JSON.parse(localStorage.getItem('nodesData') || '{}');
 	edges: Edge<any>[] = JSON.parse(localStorage.getItem('edges') || '[]');
@@ -137,15 +138,15 @@ class AppStore {
 		[x, y] = [-(x - 100) / zoom, -(y - 100) / zoom];
 
 		if (x > 0) {
-			x = x + (x % 30);
+			x = x + (x % 35);
 		} else {
-			x = x - (x % 30);
+			x = x - (x % 35);
 		}
 
 		if (y > 0) {
-			y = x + (y % 30);
+			y = x + (y % 35);
 		} else {
-			y = y - (y % 30);
+			y = y - (y % 35);
 		}
 
 		const id = existing ? existing.id : uniqid();
@@ -173,15 +174,15 @@ class AppStore {
 	};
 
 	removeNode = (id: string) => {
+		this.nodes = this.nodes.filter((node) => node.id !== id);
+		const nodesData = this.nodesData;
+		delete nodesData[id];
+		this.nodesData = { ...nodesData };
 		this.edges
 			.filter((edge: Edge<any>) => edge.source === id || edge.target === id)
 			.forEach((edge: Edge<any>) => {
 				this.removeEdge(edge.id);
 			});
-		this.nodes = this.nodes.filter((node) => node.id !== id);
-		const nodesData = this.nodesData;
-		delete nodesData[id];
-		this.nodesData = { ...nodesData };
 		const connections = this.connections;
 		delete connections[id];
 		this.connections = { ...connections };

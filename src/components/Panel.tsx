@@ -8,11 +8,10 @@ import {
 	DisconnectOutlined,
 	EllipsisOutlined,
 	HistoryOutlined,
-	LoginOutlined,
-	LogoutOutlined,
 	PlayCircleOutlined,
 	PoweroffOutlined,
 	ShareAltOutlined,
+	WifiOutlined,
 } from '@ant-design/icons';
 
 const Panel: React.FC = observer(() => {
@@ -65,11 +64,10 @@ const Panel: React.FC = observer(() => {
 				<EllipsisOutlined />
 			</Button>
 			<TransmitterPanel
-				addIn={() =>
-					addNode(null, 'transmitterIn', { remote: { type: 'in', id: null } })
-				}
-				addOut={() =>
-					addNode(null, 'transmitterOut', { remote: { type: 'out', id: null } })
+				addTransmitter={() =>
+					addNode(null, 'transmitter', {
+						remote: { type: 'in', id: null },
+					})
 				}
 				addReceiver={() => addNode(null, 'receiver', { remote: { id: null } })}
 			/>
@@ -83,13 +81,13 @@ const Panel: React.FC = observer(() => {
 export default Panel;
 
 interface PanelProps {
-	addIn: () => void;
-	addOut: () => void;
+	addTransmitter: () => void;
+
 	addReceiver: () => void;
 }
 
 const TransmitterPanel: React.FC<PanelProps> = observer(
-	({ addIn, addOut, addReceiver }) => {
+	({ addTransmitter, addReceiver }) => {
 		return (
 			<Tooltip
 				placement='right'
@@ -103,11 +101,8 @@ const TransmitterPanel: React.FC<PanelProps> = observer(
 						gap={8}
 					>
 						<Flex gap={8}>
-							<Button onClick={addIn}>
-								<LoginOutlined />
-							</Button>
-							<Button onClick={addOut}>
-								<LogoutOutlined />
+							<Button onClick={addTransmitter}>
+								<WifiOutlined />
 							</Button>
 						</Flex>
 						<Button onClick={addReceiver}>

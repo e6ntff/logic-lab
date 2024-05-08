@@ -10,6 +10,7 @@ const GetNodeParameters = (id: string) => {
 		plusDelay: nodesData[id]?.plusDelay ?? 0,
 		minusDelay: nodesData[id]?.minusDelay ?? 0,
 		remote: nodesData[id]?.remote ?? { id: null },
+		mode: nodesData[id]?.mode ?? 'all',
 	};
 };
 
