@@ -154,7 +154,6 @@ const ViewportChangeHandler: React.FC = observer(() => {
 
 	const save = useCallback(
 		(viewport: Viewport) => {
-			sessionStorage.setItem('viewport', JSON.stringify(viewport));
 			setViewport(viewport);
 		},
 		[setViewport]

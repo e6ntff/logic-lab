@@ -61,6 +61,10 @@ class AppStore {
 		this.nodes = nodes;
 	};
 
+	setConnections = (connections: typeof this.connections) => {
+		this.connections = connections;
+	};
+
 	setRemoteConnectionValues = (
 		id: number,
 		type: 'in' | 'out',
@@ -98,35 +102,7 @@ class AppStore {
 		const id = uniqid();
 		changes = { ...changes, type: 'wire', id: id };
 		this.edges = addEdge(changes, this.edges);
-		const { source, target } = changes;
-		try {
-			this.connections = {
-				...this.connections,
-				[source as string]: {
-					...this.connections[source as string],
-					next: {
-						...this.connections[source as string]?.next,
-						[id]: changes as Edge,
-					},
-				},
-				[target as string]: {
-					...this.connections[target as string],
-					prev: {
-						...this.connections[target as string]?.prev,
-						[id]: changes as Edge,
-					},
-				},
-			};
-		} catch (error) {
-			this.connections = {
-				...this.connections,
-				[source as string]: { prev: { [id]: changes as Edge }, next: {} },
-				[target as string]: {
-					prev: {},
-					next: { [id]: changes as Edge },
-				},
-			};
-		}
+		addEdgeToConnections(id, changes);
 	};
 
 	addNode = (
@@ -134,20 +110,7 @@ class AppStore {
 		type?: nodeType,
 		parameters?: (typeof this.nodesData)[0]
 	) => {
-		let { x, y, zoom } = this.viewport;
-		[x, y] = [-(x - 100) / zoom, -(y - 100) / zoom];
-
-		if (x > 0) {
-			x = x + (x % 35);
-		} else {
-			x = x - (x % 35);
-		}
-
-		if (y > 0) {
-			y = x + (y % 35);
-		} else {
-			y = y - (y % 35);
-		}
+		const { x, y } = getCoordinates();
 
 		const id = existing ? existing.id : uniqid();
 		const node: Node<any, string | undefined> = existing || {
@@ -178,28 +141,12 @@ class AppStore {
 		const nodesData = this.nodesData;
 		delete nodesData[id];
 		this.nodesData = { ...nodesData };
-		this.edges
-			.filter((edge: Edge<any>) => edge.source === id || edge.target === id)
-			.forEach((edge: Edge<any>) => {
-				this.removeEdge(edge.id);
-			});
-		const connections = this.connections;
-		delete connections[id];
-		this.connections = { ...connections };
+		removeUselessEdges(id);
 	};
 
 	removeEdge = (id: string) => {
 		this.edges = this.edges.filter((edge) => edge.id !== id);
-		for (const key in this.connections) {
-			const connection = this.connections[key];
-			if (Object.hasOwn(connection, 'prev')) {
-				delete connection.prev[id];
-			}
-			if (Object.hasOwn(connection, 'next')) {
-				delete connection.next[id];
-			}
-			this.connections = { ...this.connections, [key]: connection };
-		}
+		removeEdgeFromConnections(id);
 	};
 
 	constructor() {
@@ -250,3 +197,87 @@ reaction(
 		);
 	}
 );
+
+reaction(
+	() => appStore.viewport,
+	() => {
+		sessionStorage.setItem('viewport', JSON.stringify(appStore.viewport));
+	}
+);
+
+const removeUselessEdges = (id: string) => {
+	appStore.edges
+		.filter((edge: Edge<any>) => edge.source === id || edge.target === id)
+		.forEach((edge: Edge<any>) => {
+			appStore.removeEdge(edge.id);
+		});
+
+	const connections = appStore.connections;
+	delete connections[id];
+	appStore.setConnections({ ...connections });
+};
+
+const removeEdgeFromConnections = (id: string) => {
+	for (const key in appStore.connections) {
+		const connection = appStore.connections[key];
+		if (Object.hasOwn(connection, 'prev')) {
+			delete connection.prev[id];
+		}
+		if (Object.hasOwn(connection, 'next')) {
+			delete connection.next[id];
+		}
+		appStore.setConnections({ ...appStore.connections, [key]: connection });
+	}
+};
+
+const addEdgeToConnections = (id: string, changes: Edge | Connection) => {
+	const { source, target } = changes;
+	try {
+		appStore.setConnections({
+			...appStore.connections,
+			[source as string]: {
+				...appStore.connections[source as string],
+				next: {
+					...appStore.connections[source as string]?.next,
+					[id]: changes as Edge,
+				},
+			},
+			[target as string]: {
+				...appStore.connections[target as string],
+				prev: {
+					...appStore.connections[target as string]?.prev,
+					[id]: changes as Edge,
+				},
+			},
+		});
+	} catch (error) {
+		appStore.setConnections({
+			...appStore.connections,
+			[source as string]: { prev: { [id]: changes as Edge }, next: {} },
+			[target as string]: {
+				prev: {},
+				next: { [id]: changes as Edge },
+			},
+		});
+	}
+};
+
+const getCoordinates = () => {
+	let { x, y, zoom } = appStore.viewport;
+
+	[x, y] = [-(x - 100) / zoom, -(y - 100) / zoom];
+
+	if (x > 0) {
+		x = x + (x % 35);
+	} else {
+		x = x - (x % 35);
+	}
+
+	if (y > 0) {
+		y = x + (y % 35);
+	} else {
+		y = y - (y % 35);
+	}
+
+	return { x, y };
+};
