@@ -2,6 +2,7 @@ import { observer } from 'mobx-react-lite';
 import ReactFlow, {
 	Background,
 	BackgroundVariant,
+	Edge,
 	MiniMap,
 	Node,
 	SelectionMode,
@@ -27,6 +28,7 @@ const App: React.FC = observer(() => {
 		updateEdges,
 		updateConnections,
 		removeNode,
+		removeEdge,
 		viewport,
 		nodesData,
 		setRemoteConnectionUsed,
@@ -36,6 +38,12 @@ const App: React.FC = observer(() => {
 		(nodes: Node<any, string | undefined>[]) =>
 			nodes.forEach(({ id }: Node<any, string | undefined>) => removeNode(id)),
 		[removeNode]
+	);
+
+	const handleEdgesDeleting = useCallback(
+		(nodes: Edge<any>[]) =>
+			nodes.forEach(({ id }: Edge<any>) => removeEdge(id)),
+		[removeEdge]
 	);
 
 	useEffect(() => {
@@ -100,6 +108,7 @@ const App: React.FC = observer(() => {
 				onEdgesChange={updateEdges}
 				onConnect={updateConnections}
 				onNodesDelete={handleNodesDeleting}
+				onEdgesDelete={handleEdgesDeleting}
 				nodes={nodes}
 				edges={edges}
 				selectionMode={SelectionMode.Partial}
