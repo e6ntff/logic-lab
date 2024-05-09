@@ -1,18 +1,15 @@
 import { observer } from 'mobx-react-lite';
-import { blockStyle } from '../utils/blockStyles';
-import appStore from '../utils/appStore';
-import { Button as ButtonAntd, Flex, Typography } from 'antd';
-import {
-	LeftOutlined,
-	PlayCircleOutlined,
-	RightOutlined,
-} from '@ant-design/icons';
+import { blockStyle } from '../../utils/blockStyles';
+import appStore from '../../utils/appStore';
+import { Button as ButtonAntd, Flex } from 'antd';
+import { PlayCircleOutlined } from '@ant-design/icons';
 import { useCallback, useEffect, useMemo } from 'react';
 import { Position } from 'reactflow';
-import Connector from './Connector';
-import NodeUtils from './NodeUtils';
-import GetEdges from '../utils/getEdges';
-import GetNodeParameters from '../utils/getNodeParameters';
+import Connector from '../Connector';
+import NodeUtils from '../NodeUtils';
+import GetEdges from '../../utils/getEdges';
+import GetNodeParameters from '../../utils/getNodeParameters';
+import TimeRange from '../TimeRange';
 
 interface Props {
 	id: string;
@@ -40,8 +37,9 @@ const Button: React.FC<Props> = observer(({ id }) => {
 
 	const handleDelayChange = useCallback(
 		(diff: number) => {
-			const newDelay = (delay || 0) + diff;
-			if (newDelay > 10000 || newDelay < 100) return;
+			let newDelay = (delay || 0) + diff;
+			if (newDelay > 10000) newDelay = 10000;
+			if (newDelay < 100) newDelay = 100;
 			setNodeParameters(id, { delay: newDelay });
 		},
 		[setNodeParameters, delay, id]
@@ -57,13 +55,11 @@ const Button: React.FC<Props> = observer(({ id }) => {
 			<ButtonAntd onClick={() => setNodeParameters(id, { active: true })}>
 				<PlayCircleOutlined />
 			</ButtonAntd>
-			<Flex gap={4}>
-				<Flex align='center'>
-					<LeftOutlined onClick={() => handleDelayChange(-100)} />
-					<Typography.Text>{((delay || 0) / 1000).toFixed(1)}</Typography.Text>
-					<RightOutlined onClick={() => handleDelayChange(100)} />
-				</Flex>
-			</Flex>
+			<TimeRange
+				id={id}
+				onChange={handleDelayChange}
+				value={delay}
+			/>
 			<NodeUtils id={id} />
 			<Connector
 				id='a'

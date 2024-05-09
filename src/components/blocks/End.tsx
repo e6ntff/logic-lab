@@ -1,14 +1,14 @@
 import { observer } from 'mobx-react-lite';
-import { blockStyle } from '../utils/blockStyles';
-import appStore from '../utils/appStore';
+import { blockStyle } from '../../utils/blockStyles';
+import appStore from '../../utils/appStore';
 import { Flex } from 'antd';
 import { BulbOutlined } from '@ant-design/icons';
 import { useMemo } from 'react';
 import { Position } from 'reactflow';
 import Title from 'antd/es/typography/Title';
-import NodeUtils from './NodeUtils';
-import Connector from './Connector';
-import GetEdges from '../utils/getEdges';
+import NodeUtils from '../NodeUtils';
+import Connector from '../Connector';
+import GetEdges from '../../utils/getEdges';
 
 interface Props {
 	id: string;

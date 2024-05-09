@@ -1,13 +1,13 @@
 import { observer } from 'mobx-react-lite';
-import { blockStyle } from '../utils/blockStyles';
-import appStore from '../utils/appStore';
+import { blockStyle } from '../../utils/blockStyles';
+import appStore from '../../utils/appStore';
 import { Flex, Switch } from 'antd';
 import { useCallback, useEffect, useMemo } from 'react';
 import { Position } from 'reactflow';
-import NodeUtils from './NodeUtils';
-import Connector from './Connector';
-import GetEdges from '../utils/getEdges';
-import GetNodeParameters from '../utils/getNodeParameters';
+import NodeUtils from '../NodeUtils';
+import Connector from '../Connector';
+import GetEdges from '../../utils/getEdges';
+import GetNodeParameters from '../../utils/getNodeParameters';
 
 interface Props {
 	id: string;

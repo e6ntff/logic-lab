@@ -1,19 +1,14 @@
 import { observer } from 'mobx-react-lite';
-import { blockStyle } from '../utils/blockStyles';
-import appStore from '../utils/appStore';
-import { Flex, Switch, Typography } from 'antd';
-import {
-	LeftOutlined,
-	MinusCircleOutlined,
-	PlusCircleOutlined,
-	RightOutlined,
-} from '@ant-design/icons';
+import { blockStyle } from '../../utils/blockStyles';
+import appStore from '../../utils/appStore';
+import { Divider, Flex, Switch } from 'antd';
 import { useCallback, useEffect, useMemo } from 'react';
 import { Position } from 'reactflow';
-import Connector from './Connector';
-import NodeUtils from './NodeUtils';
-import GetEdges from '../utils/getEdges';
-import getNodeParameters from '../utils/getNodeParameters';
+import Connector from '../Connector';
+import NodeUtils from '../NodeUtils';
+import GetEdges from '../../utils/getEdges';
+import getNodeParameters from '../../utils/getNodeParameters';
+import TimeRange from '../TimeRange';
 
 interface Props {
 	id: string;
@@ -52,10 +47,15 @@ const Flasher: React.FC<Props> = observer(({ id }) => {
 
 	const { nextEdgeIds } = GetEdges(id, { prev: true, next: true });
 
+	useEffect(() => {
+		nextEdgeIds[0] && setEdgeActive(nextEdgeIds[0], active || false);
+	}, [setEdgeActive, id, nextEdgeIds, active]);
+
 	const handlePlusDelayChange = useCallback(
 		(diff: number) => {
-			const newDelay = (plusDelay || 0) + diff;
-			if (newDelay > 10000 || newDelay < 100) return;
+			let newDelay = (plusDelay || 0) + diff;
+			if (newDelay > 10000) newDelay = 10000;
+			if (newDelay < 100) newDelay = 100;
 			setNodeParameters(id, { plusDelay: newDelay });
 		},
 		[setNodeParameters, plusDelay, id]
@@ -63,16 +63,13 @@ const Flasher: React.FC<Props> = observer(({ id }) => {
 
 	const handleMinusDelayChange = useCallback(
 		(diff: number) => {
-			const newDelay = (minusDelay || 0) + diff;
-			if (newDelay > 10000 || newDelay < 100) return;
+			let newDelay = (minusDelay || 0) + diff;
+			if (newDelay > 10000) newDelay = 10000;
+			if (newDelay < 100) newDelay = 100;
 			setNodeParameters(id, { minusDelay: newDelay });
 		},
 		[setNodeParameters, minusDelay, id]
 	);
-
-	useEffect(() => {
-		nextEdgeIds[0] && setEdgeActive(nextEdgeIds[0], active || false);
-	}, [setEdgeActive, id, nextEdgeIds, active]);
 
 	return (
 		<Flex
@@ -85,27 +82,22 @@ const Flasher: React.FC<Props> = observer(({ id }) => {
 				value={active}
 				disabled
 			/>
-			<Flex vertical>
-				<Flex gap={4}>
-					<PlusCircleOutlined />
-					<Flex align='center'>
-						<LeftOutlined onClick={() => handlePlusDelayChange(-100)} />
-						<Typography.Text>
-							{((plusDelay || 0) / 1000).toFixed(1)}
-						</Typography.Text>
-						<RightOutlined onClick={() => handlePlusDelayChange(100)} />
-					</Flex>
-				</Flex>
-				<Flex gap={4}>
-					<MinusCircleOutlined />
-					<Flex align='center'>
-						<LeftOutlined onClick={() => handleMinusDelayChange(-100)} />
-						<Typography.Text>
-							{((minusDelay || 0) / 1000).toFixed(1)}
-						</Typography.Text>
-						<RightOutlined onClick={() => handleMinusDelayChange(100)} />
-					</Flex>
-				</Flex>
+			<Flex
+				vertical
+				gap={4}
+				style={{ inlineSize: '100%' }}
+			>
+				<TimeRange
+					value={plusDelay}
+					id={id}
+					onChange={handlePlusDelayChange}
+				/>
+				<Divider style={{ margin: 0 }} />
+				<TimeRange
+					value={minusDelay}
+					id={id}
+					onChange={handleMinusDelayChange}
+				/>
 			</Flex>
 			<NodeUtils id={id} />
 			<Connector

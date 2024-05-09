@@ -1,15 +1,15 @@
 import { observer } from 'mobx-react-lite';
 import { Position } from 'reactflow';
-import { blockStyle } from '../utils/blockStyles';
+import { blockStyle } from '../../utils/blockStyles';
 import Title from 'antd/es/typography/Title';
-import appStore from '../utils/appStore';
+import appStore from '../../utils/appStore';
 import { Flex } from 'antd';
 import { MinusOutlined } from '@ant-design/icons';
 import { useCallback, useEffect, useMemo } from 'react';
-import Connector from './Connector';
-import NodeUtils from './NodeUtils';
-import GetEdges from '../utils/getEdges';
-import GetNodeParameters from '../utils/getNodeParameters';
+import Connector from '../Connector';
+import NodeUtils from '../NodeUtils';
+import GetEdges from '../../utils/getEdges';
+import GetNodeParameters from '../../utils/getNodeParameters';
 
 interface Props {
 	id: string;

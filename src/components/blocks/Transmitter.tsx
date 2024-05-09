@@ -1,16 +1,16 @@
 import { observer } from 'mobx-react-lite';
 import { Position } from 'reactflow';
-import { blockStyle } from '../utils/blockStyles';
+import { blockStyle } from '../../utils/blockStyles';
 import Title from 'antd/es/typography/Title';
-import appStore from '../utils/appStore';
+import appStore from '../../utils/appStore';
 import { Flex, Segmented } from 'antd';
 import { useCallback, useEffect, useMemo } from 'react';
-import NodeUtils from './NodeUtils';
-import Connector from './Connector';
-import GetEdges from '../utils/getEdges';
+import NodeUtils from '../NodeUtils';
+import Connector from '../Connector';
+import GetEdges from '../../utils/getEdges';
 import { LoginOutlined, LogoutOutlined, WifiOutlined } from '@ant-design/icons';
-import RemoteSelect from './RemoteSelect';
-import GetNodeParameters from '../utils/getNodeParameters';
+import RemoteSelect from '../RemoteSelect';
+import GetNodeParameters from '../../utils/getNodeParameters';
 import { SegmentedLabeledOption } from 'antd/es/segmented';
 
 interface Props {

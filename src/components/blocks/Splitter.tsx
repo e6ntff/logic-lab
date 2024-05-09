@@ -1,34 +1,35 @@
 import { observer } from 'mobx-react-lite';
 import { Position } from 'reactflow';
-import { blockStyle } from '../utils/blockStyles';
+import { blockStyle } from '../../utils/blockStyles';
 import Title from 'antd/es/typography/Title';
-import appStore from '../utils/appStore';
+import appStore from '../../utils/appStore';
 import { Flex } from 'antd';
+import { ShareAltOutlined } from '@ant-design/icons';
 import { useEffect, useMemo } from 'react';
-import Connector from './Connector';
-import NodeUtils from './NodeUtils';
-import GetEdges from '../utils/getEdges';
+import NodeUtils from '../NodeUtils';
+import Connector from '../Connector';
+import GetEdges from '../../utils/getEdges';
 
 interface Props {
 	id: string;
 }
 
-const Or: React.FC<Props> = observer(({ id }) => {
+const Splitter: React.FC<Props> = observer(({ id }) => {
 	const { setEdgeActive, activeEdges } = appStore;
 
 	const { prevEdgeIds, nextEdgeIds } = GetEdges(id, { prev: true, next: true });
 
 	const active: boolean | null = useMemo(
-		() =>
-			prevEdgeIds.length > 0 &&
-			prevEdgeIds.some((id: string) => activeEdges[id]),
+		() => prevEdgeIds[0] !== undefined && activeEdges[prevEdgeIds[0]],
 		// eslint-disable-next-line
 		[activeEdges, prevEdgeIds]
 	);
 
 	useEffect(() => {
-		nextEdgeIds[0] && setEdgeActive(nextEdgeIds[0], active || false);
-	}, [prevEdgeIds, nextEdgeIds, active, setEdgeActive]);
+		nextEdgeIds.forEach((id: string) => {
+			setEdgeActive(id, active || false);
+		});
+	}, [nextEdgeIds, active, setEdgeActive]);
 
 	return (
 		<Flex
@@ -36,7 +37,9 @@ const Or: React.FC<Props> = observer(({ id }) => {
 			justify='center'
 			align='center'
 		>
-			<Title style={{ margin: 0 }}>||</Title>
+			<Title style={{ margin: 0 }}>
+				<ShareAltOutlined />
+			</Title>
 			<NodeUtils id={id} />
 			<Connector
 				id='a'
@@ -44,7 +47,6 @@ const Or: React.FC<Props> = observer(({ id }) => {
 				position={'left' as Position}
 				active={active}
 				nodeId={id}
-				maxConnections={Infinity}
 			/>
 			<Connector
 				id='b'
@@ -52,9 +54,10 @@ const Or: React.FC<Props> = observer(({ id }) => {
 				position={'right' as Position}
 				active={active}
 				nodeId={id}
+				maxConnections={Infinity}
 			/>
 		</Flex>
 	);
 });
 
-export default Or;
+export default Splitter;
