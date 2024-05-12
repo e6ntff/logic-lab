@@ -10,29 +10,24 @@ import {
 import getHandlePosition from '../utils/getHandlePosition';
 import { connectorStyle } from '../utils/blockStyles';
 import { Flex, Typography } from 'antd';
+import { NodeData } from '../utils/interfaces';
 import appStore from '../utils/appStore';
-import GetNodeParameters from '../utils/getNodeParameters';
 
 interface Props {
-	active: boolean | null;
+	active: boolean;
 	type: HandleType;
 	id: string;
 	position: Position;
 	nodeId: string;
+	rotation: NodeData['rotation'];
 	maxConnections?: number;
 }
 
 const Connector: React.FC<Props> = observer(
-	({ active, type, id, position, nodeId, maxConnections = 1 }) => {
+	({ active, type, id, position, nodeId, rotation, maxConnections = 1 }) => {
+		const { edges } = appStore;
+
 		const updateNodeInternals = useUpdateNodeInternals();
-
-		const { nodesData, connections } = appStore;
-
-		const { rotation } = useMemo(
-			() => GetNodeParameters(nodeId),
-			// eslint-disable-next-line
-			[nodesData[nodeId]]
-		);
 
 		const computedPosition = useMemo(
 			() => getHandlePosition(position, rotation),
@@ -41,23 +36,15 @@ const Connector: React.FC<Props> = observer(
 
 		useEffect(() => {
 			updateNodeInternals(nodeId);
+
 			return () => updateNodeInternals(nodeId);
 		}, [computedPosition, nodeId, updateNodeInternals]);
 
 		const connectedEdges = useMemo(() => {
-			let prev: Edge<any>[] = [];
-			let next: Edge<any>[] = [];
-			try {
-				prev = Object.values(connections[nodeId]?.prev);
-			} catch (error) {}
-
-			try {
-				next = Object.values(connections[nodeId]?.next);
-			} catch (error) {}
-			return [...prev, ...next].filter((edge: Edge<any>) => {
+			return edges.filter((edge: Edge<any>) => {
 				return edge[type] === nodeId;
 			});
-		}, [nodeId, connections, type]);
+		}, [type, nodeId, edges]);
 
 		const isHandleConnectable = useMemo(() => {
 			return connectedEdges.length < maxConnections;

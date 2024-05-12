@@ -8,28 +8,26 @@ import { ShareAltOutlined } from '@ant-design/icons';
 import { useEffect, useMemo } from 'react';
 import NodeUtils from '../NodeUtils';
 import Connector from '../Connector';
-import GetEdges from '../../utils/getEdges';
+import { NodeData } from '../../utils/interfaces';
 
 interface Props {
 	id: string;
+	data: NodeData;
 }
 
-const Splitter: React.FC<Props> = observer(({ id }) => {
-	const { setEdgeActive, activeEdges } = appStore;
+const Splitter: React.FC<Props> = observer(({ id, data }) => {
+	const { setNodeData, nodes } = appStore;
 
-	const { prevEdgeIds, nextEdgeIds } = GetEdges(id, { prev: true, next: true });
+	const { rotation, prevNodeIds } = useMemo(() => data, [data]);
 
-	const active: boolean | null = useMemo(
-		() => prevEdgeIds[0] !== undefined && activeEdges[prevEdgeIds[0]],
-		// eslint-disable-next-line
-		[activeEdges, prevEdgeIds]
+	const output: boolean = useMemo(
+		() => nodes[prevNodeIds[0]]?.data?.output || false,
+		[prevNodeIds, nodes]
 	);
 
 	useEffect(() => {
-		nextEdgeIds.forEach((id: string) => {
-			setEdgeActive(id, active || false);
-		});
-	}, [nextEdgeIds, active, setEdgeActive]);
+		setNodeData(id, { output });
+	}, [id, output, setNodeData]);
 
 	return (
 		<Flex
@@ -40,20 +38,25 @@ const Splitter: React.FC<Props> = observer(({ id }) => {
 			<Title style={{ margin: 0 }}>
 				<ShareAltOutlined />
 			</Title>
-			<NodeUtils id={id} />
+			<NodeUtils
+				id={id}
+				rotation={rotation}
+			/>
 			<Connector
 				id='a'
 				type='target'
 				position={'left' as Position}
-				active={active}
+				active={output}
 				nodeId={id}
+				rotation={rotation}
 			/>
 			<Connector
 				id='b'
 				type='source'
 				position={'right' as Position}
-				active={active}
+				active={output}
 				nodeId={id}
+				rotation={rotation}
 				maxConnections={Infinity}
 			/>
 		</Flex>

@@ -7,26 +7,26 @@ import { Flex } from 'antd';
 import { useEffect, useMemo } from 'react';
 import Connector from '../Connector';
 import NodeUtils from '../NodeUtils';
-import GetEdges from '../../utils/getEdges';
+import { NodeData } from '../../utils/interfaces';
 
 interface Props {
 	id: string;
+	data: NodeData;
 }
 
-const Not: React.FC<Props> = observer(({ id }) => {
-	const { activeEdges, setEdgeActive } = appStore;
+const Not: React.FC<Props> = observer(({ id, data }) => {
+	const { setNodeData, nodes } = appStore;
 
-	const { prevEdgeIds, nextEdgeIds } = GetEdges(id, { prev: true, next: true });
+	const { rotation, prevNodeIds } = useMemo(() => data, [data]);
 
-	const active: boolean | null = useMemo(
-		() => (prevEdgeIds[0] ? !activeEdges[prevEdgeIds[0]] : null),
-		// eslint-disable-next-line
-		[activeEdges, prevEdgeIds]
+	const output: boolean = useMemo(
+		() => prevNodeIds.length > 0 && !nodes[prevNodeIds[0]]?.data?.output,
+		[prevNodeIds, nodes]
 	);
 
 	useEffect(() => {
-		nextEdgeIds[0] && setEdgeActive(nextEdgeIds[0], active || false);
-	}, [prevEdgeIds, nextEdgeIds, setEdgeActive, active]);
+		setNodeData(id, { output });
+	}, [id, setNodeData, output]);
 
 	return (
 		<Flex
@@ -35,20 +35,25 @@ const Not: React.FC<Props> = observer(({ id }) => {
 			align='center'
 		>
 			<Title style={{ margin: 0 }}>!</Title>
-			<NodeUtils id={id} />
+			<NodeUtils
+				id={id}
+				rotation={rotation}
+			/>
 			<Connector
 				id='a'
 				type='target'
 				position={'left' as Position}
-				active={!active && active !== null}
+				active={!output && prevNodeIds.length > 0}
 				nodeId={id}
+				rotation={rotation}
 			/>
 			<Connector
 				id='b'
 				type='source'
 				position={'right' as Position}
-				active={active}
+				active={output}
 				nodeId={id}
+				rotation={rotation}
 			/>
 		</Flex>
 	);

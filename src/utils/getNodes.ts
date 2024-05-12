@@ -6,20 +6,20 @@ const getNodes = () => {
 	setLoaded(0);
 
 	const nodes: typeof appStore.nodes = JSON.parse(
-		localStorage.getItem('nodes') || '[]'
+		localStorage.getItem('nodes') || '{}'
 	);
 
-	setNodes([]);
+	setNodes({});
 
-	if (!nodes.length) {
+	if (!Object.keys(nodes).length) {
 		setLoaded(1);
 		return;
 	}
 
-	nodes.forEach((node: any, index: number) => {
+	Object.keys(nodes).forEach((id: string, index: number) => {
 		setTimeout(() => {
-			addNode(node);
-			setLoaded(++index / nodes.length || 0);
+			addNode(nodes[id]);
+			setLoaded(++index / Object.keys(nodes).length || 0);
 		});
 	});
 };

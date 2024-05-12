@@ -8,55 +8,44 @@ import { ApiOutlined, LoginOutlined, LogoutOutlined } from '@ant-design/icons';
 import { useCallback, useEffect, useMemo } from 'react';
 import NodeUtils from '../NodeUtils';
 import Connector from '../Connector';
-import GetEdges from '../../utils/getEdges';
 import RemoteSelect from '../RemoteSelect';
-import GetNodeParameters from '../../utils/getNodeParameters';
 import { SegmentedLabeledOption } from 'antd/es/segmented';
+import { NodeData } from '../../utils/interfaces';
 
 interface Props {
 	id: string;
+	data: NodeData;
 }
 
-const Receiver: React.FC<Props> = observer(({ id }) => {
+const Receiver: React.FC<Props> = observer(({ id, data }) => {
 	const {
-		setEdgeActive,
-		activeEdges,
 		remoteConnections,
 		setRemoteConnectionValues,
-		nodesData,
-		setNodeParameters,
-		removeEdge,
+		setNodeData,
+		removeEdges,
+		nodes,
 	} = appStore;
 
-	const { remote, mode } = useMemo(
-		() => GetNodeParameters(id),
-		// eslint-disable-next-line
-		[nodesData[id]]
+	const { remote, mode, rotation, prevNodeIds } = useMemo(() => data, [data]);
+
+	const input: boolean = useMemo(
+		() => nodes[prevNodeIds[0]]?.data?.output || false,
+		[prevNodeIds, nodes]
 	);
 
-	const { prevEdgeIds, nextEdgeIds } = GetEdges(id, {
-		prev: true,
-		next: true,
-	});
-
-	const incoming: boolean = useMemo(
-		() => prevEdgeIds[0] !== undefined && activeEdges[prevEdgeIds[0]],
-		[activeEdges, prevEdgeIds]
-	);
-
-	const active: boolean = useMemo(() => {
+	const output: boolean = useMemo(() => {
 		return remoteConnections[remote?.id as number]?.out;
 	}, [remoteConnections, remote?.id]);
 
 	useEffect(() => {
-		setRemoteConnectionValues(remote?.id as number, 'in', incoming);
+		setRemoteConnectionValues(remote?.id as number, 'in', input);
 
 		return () => setRemoteConnectionValues(remote?.id as number, 'in', false);
-	}, [remote?.id, incoming, setRemoteConnectionValues]);
+	}, [remote?.id, input, setRemoteConnectionValues]);
 
 	useEffect(() => {
-		setEdgeActive(nextEdgeIds[0], active);
-	}, [nextEdgeIds, active, setEdgeActive]);
+		setNodeData(id, { output });
+	}, [setNodeData, output, id]);
 
 	const options: SegmentedLabeledOption<'in' | 'out' | 'all'>[] = useMemo(
 		() => [
@@ -69,12 +58,11 @@ const Receiver: React.FC<Props> = observer(({ id }) => {
 
 	const handleModeChanging = useCallback(
 		(mode: 'in' | 'out' | 'all') => {
-			setNodeParameters(id, { mode });
-			mode === 'in' && removeEdge(nextEdgeIds[0]);
-			mode === 'out' && removeEdge(prevEdgeIds[0]);
+			setNodeData(id, { mode });
+			mode === 'in' && removeEdges(id, false, true);
+			mode === 'out' && removeEdges(id, true, false);
 		},
-		// eslint-disable-next-line
-		[setNodeParameters, id, removeEdge, prevEdgeIds[0], nextEdgeIds[0]]
+		[setNodeData, id, removeEdges]
 	);
 
 	return (
@@ -101,14 +89,18 @@ const Receiver: React.FC<Props> = observer(({ id }) => {
 					remote={remote}
 				/>
 			</Flex>
-			<NodeUtils id={id} />
+			<NodeUtils
+				id={id}
+				rotation={rotation}
+			/>
 			{!(mode === 'out') && (
 				<Connector
 					id='a'
 					type='target'
 					position={'left' as Position}
-					active={incoming}
+					active={input}
 					nodeId={id}
+					rotation={rotation}
 				/>
 			)}
 			{!(mode === 'in') && (
@@ -116,8 +108,9 @@ const Receiver: React.FC<Props> = observer(({ id }) => {
 					id='b'
 					type='source'
 					position={'right' as Position}
-					active={active}
+					active={output}
 					nodeId={id}
+					rotation={rotation}
 				/>
 			)}
 		</Flex>

@@ -16,8 +16,10 @@ import Panel from './components/Panel';
 import MessageButton from './components/MessageButton';
 import FpsScreen from './components/FpsScreen';
 import React, { useCallback, useEffect } from 'react';
-import getNodes from './utils/getNodes';
+// import getNodes from './utils/getNodes';
 import { Flex, Progress } from 'antd';
+import { NodeData, RemoteUsed } from './utils/interfaces';
+import getNodes from './utils/getNodes';
 
 const App: React.FC = observer(() => {
 	const {
@@ -30,19 +32,17 @@ const App: React.FC = observer(() => {
 		removeNode,
 		removeEdge,
 		viewport,
-		nodesData,
 		setRemoteConnectionUsed,
 	} = appStore;
 
 	const handleNodesDeleting = useCallback(
-		(nodes: Node<any, string | undefined>[]) =>
-			nodes.forEach(({ id }: Node<any, string | undefined>) => removeNode(id)),
+		(nodes: Node<NodeData>[]) =>
+			nodes.forEach(({ id }: Node<NodeData>) => removeNode(id)),
 		[removeNode]
 	);
 
 	const handleEdgesDeleting = useCallback(
-		(nodes: Edge<any>[]) =>
-			nodes.forEach(({ id }: Edge<any>) => removeEdge(id)),
+		(edges: Edge<any>[]) => edges.forEach((edge: Edge) => removeEdge(edge)),
 		[removeEdge]
 	);
 
@@ -52,22 +52,22 @@ const App: React.FC = observer(() => {
 	}, []);
 
 	useEffect(() => {
-		const used: { in: number[]; out: number[]; receiver: number[] } = {
+		const used: RemoteUsed = {
 			in: [],
 			out: [],
 			receiver: [],
 		};
-		for (const key in nodesData) {
-			const remote = nodesData[key]?.remote;
-			if (remote?.id === null || !remote) continue;
+		Object.keys(nodes).forEach((key: string) => {
+			const remote = nodes[key].data.remote;
+			if (remote?.id === null || !remote) return;
 			if (remote?.type) {
 				used[remote.type].push(remote.id);
 			} else {
 				used.receiver.push(remote.id);
 			}
-		}
+		});
 		setRemoteConnectionUsed(used);
-	}, [setRemoteConnectionUsed, nodesData]);
+	}, [setRemoteConnectionUsed, nodes]);
 
 	return (
 		<>
@@ -109,8 +109,8 @@ const App: React.FC = observer(() => {
 				onConnect={updateConnections}
 				onNodesDelete={handleNodesDeleting}
 				onEdgesDelete={handleEdgesDeleting}
-				nodes={nodes}
-				edges={edges}
+				nodes={Object.values(nodes)}
+				edges={Object.values(edges)}
 				selectionMode={SelectionMode.Partial}
 				translateExtent={[
 					[-10000, -10000],

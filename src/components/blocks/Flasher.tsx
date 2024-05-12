@@ -6,59 +6,50 @@ import { useCallback, useEffect, useMemo } from 'react';
 import { Position } from 'reactflow';
 import Connector from '../Connector';
 import NodeUtils from '../NodeUtils';
-import GetEdges from '../../utils/getEdges';
-import getNodeParameters from '../../utils/getNodeParameters';
 import TimeRange from '../TimeRange';
+import { NodeData } from '../../utils/interfaces';
 
 interface Props {
 	id: string;
+	data: NodeData;
 }
 
-const Flasher: React.FC<Props> = observer(({ id }) => {
-	const { setEdgeActive, setNodeParameters, nodesData } = appStore;
+const Flasher: React.FC<Props> = observer(({ id, data }) => {
+	const { setNodeData } = appStore;
 
-	const { plusDelay, minusDelay, active } = useMemo(
-		() => getNodeParameters(id),
-		// eslint-disable-next-line
-		[nodesData[id]]
+	const { plusDelay, minusDelay, output, rotation } = useMemo(
+		() => data,
+		[data]
 	);
 
 	useEffect(() => {
 		let timerId: NodeJS.Timer;
-		if (active)
-			timerId = setTimeout(
-				() => setNodeParameters(id, { active: false }),
-				plusDelay
-			);
+		if (output)
+			timerId = setTimeout(() => setNodeData(id, { output: false }), plusDelay);
 
 		return () => clearTimeout(timerId);
-	}, [plusDelay, active, setNodeParameters, id]);
+	}, [plusDelay, output, id, setNodeData]);
 
 	useEffect(() => {
 		let timerId: NodeJS.Timer;
-		if (!active)
-			timerId = setTimeout(
-				() => setNodeParameters(id, { active: true }),
-				minusDelay
-			);
+		if (!output)
+			timerId = setTimeout(() => setNodeData(id, { output: true }), minusDelay);
 
 		return () => clearTimeout(timerId);
-	}, [minusDelay, active, setNodeParameters, id]);
-
-	const { nextEdgeIds } = GetEdges(id, { prev: true, next: true });
+	}, [minusDelay, output, id, setNodeData]);
 
 	useEffect(() => {
-		nextEdgeIds[0] && setEdgeActive(nextEdgeIds[0], active || false);
-	}, [setEdgeActive, id, nextEdgeIds, active]);
+		setNodeData(id, { output });
+	}, [setNodeData, id, output]);
 
 	const handlePlusDelayChange = useCallback(
 		(diff: number) => {
 			let newDelay = (plusDelay || 0) + diff;
 			if (newDelay > 10000) newDelay = 10000;
 			if (newDelay < 100) newDelay = 100;
-			setNodeParameters(id, { plusDelay: newDelay });
+			setNodeData(id, { plusDelay: newDelay });
 		},
-		[setNodeParameters, plusDelay, id]
+		[setNodeData, plusDelay, id]
 	);
 
 	const handleMinusDelayChange = useCallback(
@@ -66,9 +57,9 @@ const Flasher: React.FC<Props> = observer(({ id }) => {
 			let newDelay = (minusDelay || 0) + diff;
 			if (newDelay > 10000) newDelay = 10000;
 			if (newDelay < 100) newDelay = 100;
-			setNodeParameters(id, { minusDelay: newDelay });
+			setNodeData(id, { minusDelay: newDelay });
 		},
-		[setNodeParameters, minusDelay, id]
+		[setNodeData, minusDelay, id]
 	);
 
 	return (
@@ -79,7 +70,7 @@ const Flasher: React.FC<Props> = observer(({ id }) => {
 			align='center'
 		>
 			<Switch
-				value={active}
+				value={output}
 				disabled
 			/>
 			<Flex
@@ -99,13 +90,17 @@ const Flasher: React.FC<Props> = observer(({ id }) => {
 					onChange={handleMinusDelayChange}
 				/>
 			</Flex>
-			<NodeUtils id={id} />
+			<NodeUtils
+				id={id}
+				rotation={rotation}
+			/>
 			<Connector
 				id='a'
 				type='source'
 				position={'right' as Position}
-				active={active || false}
+				active={output || false}
 				nodeId={id}
+				rotation={rotation}
 			/>
 		</Flex>
 	);

@@ -6,30 +6,24 @@ import {
 } from '@ant-design/icons';
 import { observer } from 'mobx-react-lite';
 import appStore from '../utils/appStore';
-import { useCallback, useMemo } from 'react';
+import { useCallback } from 'react';
 import { Flex } from 'antd';
-import GetNodeParameters from '../utils/getNodeParameters';
 
 interface Props {
 	id: string;
+	rotation: number;
 }
 
-const NodeUtils: React.FC<Props> = observer(({ id }) => {
-	const { setNodeParameters, removeNode, nodesData } = appStore;
-
-	const { rotation } = useMemo(
-		() => GetNodeParameters(id),
-		// eslint-disable-next-line
-		[nodesData[id]]
-	);
+const NodeUtils: React.FC<Props> = observer(({ id, rotation }) => {
+	const { setNodeData, removeNode } = appStore;
 
 	const handleNodeRotation = useCallback(
 		(right: boolean) => {
 			let newRotation: number = ((rotation || 0) + (right ? 90 : -90)) % 360;
 			if (newRotation === -90) newRotation = 270;
-			setNodeParameters(id, { rotation: newRotation });
+			setNodeData(id, { rotation: newRotation });
 		},
-		[setNodeParameters, id, rotation]
+		[setNodeData, id, rotation]
 	);
 
 	return (

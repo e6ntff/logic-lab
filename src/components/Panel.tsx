@@ -5,7 +5,6 @@ import {
 	ApiOutlined,
 	BulbOutlined,
 	CloudOutlined,
-	DisconnectOutlined,
 	EllipsisOutlined,
 	HistoryOutlined,
 	PlayCircleOutlined,
@@ -29,16 +28,13 @@ const Panel: React.FC = observer(() => {
 				blockSize: 'min-content',
 			}}
 		>
-			<Button onClick={() => addNode(null, 'start', { active: true })}>
+			<Button onClick={() => addNode(null, 'start', { output: true })}>
 				<PoweroffOutlined />
 			</Button>
 			<Button
-				onClick={() => addNode(null, 'button', { active: false, delay: 1000 })}
+				onClick={() => addNode(null, 'button', { output: false, delay: 1000 })}
 			>
 				<PlayCircleOutlined />
-			</Button>
-			<Button onClick={() => addNode(null, 'switch', { active: true })}>
-				<DisconnectOutlined />
 			</Button>
 			<Button onClick={() => addNode(null, 'and')}>&</Button>
 			<Button onClick={() => addNode(null, 'or')}>||</Button>
@@ -50,7 +46,7 @@ const Panel: React.FC = observer(() => {
 			<Button
 				onClick={() =>
 					addNode(null, 'flasher', {
-						active: true,
+						output: true,
 						plusDelay: 1000,
 						minusDelay: 1000,
 					})
@@ -59,7 +55,7 @@ const Panel: React.FC = observer(() => {
 				<HistoryOutlined />
 			</Button>
 			<Button
-				onClick={() => addNode(null, 'delay', { active: false, delay: 1000 })}
+				onClick={() => addNode(null, 'delay', { output: false, delay: 1000 })}
 			>
 				<EllipsisOutlined />
 			</Button>

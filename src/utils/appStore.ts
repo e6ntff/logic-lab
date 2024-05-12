@@ -6,38 +6,31 @@ import {
 	Node,
 	NodeChange,
 	Viewport,
-	addEdge,
 	applyEdgeChanges,
 	applyNodeChanges,
 } from 'reactflow';
 import uniqid from 'uniqid';
 import { nodeType } from './types';
+import { NodeData, NodeDataOptional } from './interfaces';
+
+const defaultNodeData: NodeData = {
+	rotation: 0,
+	output: false,
+	delay: 0,
+	plusDelay: 0,
+	minusDelay: 0,
+	remote: { id: null },
+	mode: 'all',
+	prevNodeIds: [],
+};
 
 class AppStore {
 	loading: number = 0;
 	viewport: Viewport = JSON.parse(
 		sessionStorage.getItem('viewport') || '{"x":0,"y":0,"zoom":1}'
 	);
-	nodes: Node<any, string | undefined>[] = [];
-	connections: {
-		[key: string]: {
-			prev: { [key: string]: Edge<any> };
-			next: { [key: string]: Edge<any> };
-		};
-	} = JSON.parse(localStorage.getItem('connections') || '{}');
-	nodesData: {
-		[key: string]: {
-			rotation?: number;
-			active?: boolean;
-			delay?: number;
-			plusDelay?: number;
-			minusDelay?: number;
-			remote?: { type?: 'in' | 'out'; id: number | null };
-			mode?: 'in' | 'out' | 'all';
-		};
-	} = JSON.parse(localStorage.getItem('nodesData') || '{}');
-	edges: Edge<any>[] = JSON.parse(localStorage.getItem('edges') || '[]');
-	activeEdges: { [key: string]: boolean } = {};
+	nodes: { [key: string]: Node<NodeData> } = {};
+	edges: Edge[] = JSON.parse(localStorage.getItem('edges') || '[]');
 	remoteConnections: {
 		used: { in: number[]; out: number[]; receiver: number[] };
 		[key: number]: {
@@ -61,8 +54,8 @@ class AppStore {
 		this.nodes = nodes;
 	};
 
-	setConnections = (connections: typeof this.connections) => {
-		this.connections = connections;
+	setEdges = (edges: typeof this.edges) => {
+		this.edges = edges;
 	};
 
 	setRemoteConnectionValues = (
@@ -70,13 +63,14 @@ class AppStore {
 		type: 'in' | 'out',
 		value: boolean
 	) => {
-		this.remoteConnections = {
-			...this.remoteConnections,
-			[id]: {
-				...this.remoteConnections[id],
-				[type]: value,
-			},
-		};
+		if (id)
+			this.remoteConnections = {
+				...this.remoteConnections,
+				[id]: {
+					...this.remoteConnections[id],
+					[type]: value,
+				},
+			};
 	};
 
 	setRemoteConnectionUsed = (values: typeof this.remoteConnections.used) => {
@@ -86,12 +80,21 @@ class AppStore {
 		};
 	};
 
-	setEdgeActive = (id: string, active: boolean) => {
-		this.activeEdges = { ...this.activeEdges, [id]: active };
-	};
-
 	updateNodes = (changes: NodeChange[]) => {
-		this.nodes = applyNodeChanges(changes, this.nodes);
+		changes.forEach((change: NodeChange) => {
+			if (
+				change.type === 'add' ||
+				change.type === 'remove' ||
+				change.type === 'reset'
+			)
+				return;
+			const { id } = change;
+			id &&
+				this.setNodes({
+					...this.nodes,
+					[id]: applyNodeChanges([change], [this.nodes[id]])[0],
+				});
+		});
 	};
 
 	updateEdges = (changes: EdgeChange[]) => {
@@ -99,54 +102,77 @@ class AppStore {
 	};
 
 	updateConnections = (changes: Edge | Connection) => {
-		const id = uniqid();
-		changes = { ...changes, type: 'wire', id: id };
-		this.edges = addEdge(changes, this.edges);
-		addEdgeToConnections(id, changes);
+		changes = {
+			...changes,
+			type: 'wire',
+			id: uniqid(),
+		};
+		const newEdge = changes as Edge;
+		const { source, target } = newEdge;
+		const nodes = { ...this.nodes };
+		nodes[target].data.prevNodeIds.push(source);
+		this.setNodes({
+			...this.nodes,
+			[target]: nodes[target],
+		});
+		this.updateEdges([{ item: newEdge, type: 'add' }]);
 	};
 
 	addNode = (
-		existing?: Node<any, string | undefined> | null,
+		existing?: Node<NodeData> | null,
 		type?: nodeType,
-		parameters?: (typeof this.nodesData)[0]
+		parameters?: NodeDataOptional
 	) => {
 		const { x, y } = getCoordinates();
 
 		const id = existing ? existing.id : uniqid();
-		const node: Node<any, string | undefined> = existing || {
+		const node: Node<NodeData> = existing || {
 			id: id,
 			position: { x, y },
-			data: {},
+			data: { ...defaultNodeData, ...parameters },
 			type: type,
 		};
-		this.nodes = [...this.nodes, node];
-		if (!existing)
-			this.nodesData = {
-				...this.nodesData,
-				[id]: parameters || {},
-			};
+		this.setNodes({ ...this.nodes, [id]: node });
 	};
 
-	setNodeParameters = (id: string, parameters: (typeof this.nodesData)[0]) => {
-		try {
-			this.nodesData = {
-				...this.nodesData,
-				[id]: { ...this.nodesData[id], ...parameters },
-			};
-		} catch (error) {}
+	setNodeData = (id: string, data: NodeDataOptional) => {
+		id &&
+			this.setNodes({
+				...this.nodes,
+				[id]: {
+					...this.nodes[id],
+					data: { ...this.nodes[id]?.data, ...data },
+				},
+			});
 	};
 
 	removeNode = (id: string) => {
-		this.nodes = this.nodes.filter((node) => node.id !== id);
-		const nodesData = this.nodesData;
-		delete nodesData[id];
-		this.nodesData = { ...nodesData };
-		removeUselessEdges(id);
+		this.removeEdges(id, true, true);
+		const { [id]: _, ...nodes } = this.nodes;
+		this.setNodes(nodes);
 	};
 
-	removeEdge = (id: string) => {
-		this.edges = this.edges.filter((edge) => edge.id !== id);
-		removeEdgeFromConnections(id);
+	removeEdges = (id: string, prev: boolean, next: boolean) => {
+		this.edges.forEach((edge: Edge) => {
+			if (edge.target === id && prev) this.removeEdge(edge);
+			if (edge.source === id && next) this.removeEdge(edge);
+		});
+	};
+
+	removeEdge = ({ id, target, source }: Edge) => {
+		this.updateEdges([{ id, type: 'remove' }]);
+		this.setNodes({
+			...this.nodes,
+			[target]: {
+				...this.nodes[target],
+				data: {
+					...this.nodes[target].data,
+					prevNodeIds: this.nodes[target].data.prevNodeIds.filter(
+						(edgeId: string) => edgeId !== source
+					),
+				},
+			},
+		});
 	};
 
 	constructor() {
@@ -175,20 +201,6 @@ reaction(
 );
 
 reaction(
-	() => appStore.nodesData,
-	() => {
-		localStorage.setItem('nodesData', JSON.stringify(appStore.nodesData));
-	}
-);
-
-reaction(
-	() => appStore.connections,
-	() => {
-		localStorage.setItem('connections', JSON.stringify(appStore.connections));
-	}
-);
-
-reaction(
 	() => appStore.remoteConnections,
 	() => {
 		localStorage.setItem(
@@ -204,63 +216,6 @@ reaction(
 		sessionStorage.setItem('viewport', JSON.stringify(appStore.viewport));
 	}
 );
-
-const removeUselessEdges = (id: string) => {
-	appStore.edges
-		.filter((edge: Edge<any>) => edge.source === id || edge.target === id)
-		.forEach((edge: Edge<any>) => {
-			appStore.removeEdge(edge.id);
-		});
-
-	const connections = appStore.connections;
-	delete connections[id];
-	appStore.setConnections({ ...connections });
-};
-
-const removeEdgeFromConnections = (id: string) => {
-	for (const key in appStore.connections) {
-		const connection = appStore.connections[key];
-		if (Object.hasOwn(connection, 'prev')) {
-			delete connection.prev[id];
-		}
-		if (Object.hasOwn(connection, 'next')) {
-			delete connection.next[id];
-		}
-		appStore.setConnections({ ...appStore.connections, [key]: connection });
-	}
-};
-
-const addEdgeToConnections = (id: string, changes: Edge | Connection) => {
-	const { source, target } = changes;
-	try {
-		appStore.setConnections({
-			...appStore.connections,
-			[source as string]: {
-				...appStore.connections[source as string],
-				next: {
-					...appStore.connections[source as string]?.next,
-					[id]: changes as Edge,
-				},
-			},
-			[target as string]: {
-				...appStore.connections[target as string],
-				prev: {
-					...appStore.connections[target as string]?.prev,
-					[id]: changes as Edge,
-				},
-			},
-		});
-	} catch (error) {
-		appStore.setConnections({
-			...appStore.connections,
-			[source as string]: { prev: { [id]: changes as Edge }, next: {} },
-			[target as string]: {
-				prev: {},
-				next: { [id]: changes as Edge },
-			},
-		});
-	}
-};
 
 const getCoordinates = () => {
 	let { x, y, zoom } = appStore.viewport;

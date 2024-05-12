@@ -6,35 +6,25 @@ import { useCallback, useEffect, useMemo } from 'react';
 import { Position } from 'reactflow';
 import NodeUtils from '../NodeUtils';
 import Connector from '../Connector';
-import GetEdges from '../../utils/getEdges';
-import GetNodeParameters from '../../utils/getNodeParameters';
+import { NodeData } from '../../utils/interfaces';
 
 interface Props {
 	id: string;
+	data: NodeData;
 }
 
-const Start: React.FC<Props> = observer(({ id }) => {
-	const { setEdgeActive, setNodeParameters, nodesData } = appStore;
+const Start: React.FC<Props> = observer(({ id, data }) => {
+	const { setNodeData } = appStore;
 
-	const { active } = useMemo(
-		() => GetNodeParameters(id),
-		// eslint-disable-next-line
-		[nodesData[id]]
-	);
-
-	const { nextEdgeIds } = GetEdges(id, { prev: false, next: true });
+	const { output, rotation } = useMemo(() => data, [data]);
 
 	useEffect(() => {
-		try {
-			nextEdgeIds.forEach((id: string) => {
-				setEdgeActive(id, active || false);
-			});
-		} catch (error) {}
-	}, [setEdgeActive, id, nextEdgeIds, active]);
+		setNodeData(id, { output });
+	}, [setNodeData, output, id]);
 
 	const handleSwitchChange = useCallback(
-		(active: boolean) => setNodeParameters(id, { active: active }),
-		[setNodeParameters, id]
+		(active: boolean) => setNodeData(id, { output: active }),
+		[setNodeData, id]
 	);
 
 	return (
@@ -45,15 +35,19 @@ const Start: React.FC<Props> = observer(({ id }) => {
 		>
 			<Switch
 				onChange={handleSwitchChange}
-				value={active}
+				value={output}
 			/>
-			<NodeUtils id={id} />
+			<NodeUtils
+				id={id}
+				rotation={rotation}
+			/>
 			<Connector
 				id='a'
 				type='source'
 				position={'right' as Position}
-				active={active || false}
+				active={output || false}
 				nodeId={id}
+				rotation={rotation}
 			/>
 		</Flex>
 	);

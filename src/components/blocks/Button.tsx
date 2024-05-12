@@ -7,43 +7,36 @@ import { useCallback, useEffect, useMemo } from 'react';
 import { Position } from 'reactflow';
 import Connector from '../Connector';
 import NodeUtils from '../NodeUtils';
-import GetEdges from '../../utils/getEdges';
-import GetNodeParameters from '../../utils/getNodeParameters';
 import TimeRange from '../TimeRange';
+import { NodeData } from '../../utils/interfaces';
 
 interface Props {
 	id: string;
+	data: NodeData;
 }
 
-const Button: React.FC<Props> = observer(({ id }) => {
-	const { setEdgeActive, setNodeParameters, nodesData } = appStore;
+const Button: React.FC<Props> = observer(({ id, data }) => {
+	const { setNodeData } = appStore;
 
-	const { delay, active } = useMemo(
-		() => GetNodeParameters(id),
-		// eslint-disable-next-line
-		[nodesData[id]]
-	);
-
-	const { nextEdgeIds } = GetEdges(id, { prev: true, next: true });
+	const { delay, output, rotation } = useMemo(() => data, [data]);
 
 	useEffect(() => {
-		if (active)
-			setTimeout(() => setNodeParameters(id, { active: false }), delay);
-	}, [delay, active, setNodeParameters, id]);
-
-	useEffect(() => {
-		nextEdgeIds[0] && setEdgeActive(nextEdgeIds[0], active || false);
-	}, [setEdgeActive, id, nextEdgeIds, active]);
+		if (output) setTimeout(() => setNodeData(id, { output: false }), delay);
+	}, [delay, output, setNodeData, id]);
 
 	const handleDelayChange = useCallback(
 		(diff: number) => {
 			let newDelay = (delay || 0) + diff;
 			if (newDelay > 10000) newDelay = 10000;
 			if (newDelay < 100) newDelay = 100;
-			setNodeParameters(id, { delay: newDelay });
+			setNodeData(id, { delay: newDelay });
 		},
-		[setNodeParameters, delay, id]
+		[setNodeData, delay, id]
 	);
+
+	useEffect(() => {
+		setNodeData(id, { output });
+	}, [setNodeData, id, output]);
 
 	return (
 		<Flex
@@ -52,7 +45,7 @@ const Button: React.FC<Props> = observer(({ id }) => {
 			justify='space-around'
 			align='center'
 		>
-			<ButtonAntd onClick={() => setNodeParameters(id, { active: true })}>
+			<ButtonAntd onClick={() => setNodeData(id, { output: true })}>
 				<PlayCircleOutlined />
 			</ButtonAntd>
 			<TimeRange
@@ -60,13 +53,17 @@ const Button: React.FC<Props> = observer(({ id }) => {
 				onChange={handleDelayChange}
 				value={delay}
 			/>
-			<NodeUtils id={id} />
+			<NodeUtils
+				id={id}
+				rotation={rotation}
+			/>
 			<Connector
 				id='a'
 				type='source'
 				position={'right' as Position}
-				active={active || false}
+				active={output || false}
 				nodeId={id}
+				rotation={rotation}
 			/>
 		</Flex>
 	);

@@ -1,14 +1,14 @@
 import { CloseOutlined } from '@ant-design/icons';
 import { observer } from 'mobx-react-lite';
 import { useCallback, useMemo } from 'react';
-import { EdgeLabelRenderer, getSimpleBezierPath } from 'reactflow';
+import { Edge, EdgeLabelRenderer, getSimpleBezierPath } from 'reactflow';
 import appStore from '../utils/appStore';
 
 const Wire: React.FC = observer(
-	({ id, sourceX, sourceY, targetX, targetY }: any) => {
-		const { removeEdge, activeEdges } = appStore;
+	({ id, target, source, sourceX, sourceY, targetX, targetY }: any) => {
+		const { removeEdge, nodes } = appStore;
 
-		const active = useMemo(() => activeEdges[id], [activeEdges, id]);
+		const output = useMemo(() => nodes[source]?.data?.output, [nodes, source]);
 
 		const [edgePath, labelX, labelY] = getSimpleBezierPath({
 			sourceX,
@@ -18,17 +18,17 @@ const Wire: React.FC = observer(
 		});
 
 		const handleRemoving = useCallback(() => {
-			removeEdge(id);
-		}, [id, removeEdge]);
+			removeEdge({ id, target, source } as Edge);
+		}, [id, removeEdge, target, source]);
 
 		return (
 			<>
 				<g>
 					<path
 						d={edgePath}
-						stroke={active ? '#f00' : '#555'}
+						stroke={output ? '#f00' : '#555'}
 						fill='#0000'
-						strokeWidth={active ? 7 : 5}
+						strokeWidth={output ? 7 : 5}
 						className='animated'
 					/>
 				</g>

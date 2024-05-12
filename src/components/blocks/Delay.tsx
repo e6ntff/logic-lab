@@ -6,51 +6,42 @@ import { useCallback, useEffect, useMemo } from 'react';
 import { Position } from 'reactflow';
 import Connector from '../Connector';
 import NodeUtils from '../NodeUtils';
-import GetEdges from '../../utils/getEdges';
-import GetNodeParameters from '../../utils/getNodeParameters';
 import TimeRange from '../TimeRange';
+import { NodeData } from '../../utils/interfaces';
 
 interface Props {
 	id: string;
+	data: NodeData;
 }
 
-const Delay: React.FC<Props> = observer(({ id }) => {
-	const { setEdgeActive, activeEdges, setNodeParameters, nodesData } = appStore;
+const Delay: React.FC<Props> = observer(({ id, data }) => {
+	const { setNodeData, nodes } = appStore;
 
-	const { delay, active } = useMemo(
-		() => GetNodeParameters(id),
-		// eslint-disable-next-line
-		[nodesData[id]]
-	);
+	const { delay, output, rotation, prevNodeIds } = useMemo(() => data, [data]);
 
-	const { prevEdgeIds, nextEdgeIds } = GetEdges(id, { prev: true, next: true });
-
-	const incoming: boolean | null = useMemo(
-		() => (prevEdgeIds[0] ? activeEdges[prevEdgeIds[0]] : null),
-		// eslint-disable-next-line
-		[activeEdges[prevEdgeIds[0] as string]]
+	const incoming: boolean = useMemo(
+		() => nodes[prevNodeIds[0]]?.data?.output || false,
+		[prevNodeIds, nodes]
 	);
 
 	useEffect(() => {
-		if (incoming)
-			setTimeout(() => setNodeParameters(id, { active: true }), delay);
-		if (!incoming)
-			setTimeout(() => setNodeParameters(id, { active: false }), delay);
-	}, [incoming, delay, id, setNodeParameters]);
+		if (incoming) setTimeout(() => setNodeData(id, { output: true }), delay);
+		if (!incoming) setTimeout(() => setNodeData(id, { output: false }), delay);
+	}, [incoming, delay, setNodeData, id]);
 
 	const handleDelayChange = useCallback(
 		(diff: number) => {
 			let newDelay = (delay || 0) + diff;
 			if (newDelay > 10000) newDelay = 10000;
 			if (newDelay < 0) newDelay = 0;
-			setNodeParameters(id, { delay: newDelay });
+			setNodeData(id, { delay: newDelay });
 		},
-		[setNodeParameters, delay, id]
+		[setNodeData, delay, id]
 	);
 
 	useEffect(() => {
-		nextEdgeIds[0] && setEdgeActive(nextEdgeIds[0], active || false);
-	}, [setEdgeActive, nextEdgeIds, active]);
+		setNodeData(id, { output });
+	}, [setNodeData, id, output]);
 
 	return (
 		<Flex
@@ -64,20 +55,25 @@ const Delay: React.FC<Props> = observer(({ id }) => {
 				onChange={handleDelayChange}
 				value={delay}
 			/>
-			<NodeUtils id={id} />
+			<NodeUtils
+				id={id}
+				rotation={rotation}
+			/>
 			<Connector
 				id='a'
 				type='target'
 				position={'left' as Position}
 				active={incoming}
 				nodeId={id}
+				rotation={rotation}
 			/>
 			<Connector
 				id='b'
 				type='source'
 				position={'right' as Position}
-				active={active || false}
+				active={output || false}
 				nodeId={id}
+				rotation={rotation}
 			/>
 		</Flex>
 	);

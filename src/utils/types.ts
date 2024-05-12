@@ -8,7 +8,6 @@ import End from '../components/blocks/End';
 import Splitter from '../components/blocks/Splitter';
 import Flasher from '../components/blocks/Flasher';
 import Delay from '../components/blocks/Delay';
-import Switch from '../components/blocks/Switch';
 import ButtonAntd from '../components/blocks/Button';
 import Transmitter from '../components/blocks/Transmitter';
 import Receiver from '../components/blocks/Receiver';
@@ -23,7 +22,6 @@ export type nodeType =
 	| 'delay'
 	| 'flasher'
 	| 'button'
-	| 'switch'
 	| 'start'
 	| 'transmitter'
 	| 'receiver'
@@ -41,7 +39,6 @@ export const nodeTypes: NodeTypes = {
 	splitter: Splitter,
 	flasher: Flasher,
 	delay: Delay,
-	switch: Switch,
 	button: ButtonAntd,
 	transmitter: Transmitter,
 	receiver: Receiver,

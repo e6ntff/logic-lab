@@ -7,66 +7,45 @@ import { Flex, Segmented } from 'antd';
 import { useCallback, useEffect, useMemo } from 'react';
 import NodeUtils from '../NodeUtils';
 import Connector from '../Connector';
-import GetEdges from '../../utils/getEdges';
 import { LoginOutlined, LogoutOutlined, WifiOutlined } from '@ant-design/icons';
 import RemoteSelect from '../RemoteSelect';
-import GetNodeParameters from '../../utils/getNodeParameters';
 import { SegmentedLabeledOption } from 'antd/es/segmented';
+import { NodeData } from '../../utils/interfaces';
 
 interface Props {
 	id: string;
+	data: NodeData;
 }
 
-const Transmitter: React.FC<Props> = observer(({ id }) => {
+const Transmitter: React.FC<Props> = observer(({ id, data }) => {
 	const {
-		setEdgeActive,
 		remoteConnections,
-		nodesData,
-		setNodeParameters,
-		removeEdge,
-		activeEdges,
+		setNodeData,
+		removeEdges,
 		setRemoteConnectionValues,
+		nodes,
 	} = appStore;
 
-	const { remote } = useMemo(
-		() => GetNodeParameters(id),
-		// eslint-disable-next-line
-		[nodesData[id]]
-	);
+	const { remote, rotation, prevNodeIds } = useMemo(() => data, [data]);
 
-	const { prevEdgeIds, nextEdgeIds } = GetEdges(id, {
-		prev: true,
-		next: true,
-	});
-
-	const active: boolean | null = useMemo(
+	const output: boolean = useMemo(
 		() =>
 			remote?.type === 'in'
-				? prevEdgeIds[0] !== undefined && activeEdges[prevEdgeIds[0]]
+				? nodes[prevNodeIds[0]]?.data?.output || false
 				: remoteConnections[remote?.id as number]?.in,
-		// eslint-disable-next-line
-		[remoteConnections, remote?.id, remote?.type, activeEdges, prevEdgeIds]
+		[remoteConnections, remote, prevNodeIds, nodes]
 	);
 
 	useEffect(() => {
-		remote?.type === 'out' && setEdgeActive(nextEdgeIds[0], active || false);
+		remote?.type === 'out' && setNodeData(id, { output });
 
 		remote?.type === 'in' &&
-			setRemoteConnectionValues(remote?.id as number, 'out', active);
+			setRemoteConnectionValues(remote?.id as number, 'out', output);
 
 		return () => {
 			setRemoteConnectionValues(remote?.id as number, 'out', false);
 		};
-	}, [
-		nextEdgeIds,
-		active,
-		setEdgeActive,
-		setRemoteConnectionValues,
-		remote?.id,
-		remote?.type,
-	]);
-
-	useEffect(() => {}, [remote?.id, active, setRemoteConnectionValues]);
+	}, [id, output, setNodeData, setRemoteConnectionValues, remote]);
 
 	const options: SegmentedLabeledOption<'in' | 'out'>[] = useMemo(
 		() => [
@@ -78,12 +57,11 @@ const Transmitter: React.FC<Props> = observer(({ id }) => {
 
 	const handleTypeChanging = useCallback(
 		(type: 'in' | 'out') => {
-			setNodeParameters(id, { remote: { ...remote, type } });
-			type === 'in' && removeEdge(nextEdgeIds[0]);
-			type === 'out' && removeEdge(prevEdgeIds[0]);
+			setNodeData(id, { remote: { ...remote, type } });
+			type === 'in' && removeEdges(id, false, true);
+			type === 'out' && removeEdges(id, true, false);
 		},
-		// eslint-disable-next-line
-		[setNodeParameters, id, removeEdge, prevEdgeIds[0], nextEdgeIds[0]]
+		[setNodeData, removeEdges, id, remote]
 	);
 
 	return (
@@ -108,14 +86,18 @@ const Transmitter: React.FC<Props> = observer(({ id }) => {
 					remote={remote}
 				/>
 			</Flex>
-			<NodeUtils id={id} />
+			<NodeUtils
+				id={id}
+				rotation={rotation}
+			/>
 			{remote?.type === 'in' && (
 				<Connector
 					id='a'
 					type='target'
 					position={'left' as Position}
-					active={active}
+					active={output}
 					nodeId={id}
+					rotation={rotation}
 				/>
 			)}
 			{remote?.type === 'out' && (
@@ -123,8 +105,9 @@ const Transmitter: React.FC<Props> = observer(({ id }) => {
 					id='b'
 					type='source'
 					position={'right' as Position}
-					active={active}
+					active={output}
 					nodeId={id}
+					rotation={rotation}
 				/>
 			)}
 		</Flex>

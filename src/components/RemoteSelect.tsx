@@ -2,14 +2,15 @@ import { Flex, Radio, RadioChangeEvent } from 'antd';
 import { observer } from 'mobx-react-lite';
 import appStore from '../utils/appStore';
 import { useCallback } from 'react';
+import { NodeData } from '../utils/interfaces';
 
 interface Props {
 	nodeId: string;
-	remote: { type?: 'in' | 'out'; id: number | null };
+	remote: NodeData['remote'];
 }
 
 const RemoteSelect: React.FC<Props> = observer(({ nodeId, remote }) => {
-	const { setNodeParameters, remoteConnections } = appStore;
+	const { setNodeData, remoteConnections } = appStore;
 
 	const { type, id } = remote;
 
@@ -17,9 +18,9 @@ const RemoteSelect: React.FC<Props> = observer(({ nodeId, remote }) => {
 		(event: RadioChangeEvent) => {
 			const value = event.target.value;
 			if (value === undefined) return;
-			setNodeParameters(nodeId, { remote: { type, id: value } });
+			setNodeData(nodeId, { remote: { type, id: value } });
 		},
-		[setNodeParameters, nodeId, type]
+		[setNodeData, nodeId, type]
 	);
 
 	const getIsButtonDisabled = useCallback(

@@ -1,6 +1,5 @@
 import { observer } from 'mobx-react-lite';
 import { blockStyle } from '../../utils/blockStyles';
-import appStore from '../../utils/appStore';
 import { Flex } from 'antd';
 import { BulbOutlined } from '@ant-design/icons';
 import { useMemo } from 'react';
@@ -8,28 +7,29 @@ import { Position } from 'reactflow';
 import Title from 'antd/es/typography/Title';
 import NodeUtils from '../NodeUtils';
 import Connector from '../Connector';
-import GetEdges from '../../utils/getEdges';
+import { NodeData } from '../../utils/interfaces';
+import appStore from '../../utils/appStore';
 
 interface Props {
 	id: string;
+	data: NodeData;
 }
 
-const End: React.FC<Props> = observer(({ id }) => {
-	const { activeEdges } = appStore;
-	
-	const { prevEdgeIds } = GetEdges(id, { prev: true, next: false });
+const End: React.FC<Props> = observer(({ id, data }) => {
+	const { nodes } = appStore;
 
-	const incoming = useMemo(
-		() => (prevEdgeIds[0] ? activeEdges[prevEdgeIds[0]] : false),
-		// eslint-disable-next-line
-		[prevEdgeIds[0], activeEdges[prevEdgeIds[0]]]
+	const { prevNodeIds, rotation } = useMemo(() => data, [data]);
+
+	const input: boolean = useMemo(
+		() => nodes[prevNodeIds[0]]?.data?.output || false,
+		[nodes, prevNodeIds]
 	);
 
 	return (
 		<Flex
 			style={{
 				...blockStyle,
-				background: incoming ? '#ff0' : '#555',
+				background: input ? '#ff0' : '#555',
 			}}
 			justify='center'
 			align='center'
@@ -37,13 +37,17 @@ const End: React.FC<Props> = observer(({ id }) => {
 			<Title style={{ color: '#000', margin: 0 }}>
 				<BulbOutlined />
 			</Title>
-			<NodeUtils id={id} />
+			<NodeUtils
+				id={id}
+				rotation={rotation}
+			/>
 			<Connector
 				id='a'
 				type='target'
-				active={incoming}
+				active={input}
 				position={'left' as Position}
 				nodeId={id}
+				rotation={rotation}
 			/>
 		</Flex>
 	);

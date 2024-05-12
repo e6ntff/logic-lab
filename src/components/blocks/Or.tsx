@@ -7,28 +7,28 @@ import { Flex } from 'antd';
 import { useEffect, useMemo } from 'react';
 import Connector from '../Connector';
 import NodeUtils from '../NodeUtils';
-import GetEdges from '../../utils/getEdges';
+import { NodeData } from '../../utils/interfaces';
 
 interface Props {
 	id: string;
+	data: NodeData;
 }
 
-const Or: React.FC<Props> = observer(({ id }) => {
-	const { setEdgeActive, activeEdges } = appStore;
+const Or: React.FC<Props> = observer(({ id, data }) => {
+	const { setNodeData, nodes } = appStore;
 
-	const { prevEdgeIds, nextEdgeIds } = GetEdges(id, { prev: true, next: true });
+	const { rotation, prevNodeIds } = useMemo(() => data, [data]);
 
-	const active: boolean | null = useMemo(
+	const output: boolean = useMemo(
 		() =>
-			prevEdgeIds.length > 0 &&
-			prevEdgeIds.some((id: string) => activeEdges[id]),
-		// eslint-disable-next-line
-		[activeEdges, prevEdgeIds]
+			prevNodeIds.length > 0 &&
+			prevNodeIds.some((id: string) => nodes[id]?.data?.output),
+		[prevNodeIds, nodes]
 	);
 
 	useEffect(() => {
-		nextEdgeIds[0] && setEdgeActive(nextEdgeIds[0], active || false);
-	}, [prevEdgeIds, nextEdgeIds, active, setEdgeActive]);
+		setNodeData(id, { output });
+	}, [id, setNodeData, output]);
 
 	return (
 		<Flex
@@ -37,21 +37,26 @@ const Or: React.FC<Props> = observer(({ id }) => {
 			align='center'
 		>
 			<Title style={{ margin: 0 }}>||</Title>
-			<NodeUtils id={id} />
+			<NodeUtils
+				id={id}
+				rotation={rotation}
+			/>
 			<Connector
 				id='a'
 				type='target'
 				position={'left' as Position}
-				active={active}
+				active={output}
 				nodeId={id}
+				rotation={rotation}
 				maxConnections={Infinity}
 			/>
 			<Connector
 				id='b'
 				type='source'
 				position={'right' as Position}
-				active={active}
+				active={output}
 				nodeId={id}
+				rotation={rotation}
 			/>
 		</Flex>
 	);
