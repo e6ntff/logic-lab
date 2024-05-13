@@ -5,6 +5,7 @@ import ReactFlow, {
 	Edge,
 	MiniMap,
 	Node,
+	ReactFlowInstance,
 	SelectionMode,
 	Viewport,
 	useOnViewportChange,
@@ -15,8 +16,7 @@ import appStore from './utils/appStore';
 import Panel from './components/Panel';
 import MessageButton from './components/MessageButton';
 import FpsScreen from './components/FpsScreen';
-import React, { useCallback, useEffect } from 'react';
-// import getNodes from './utils/getNodes';
+import React, { useCallback, useEffect, useState } from 'react';
 import { Flex, Progress } from 'antd';
 import { NodeData, RemoteUsed } from './utils/interfaces';
 import getNodes from './utils/getNodes';
@@ -34,6 +34,8 @@ const App: React.FC = observer(() => {
 		viewport,
 		setRemoteConnectionUsed,
 	} = appStore;
+
+	const [flow, setFlow] = useState<ReactFlowInstance<NodeData>>();
 
 	const handleNodesDeleting = useCallback(
 		(nodes: Node<NodeData>[]) =>
@@ -69,6 +71,10 @@ const App: React.FC = observer(() => {
 		setRemoteConnectionUsed(used);
 	}, [setRemoteConnectionUsed, nodes]);
 
+	useEffect(() => {
+		flow?.setViewport(viewport);
+	}, [viewport, flow]);
+
 	return (
 		<>
 			{loading < 1 && (
@@ -97,6 +103,7 @@ const App: React.FC = observer(() => {
 			)}
 			<Panel />
 			<ReactFlow
+				onInit={setFlow}
 				defaultViewport={viewport}
 				minZoom={0.1}
 				maxZoom={1}
