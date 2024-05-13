@@ -1,4 +1,4 @@
-import { Button, Flex, Tooltip } from 'antd';
+import { Button, Flex, Image, Tooltip } from 'antd';
 import { observer } from 'mobx-react-lite';
 import appStore from '../utils/appStore';
 import {
@@ -13,64 +13,121 @@ import {
 	WifiOutlined,
 } from '@ant-design/icons';
 
+import logo from '../media/logo.png';
+
 const Panel: React.FC = observer(() => {
 	const { addNode } = appStore;
 
 	return (
-		<Flex
-			vertical
-			gap={8}
-			style={{
-				position: 'absolute',
-				inset: 0,
-				zIndex: '999',
-				inlineSize: 'min-content',
-				blockSize: 'min-content',
-			}}
-		>
-			<Button onClick={() => addNode(null, 'start', { output: true })}>
-				<PoweroffOutlined />
-			</Button>
-			<Button
-				onClick={() => addNode(null, 'button', { output: false, delay: 1000 })}
+		<>
+			<Flex
+				vertical
+				gap={8}
+				style={{
+					position: 'absolute',
+					left: 5,
+					top: 5,
+					zIndex: 999,
+					inlineSize: 'min-content',
+					blockSize: 'min-content',
+				}}
 			>
-				<PlayCircleOutlined />
-			</Button>
-			<Button onClick={() => addNode(null, 'and')}>&</Button>
-			<Button onClick={() => addNode(null, 'or')}>||</Button>
-			<Button onClick={() => addNode(null, 'xor')}>⊕</Button>
-			<Button onClick={() => addNode(null, 'not')}>!</Button>
-			<Button onClick={() => addNode(null, 'splitter')}>
-				<ShareAltOutlined />
-			</Button>
-			<Button
-				onClick={() =>
-					addNode(null, 'flasher', {
-						output: true,
-						plusDelay: 1000,
-						minusDelay: 1000,
-					})
-				}
+				<Button
+					size='large'
+					onClick={() => addNode(null, 'start', { output: true })}
+				>
+					<PoweroffOutlined />
+				</Button>
+				<Button
+					size='large'
+					onClick={() =>
+						addNode(null, 'button', { output: false, delay: 1000 })
+					}
+				>
+					<PlayCircleOutlined />
+				</Button>
+				<Button
+					size='large'
+					onClick={() => addNode(null, 'and')}
+				>
+					&
+				</Button>
+				<Button
+					size='large'
+					onClick={() => addNode(null, 'or')}
+				>
+					||
+				</Button>
+				<Button
+					size='large'
+					onClick={() => addNode(null, 'xor')}
+				>
+					⊕
+				</Button>
+				<Button
+					size='large'
+					onClick={() => addNode(null, 'not')}
+				>
+					!
+				</Button>
+				<Button
+					size='large'
+					onClick={() => addNode(null, 'splitter')}
+				>
+					<ShareAltOutlined />
+				</Button>
+				<Button
+					size='large'
+					onClick={() =>
+						addNode(null, 'flasher', {
+							output: true,
+							plusDelay: 1000,
+							minusDelay: 1000,
+						})
+					}
+				>
+					<HistoryOutlined />
+				</Button>
+				<Button
+					size='large'
+					onClick={() => addNode(null, 'delay', { output: false, delay: 1000 })}
+				>
+					<EllipsisOutlined />
+				</Button>
+				<TransmitterPanel
+					addTransmitter={() =>
+						addNode(null, 'transmitter', {
+							remote: { type: 'in', id: null },
+						})
+					}
+					addReceiver={() =>
+						addNode(null, 'receiver', { remote: { id: null } })
+					}
+				/>
+				<Button
+					size='large'
+					onClick={() => addNode(null, 'end')}
+				>
+					<BulbOutlined />
+				</Button>
+			</Flex>
+			<Flex
+				style={{
+					pointerEvents: 'none',
+					position: 'absolute',
+					bottom: 10,
+					left: 10,
+					zIndex: 9999,
+					inlineSize: '7.5em',
+				}}
 			>
-				<HistoryOutlined />
-			</Button>
-			<Button
-				onClick={() => addNode(null, 'delay', { output: false, delay: 1000 })}
-			>
-				<EllipsisOutlined />
-			</Button>
-			<TransmitterPanel
-				addTransmitter={() =>
-					addNode(null, 'transmitter', {
-						remote: { type: 'in', id: null },
-					})
-				}
-				addReceiver={() => addNode(null, 'receiver', { remote: { id: null } })}
-			/>
-			<Button onClick={() => addNode(null, 'end')}>
-				<BulbOutlined />
-			</Button>
-		</Flex>
+				<Image
+					preview={false}
+					src={logo}
+					alt='logo'
+				/>
+			</Flex>
+		</>
 	);
 });
 
@@ -78,7 +135,6 @@ export default Panel;
 
 interface PanelProps {
 	addTransmitter: () => void;
-
 	addReceiver: () => void;
 }
 
@@ -97,17 +153,23 @@ const TransmitterPanel: React.FC<PanelProps> = observer(
 						gap={8}
 					>
 						<Flex gap={8}>
-							<Button onClick={addTransmitter}>
+							<Button
+								size='large'
+								onClick={addTransmitter}
+							>
 								<WifiOutlined />
 							</Button>
 						</Flex>
-						<Button onClick={addReceiver}>
+						<Button
+							size='large'
+							onClick={addReceiver}
+						>
 							<ApiOutlined />
 						</Button>
 					</Flex>
 				}
 			>
-				<Button>
+				<Button size='large'>
 					<CloudOutlined />
 				</Button>
 			</Tooltip>
