@@ -32,7 +32,9 @@ class AppStore {
 		sessionStorage.getItem('viewport') || '{"x":0,"y":0,"zoom":1}'
 	);
 	nodes: Node[] = [];
-	nodesData: { [key: string]: NodeData } = {};
+	nodesData: { [key: string]: NodeData } = JSON.parse(
+		localStorage.getItem('nodesData') || '{}'
+	);
 	edges: Edge[] = JSON.parse(localStorage.getItem('edges') || '[]');
 	remoteConnections: {
 		used: { in: number[]; out: number[]; receiver: number[] };
@@ -116,8 +118,13 @@ class AppStore {
 	) => {
 		const { x, y } = getCoordinates();
 
-		const id = existing ? existing.id : uniqid();
-		const node: Node = existing || {
+		if (existing) {
+			this.updateNodes([{ item: existing, type: 'add' }]);
+			return;
+		}
+
+		const id = uniqid();
+		const node: Node = {
 			id: id,
 			position: { x, y },
 			data: {},
