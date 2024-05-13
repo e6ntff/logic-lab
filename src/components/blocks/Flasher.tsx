@@ -1,7 +1,7 @@
 import { observer } from 'mobx-react-lite';
 import { blockStyle } from '../../utils/blockStyles';
 import appStore from '../../utils/appStore';
-import { Divider, Flex, Switch } from 'antd';
+import { Flex, Switch } from 'antd';
 import { useCallback, useEffect, useMemo } from 'react';
 import { Position } from 'reactflow';
 import Connector from '../Connector';
@@ -43,23 +43,17 @@ const Flasher: React.FC<Props> = observer(({ id, data }) => {
 	}, [setNodeData, id, output]);
 
 	const handlePlusDelayChange = useCallback(
-		(diff: number) => {
-			let newDelay = (plusDelay || 0) + diff;
-			if (newDelay > 10000) newDelay = 10000;
-			if (newDelay < 100) newDelay = 100;
-			setNodeData(id, { plusDelay: newDelay });
+		(plusDelay: number) => {
+			setNodeData(id, { plusDelay });
 		},
-		[setNodeData, plusDelay, id]
+		[setNodeData, id]
 	);
 
 	const handleMinusDelayChange = useCallback(
-		(diff: number) => {
-			let newDelay = (minusDelay || 0) + diff;
-			if (newDelay > 10000) newDelay = 10000;
-			if (newDelay < 100) newDelay = 100;
-			setNodeData(id, { minusDelay: newDelay });
+		(minusDelay: number) => {
+			setNodeData(id, { minusDelay });
 		},
-		[setNodeData, minusDelay, id]
+		[setNodeData, id]
 	);
 
 	return (
@@ -69,27 +63,18 @@ const Flasher: React.FC<Props> = observer(({ id, data }) => {
 			justify='space-around'
 			align='center'
 		>
+			<TimeRange
+				value={plusDelay}
+				onChange={handlePlusDelayChange}
+			/>
 			<Switch
 				value={output}
 				disabled
 			/>
-			<Flex
-				vertical
-				gap={4}
-				style={{ inlineSize: '100%' }}
-			>
-				<TimeRange
-					value={plusDelay}
-					id={id}
-					onChange={handlePlusDelayChange}
-				/>
-				<Divider style={{ margin: 0 }} />
-				<TimeRange
-					value={minusDelay}
-					id={id}
-					onChange={handleMinusDelayChange}
-				/>
-			</Flex>
+			<TimeRange
+				value={minusDelay}
+				onChange={handleMinusDelayChange}
+			/>
 			<NodeUtils
 				id={id}
 				rotation={rotation}

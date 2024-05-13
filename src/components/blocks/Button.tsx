@@ -25,13 +25,10 @@ const Button: React.FC<Props> = observer(({ id, data }) => {
 	}, [delay, output, setNodeData, id]);
 
 	const handleDelayChange = useCallback(
-		(diff: number) => {
-			let newDelay = (delay || 0) + diff;
-			if (newDelay > 10000) newDelay = 10000;
-			if (newDelay < 100) newDelay = 100;
-			setNodeData(id, { delay: newDelay });
+		(delay: number) => {
+			setNodeData(id, { delay });
 		},
-		[setNodeData, delay, id]
+		[setNodeData, id]
 	);
 
 	useEffect(() => {
@@ -42,14 +39,13 @@ const Button: React.FC<Props> = observer(({ id, data }) => {
 		<Flex
 			vertical
 			style={blockStyle}
-			justify='space-around'
+			justify='space-evenly'
 			align='center'
 		>
 			<ButtonAntd onClick={() => setNodeData(id, { output: true })}>
 				<PlayCircleOutlined />
 			</ButtonAntd>
 			<TimeRange
-				id={id}
 				onChange={handleDelayChange}
 				value={delay}
 			/>

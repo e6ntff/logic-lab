@@ -118,6 +118,7 @@ const App: React.FC = observer(() => {
 				onEdgesDelete={handleEdgesDeleting}
 				nodes={Object.values(nodes)}
 				edges={Object.values(edges)}
+				noDragClassName='noDrag'
 				selectionMode={SelectionMode.Partial}
 				translateExtent={[
 					[-10000, -10000],

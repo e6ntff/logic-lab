@@ -30,13 +30,10 @@ const Delay: React.FC<Props> = observer(({ id, data }) => {
 	}, [incoming, delay, setNodeData, id]);
 
 	const handleDelayChange = useCallback(
-		(diff: number) => {
-			let newDelay = (delay || 0) + diff;
-			if (newDelay > 10000) newDelay = 10000;
-			if (newDelay < 0) newDelay = 0;
-			setNodeData(id, { delay: newDelay });
+		(delay: number) => {
+			setNodeData(id, { delay });
 		},
-		[setNodeData, delay, id]
+		[setNodeData, id]
 	);
 
 	useEffect(() => {
@@ -51,7 +48,6 @@ const Delay: React.FC<Props> = observer(({ id, data }) => {
 			align='center'
 		>
 			<TimeRange
-				id={id}
 				onChange={handleDelayChange}
 				value={delay}
 			/>
