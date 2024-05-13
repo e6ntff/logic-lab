@@ -8,22 +8,23 @@ import { ShareAltOutlined } from '@ant-design/icons';
 import { useEffect, useMemo } from 'react';
 import NodeUtils from '../NodeUtils';
 import Connector from '../Connector';
-import { NodeData } from '../../utils/interfaces';
 
 interface Props {
 	id: string;
-	data: NodeData;
 }
 
-const Splitter: React.FC<Props> = observer(({ id, data }) => {
-	const { setNodeData, nodes } = appStore;
+const Splitter: React.FC<Props> = observer(({ id }) => {
+	const { setNodeData, nodesData } = appStore;
 
-	const { rotation, prevNodeIds } = useMemo(() => data, [data]);
+	const { rotation, prevNodeIds } = useMemo(
+		() => nodesData[id],
+		[nodesData, id]
+	);
 
 	const output: boolean = useMemo(
-		() => nodes[prevNodeIds[0]]?.data?.output || false,
+		() => nodesData[prevNodeIds[0]]?.output || false,
 		// eslint-disable-next-line
-		[nodes[prevNodeIds[0]], prevNodeIds]
+		[nodesData[prevNodeIds[0]], prevNodeIds]
 	);
 
 	useEffect(() => {

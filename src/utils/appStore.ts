@@ -5,6 +5,7 @@ import {
 	EdgeChange,
 	Node,
 	NodeChange,
+	ReactFlowInstance,
 	Viewport,
 	applyEdgeChanges,
 	applyNodeChanges,
@@ -25,11 +26,13 @@ const defaultNodeData: NodeData = {
 };
 
 class AppStore {
+	flow: ReactFlowInstance | null = null;
 	loading: number = 0;
 	viewport: Viewport = JSON.parse(
 		sessionStorage.getItem('viewport') || '{"x":0,"y":0,"zoom":1}'
 	);
-	nodes: { [key: string]: Node<NodeData> } = {};
+	nodes: Node[] = [];
+	nodesData: { [key: string]: NodeData } = {};
 	edges: Edge[] = JSON.parse(localStorage.getItem('edges') || '[]');
 	remoteConnections: {
 		used: { in: number[]; out: number[]; receiver: number[] };
@@ -41,6 +44,10 @@ class AppStore {
 		localStorage.getItem('remoteConnections') ||
 			'{ "used": { "in": [], "out": [] } }'
 	);
+
+	setFlow = (flow: typeof this.flow) => {
+		this.flow = flow;
+	};
 
 	setViewport = (viewport: Viewport) => {
 		this.viewport = viewport;
@@ -81,20 +88,7 @@ class AppStore {
 	};
 
 	updateNodes = (changes: NodeChange[]) => {
-		changes.forEach((change: NodeChange) => {
-			if (
-				change.type === 'add' ||
-				change.type === 'remove' ||
-				change.type === 'reset'
-			)
-				return;
-			const { id } = change;
-			id &&
-				this.setNodes({
-					...this.nodes,
-					[id]: applyNodeChanges([change], [this.nodes[id]])[0],
-				});
-		});
+		this.nodes = applyNodeChanges(changes, this.nodes);
 	};
 
 	updateEdges = (changes: EdgeChange[]) => {
@@ -109,11 +103,8 @@ class AppStore {
 		};
 		const newEdge = changes as Edge;
 		const { source, target } = newEdge;
-		const nodes = { ...this.nodes };
-		nodes[target].data.prevNodeIds.push(source);
-		this.setNodes({
-			...this.nodes,
-			[target]: nodes[target],
+		this.setNodeData(target, {
+			prevNodeIds: [...this.nodesData[target].prevNodeIds, source],
 		});
 		this.updateEdges([{ item: newEdge, type: 'add' }]);
 	};
@@ -126,30 +117,30 @@ class AppStore {
 		const { x, y } = getCoordinates();
 
 		const id = existing ? existing.id : uniqid();
-		const node: Node<NodeData> = existing || {
+		const node: Node = existing || {
 			id: id,
 			position: { x, y },
-			data: { ...defaultNodeData, ...parameters },
+			data: {},
 			type: type,
 		};
-		this.setNodes({ ...this.nodes, [id]: node });
+		this.setNodeData(id, { ...defaultNodeData, ...parameters });
+		this.updateNodes([{ item: node, type: 'add' }]);
 	};
 
 	setNodeData = (id: string, data: NodeDataOptional) => {
-		id &&
-			this.setNodes({
-				...this.nodes,
-				[id]: {
-					...this.nodes[id],
-					data: { ...this.nodes[id]?.data, ...data },
-				},
-			});
+		this.nodesData = {
+			...this.nodesData,
+			[id]: { ...this.nodesData[id], ...data },
+		};
 	};
 
 	removeNode = (id: string) => {
 		this.removeEdges(id, true, true);
-		const { [id]: _, ...nodes } = this.nodes;
-		this.setNodes(nodes);
+		this.updateNodes([{ id, type: 'remove' }]);
+		setTimeout(() => {
+			const { [id]: _, ...data } = this.nodesData;
+			this.nodesData = data;
+		});
 	};
 
 	removeEdges = (id: string, prev: boolean, next: boolean) => {
@@ -161,18 +152,15 @@ class AppStore {
 
 	removeEdge = ({ id, target, source }: Edge) => {
 		this.updateEdges([{ id, type: 'remove' }]);
-		this.setNodes({
-			...this.nodes,
+		this.nodesData = {
+			...this.nodesData,
 			[target]: {
-				...this.nodes[target],
-				data: {
-					...this.nodes[target].data,
-					prevNodeIds: this.nodes[target].data.prevNodeIds.filter(
-						(edgeId: string) => edgeId !== source
-					),
-				},
+				...this.nodesData[target],
+				prevNodeIds: this.nodesData[target].prevNodeIds.filter(
+					(edgeId: string) => edgeId !== source
+				),
 			},
-		});
+		};
 	};
 
 	constructor() {
@@ -197,6 +185,13 @@ reaction(
 	() => {
 		localStorage.setItem('nodes', JSON.stringify(appStore.nodes));
 		localStorage.setItem('edges', JSON.stringify(appStore.edges));
+	}
+);
+
+reaction(
+	() => appStore.nodesData,
+	() => {
+		localStorage.setItem('nodesData', JSON.stringify(appStore.nodesData));
 	}
 );
 

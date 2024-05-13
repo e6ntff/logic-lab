@@ -5,7 +5,6 @@ import ReactFlow, {
 	Edge,
 	MiniMap,
 	Node,
-	ReactFlowInstance,
 	SelectionMode,
 	Viewport,
 	useOnViewportChange,
@@ -16,7 +15,7 @@ import appStore from './utils/appStore';
 import Panel from './components/Panel';
 import MessageButton from './components/MessageButton';
 import FpsScreen from './components/FpsScreen';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect } from 'react';
 import { Flex, Progress } from 'antd';
 import { NodeData, RemoteUsed } from './utils/interfaces';
 import getNodes from './utils/getNodes';
@@ -26,6 +25,7 @@ const App: React.FC = observer(() => {
 		loading,
 		nodes,
 		edges,
+		nodesData,
 		updateNodes,
 		updateEdges,
 		updateConnections,
@@ -33,9 +33,9 @@ const App: React.FC = observer(() => {
 		removeEdge,
 		viewport,
 		setRemoteConnectionUsed,
+		flow,
+		setFlow,
 	} = appStore;
-
-	const [flow, setFlow] = useState<ReactFlowInstance<NodeData>>();
 
 	const handleNodesDeleting = useCallback(
 		(nodes: Node<NodeData>[]) =>
@@ -59,8 +59,8 @@ const App: React.FC = observer(() => {
 			out: [],
 			receiver: [],
 		};
-		Object.keys(nodes).forEach((key: string) => {
-			const remote = nodes[key].data.remote;
+		Object.keys(nodesData).forEach((key: string) => {
+			const remote = nodesData[key].remote;
 			if (remote?.id === null || !remote) return;
 			if (remote?.type) {
 				used[remote.type].push(remote.id);
@@ -69,7 +69,7 @@ const App: React.FC = observer(() => {
 			}
 		});
 		setRemoteConnectionUsed(used);
-	}, [setRemoteConnectionUsed, nodes]);
+	}, [setRemoteConnectionUsed, nodesData]);
 
 	useEffect(() => {
 		flow?.setViewport(viewport);
@@ -116,8 +116,8 @@ const App: React.FC = observer(() => {
 				onConnect={updateConnections}
 				onNodesDelete={handleNodesDeleting}
 				onEdgesDelete={handleEdgesDeleting}
-				nodes={Object.values(nodes)}
-				edges={Object.values(edges)}
+				nodes={nodes}
+				edges={edges}
 				noDragClassName='noDrag'
 				selectionMode={SelectionMode.Partial}
 				translateExtent={[

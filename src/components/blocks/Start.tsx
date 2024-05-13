@@ -6,17 +6,15 @@ import { useCallback, useEffect, useMemo } from 'react';
 import { Position } from 'reactflow';
 import NodeUtils from '../NodeUtils';
 import Connector from '../Connector';
-import { NodeData } from '../../utils/interfaces';
 
 interface Props {
 	id: string;
-	data: NodeData;
 }
 
-const Start: React.FC<Props> = observer(({ id, data }) => {
-	const { setNodeData } = appStore;
+const Start: React.FC<Props> = observer(({ id }) => {
+	const { setNodeData, nodesData } = appStore;
 
-	const { output, rotation } = useMemo(() => data, [data]);
+	const { output, rotation } = useMemo(() => nodesData[id], [nodesData, id]);
 
 	useEffect(() => {
 		setNodeData(id, { output });

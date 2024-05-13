@@ -7,22 +7,23 @@ import { Position } from 'reactflow';
 import Connector from '../Connector';
 import NodeUtils from '../NodeUtils';
 import TimeRange from '../TimeRange';
-import { NodeData } from '../../utils/interfaces';
 
 interface Props {
 	id: string;
-	data: NodeData;
 }
 
-const Delay: React.FC<Props> = observer(({ id, data }) => {
-	const { setNodeData, nodes } = appStore;
+const Delay: React.FC<Props> = observer(({ id }) => {
+	const { setNodeData, nodesData } = appStore;
 
-	const { delay, output, rotation, prevNodeIds } = useMemo(() => data, [data]);
+	const { delay, output, rotation, prevNodeIds } = useMemo(
+		() => nodesData[id],
+		[nodesData, id]
+	);
 
 	const input: boolean = useMemo(
-		() => nodes[prevNodeIds[0]]?.data?.output || false,
+		() => nodesData[prevNodeIds[0]]?.output || false,
 		// eslint-disable-next-line
-		[nodes[prevNodeIds[0]], prevNodeIds]
+		[nodesData[prevNodeIds[0]], prevNodeIds]
 	);
 
 	useEffect(() => {

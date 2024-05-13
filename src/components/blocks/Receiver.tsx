@@ -10,28 +10,29 @@ import NodeUtils from '../NodeUtils';
 import Connector from '../Connector';
 import RemoteSelect from '../RemoteSelect';
 import { SegmentedLabeledOption } from 'antd/es/segmented';
-import { NodeData } from '../../utils/interfaces';
 
 interface Props {
 	id: string;
-	data: NodeData;
 }
 
-const Receiver: React.FC<Props> = observer(({ id, data }) => {
+const Receiver: React.FC<Props> = observer(({ id }) => {
 	const {
 		remoteConnections,
 		setRemoteConnectionValues,
 		setNodeData,
 		removeEdges,
-		nodes,
+		nodesData,
 	} = appStore;
 
-	const { remote, mode, rotation, prevNodeIds } = useMemo(() => data, [data]);
+	const { remote, mode, rotation, prevNodeIds } = useMemo(
+		() => nodesData[id],
+		[nodesData, id]
+	);
 
 	const input: boolean = useMemo(
-		() => nodes[prevNodeIds[0]]?.data?.output || false,
+		() => nodesData[prevNodeIds[0]]?.output || false,
 		// eslint-disable-next-line
-		[nodes[prevNodeIds[0]], prevNodeIds]
+		[nodesData[prevNodeIds[0]], prevNodeIds]
 	);
 
 	const output: boolean = useMemo(() => {

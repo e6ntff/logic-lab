@@ -8,17 +8,18 @@ import { Position } from 'reactflow';
 import Connector from '../Connector';
 import NodeUtils from '../NodeUtils';
 import TimeRange from '../TimeRange';
-import { NodeData } from '../../utils/interfaces';
 
 interface Props {
 	id: string;
-	data: NodeData;
 }
 
-const Button: React.FC<Props> = observer(({ id, data }) => {
-	const { setNodeData } = appStore;
+const Button: React.FC<Props> = observer(({ id }) => {
+	const { setNodeData, nodesData } = appStore;
 
-	const { delay, output, rotation } = useMemo(() => data, [data]);
+	const { delay, output, rotation } = useMemo(
+		() => nodesData[id],
+		[nodesData, id]
+	);
 
 	useEffect(() => {
 		if (output) setTimeout(() => setNodeData(id, { output: false }), delay);

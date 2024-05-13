@@ -7,19 +7,17 @@ import { Position } from 'reactflow';
 import Connector from '../Connector';
 import NodeUtils from '../NodeUtils';
 import TimeRange from '../TimeRange';
-import { NodeData } from '../../utils/interfaces';
 
 interface Props {
 	id: string;
-	data: NodeData;
 }
 
-const Flasher: React.FC<Props> = observer(({ id, data }) => {
-	const { setNodeData } = appStore;
+const Flasher: React.FC<Props> = observer(({ id }) => {
+	const { setNodeData, nodesData } = appStore;
 
 	const { plusDelay, minusDelay, output, rotation } = useMemo(
-		() => data,
-		[data]
+		() => nodesData[id],
+		[nodesData, id]
 	);
 
 	useEffect(() => {

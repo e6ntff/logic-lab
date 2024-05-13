@@ -7,23 +7,24 @@ import { Position } from 'reactflow';
 import Title from 'antd/es/typography/Title';
 import NodeUtils from '../NodeUtils';
 import Connector from '../Connector';
-import { NodeData } from '../../utils/interfaces';
 import appStore from '../../utils/appStore';
 
 interface Props {
 	id: string;
-	data: NodeData;
 }
 
-const End: React.FC<Props> = observer(({ id, data }) => {
-	const { nodes } = appStore;
+const End: React.FC<Props> = observer(({ id }) => {
+	const { nodesData } = appStore;
 
-	const { prevNodeIds, rotation } = useMemo(() => data, [data]);
+	const { prevNodeIds, rotation } = useMemo(
+		() => nodesData[id],
+		[nodesData, id]
+	);
 
 	const input: boolean = useMemo(
-		() => nodes[prevNodeIds[0]]?.data?.output || false,
+		() => nodesData[prevNodeIds[0]]?.output || false,
 		// eslint-disable-next-line
-		[nodes[prevNodeIds[0]], prevNodeIds]
+		[nodesData[prevNodeIds[0]], prevNodeIds]
 	);
 
 	return (

@@ -7,23 +7,24 @@ import { Flex } from 'antd';
 import { useEffect, useMemo } from 'react';
 import Connector from '../Connector';
 import NodeUtils from '../NodeUtils';
-import { NodeData } from '../../utils/interfaces';
 
 interface Props {
 	id: string;
-	data: NodeData;
 }
 
-const Or: React.FC<Props> = observer(({ id, data }) => {
-	const { setNodeData, nodes } = appStore;
+const Or: React.FC<Props> = observer(({ id }) => {
+	const { setNodeData, nodesData } = appStore;
 
-	const { rotation, prevNodeIds } = useMemo(() => data, [data]);
+	const { rotation, prevNodeIds } = useMemo(
+		() => nodesData[id],
+		[nodesData, id]
+	);
 
 	const output: boolean = useMemo(
 		() =>
 			prevNodeIds.length > 0 &&
-			prevNodeIds.some((id: string) => nodes[id]?.data?.output),
-		[prevNodeIds, nodes]
+			prevNodeIds.some((id: string) => nodesData[id]?.output),
+		[prevNodeIds, nodesData]
 	);
 
 	useEffect(() => {

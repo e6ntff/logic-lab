@@ -10,31 +10,32 @@ import Connector from '../Connector';
 import { LoginOutlined, LogoutOutlined, WifiOutlined } from '@ant-design/icons';
 import RemoteSelect from '../RemoteSelect';
 import { SegmentedLabeledOption } from 'antd/es/segmented';
-import { NodeData } from '../../utils/interfaces';
 
 interface Props {
 	id: string;
-	data: NodeData;
 }
 
-const Transmitter: React.FC<Props> = observer(({ id, data }) => {
+const Transmitter: React.FC<Props> = observer(({ id }) => {
 	const {
 		remoteConnections,
 		setNodeData,
 		removeEdges,
 		setRemoteConnectionValues,
-		nodes,
+		nodesData,
 	} = appStore;
 
-	const { remote, rotation, prevNodeIds } = useMemo(() => data, [data]);
-
+	const { remote, rotation, prevNodeIds } = useMemo(
+		() => nodesData[id],
+		[nodesData, id]
+	);
+	
 	const output: boolean = useMemo(
 		() =>
 			remote?.type === 'in'
-				? nodes[prevNodeIds[0]]?.data?.output || false
+				? nodesData[prevNodeIds[0]]?.output || false
 				: remoteConnections[remote?.id as number]?.in,
 		// eslint-disable-next-line
-		[remoteConnections, remote, prevNodeIds, nodes[prevNodeIds[0]]]
+		[remoteConnections, remote, prevNodeIds, nodesData[prevNodeIds[0]]]
 	);
 
 	useEffect(() => {
