@@ -19,15 +19,16 @@ const Delay: React.FC<Props> = observer(({ id, data }) => {
 
 	const { delay, output, rotation, prevNodeIds } = useMemo(() => data, [data]);
 
-	const incoming: boolean = useMemo(
+	const input: boolean = useMemo(
 		() => nodes[prevNodeIds[0]]?.data?.output || false,
-		[prevNodeIds, nodes]
+		// eslint-disable-next-line
+		[nodes[prevNodeIds[0]], prevNodeIds]
 	);
 
 	useEffect(() => {
-		if (incoming) setTimeout(() => setNodeData(id, { output: true }), delay);
-		if (!incoming) setTimeout(() => setNodeData(id, { output: false }), delay);
-	}, [incoming, delay, setNodeData, id]);
+		if (input) setTimeout(() => setNodeData(id, { output: true }), delay);
+		if (!input) setTimeout(() => setNodeData(id, { output: false }), delay);
+	}, [input, delay, setNodeData, id]);
 
 	const handleDelayChange = useCallback(
 		(delay: number) => {
@@ -59,7 +60,7 @@ const Delay: React.FC<Props> = observer(({ id, data }) => {
 				id='a'
 				type='target'
 				position={'left' as Position}
-				active={incoming}
+				active={input}
 				nodeId={id}
 				rotation={rotation}
 			/>

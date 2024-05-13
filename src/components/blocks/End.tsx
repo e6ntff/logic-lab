@@ -22,7 +22,8 @@ const End: React.FC<Props> = observer(({ id, data }) => {
 
 	const input: boolean = useMemo(
 		() => nodes[prevNodeIds[0]]?.data?.output || false,
-		[nodes, prevNodeIds]
+		// eslint-disable-next-line
+		[nodes[prevNodeIds[0]], prevNodeIds]
 	);
 
 	return (

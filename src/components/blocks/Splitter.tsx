@@ -22,7 +22,8 @@ const Splitter: React.FC<Props> = observer(({ id, data }) => {
 
 	const output: boolean = useMemo(
 		() => nodes[prevNodeIds[0]]?.data?.output || false,
-		[prevNodeIds, nodes]
+		// eslint-disable-next-line
+		[nodes[prevNodeIds[0]], prevNodeIds]
 	);
 
 	useEffect(() => {

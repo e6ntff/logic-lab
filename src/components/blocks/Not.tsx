@@ -21,7 +21,8 @@ const Not: React.FC<Props> = observer(({ id, data }) => {
 
 	const output: boolean = useMemo(
 		() => prevNodeIds.length > 0 && !nodes[prevNodeIds[0]]?.data?.output,
-		[prevNodeIds, nodes]
+		// eslint-disable-next-line
+		[nodes[prevNodeIds[0]], prevNodeIds]
 	);
 
 	useEffect(() => {

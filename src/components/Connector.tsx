@@ -57,6 +57,7 @@ const Connector: React.FC<Props> = observer(
 
 		return (
 			<Handle
+				className='noDrag'
 				id={id}
 				type={type}
 				position={computedPosition}

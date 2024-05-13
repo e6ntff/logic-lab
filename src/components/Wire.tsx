@@ -8,8 +8,11 @@ const Wire: React.FC = observer(
 	({ id, target, source, sourceX, sourceY, targetX, targetY }: any) => {
 		const { removeEdge, nodes } = appStore;
 
-		const output = useMemo(() => nodes[source]?.data?.output, [nodes, source]);
-
+		const output = useMemo(
+			() => nodes[source]?.data?.output,
+			// eslint-disable-next-line
+			[nodes[source], source]
+		);
 		const [edgePath, labelX, labelY] = getSimpleBezierPath({
 			sourceX,
 			sourceY,

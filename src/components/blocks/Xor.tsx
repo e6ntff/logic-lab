@@ -26,7 +26,8 @@ const Xor: React.FC<Props> = observer(({ id, data }) => {
 			nodes[prevNodeIds[1]]?.data?.output,
 		];
 		return first !== second;
-	}, [nodes, prevNodeIds]);
+		// eslint-disable-next-line
+	}, [nodes[prevNodeIds[0]], nodes[prevNodeIds[1]], prevNodeIds]);
 
 	useEffect(() => {
 		setNodeData(id, { output });

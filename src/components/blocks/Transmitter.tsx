@@ -33,7 +33,8 @@ const Transmitter: React.FC<Props> = observer(({ id, data }) => {
 			remote?.type === 'in'
 				? nodes[prevNodeIds[0]]?.data?.output || false
 				: remoteConnections[remote?.id as number]?.in,
-		[remoteConnections, remote, prevNodeIds, nodes]
+		// eslint-disable-next-line
+		[remoteConnections, remote, prevNodeIds, nodes[prevNodeIds[0]]]
 	);
 
 	useEffect(() => {
