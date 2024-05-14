@@ -77,30 +77,7 @@ const App: React.FC = observer(() => {
 
 	return (
 		<>
-			{loading < 1 && (
-				<Flex
-					vertical
-					gap={16}
-					justify='center'
-					align='center'
-					style={{
-						zIndex: 99999,
-						background: '#fff',
-						inlineSize: '100%',
-						blockSize: '100%',
-						position: 'absolute',
-						inset: 0,
-					}}
-				>
-					<Progress
-						type='circle'
-						percent={loading * 100}
-						format={(value: number | undefined) => (
-							<>{`${Math.round(value || 0)}%`}</>
-						)}
-					/>
-				</Flex>
-			)}
+			{loading < 1 && <Preloader loading={loading} />}
 			<Panel />
 			<ReactFlow
 				onInit={setFlow}
@@ -173,3 +150,32 @@ const ViewportChangeHandler: React.FC = observer(() => {
 
 	return null;
 });
+
+interface PreloaderProps {
+	loading: number;
+}
+
+const Preloader: React.FC<PreloaderProps> = ({ loading }) => (
+	<Flex
+		vertical
+		gap={16}
+		justify='center'
+		align='center'
+		style={{
+			zIndex: 99999,
+			background: '#fff',
+			inlineSize: '100%',
+			blockSize: '100%',
+			position: 'absolute',
+			inset: 0,
+		}}
+	>
+		<Progress
+			type='circle'
+			percent={loading * 100}
+			format={(value: number | undefined) => (
+				<>{`${Math.round(value || 0)}%`}</>
+			)}
+		/>
+	</Flex>
+);

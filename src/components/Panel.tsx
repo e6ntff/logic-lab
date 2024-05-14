@@ -24,6 +24,7 @@ const Panel: React.FC = observer(() => {
 				vertical
 				gap={8}
 				style={{
+					overflow: 'visible',
 					position: 'absolute',
 					left: 5,
 					top: 5,
@@ -147,19 +148,13 @@ const TransmitterPanel: React.FC<PanelProps> = observer(
 				overlayInnerStyle={{ background: '#0000', boxShadow: 'none' }}
 				arrow={false}
 				title={
-					<Flex
-						vertical
-						align='start'
-						gap={8}
-					>
-						<Flex gap={8}>
-							<Button
-								size='large'
-								onClick={addTransmitter}
-							>
-								<WifiOutlined />
-							</Button>
-						</Flex>
+					<Flex gap={12}>
+						<Button
+							size='large'
+							onClick={addTransmitter}
+						>
+							<WifiOutlined />
+						</Button>
 						<Button
 							size='large'
 							onClick={addReceiver}
