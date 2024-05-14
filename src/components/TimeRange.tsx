@@ -17,6 +17,7 @@ const TimeRange: React.FC<Props> = observer(({ value, onChange }) => {
 			<Slider
 				min={100}
 				max={5000}
+				step={100}
 				value={value}
 				tooltip={{
 					formatter: (value?: number) => (
@@ -24,7 +25,7 @@ const TimeRange: React.FC<Props> = observer(({ value, onChange }) => {
 					),
 				}}
 				onChange={onChange}
-				style={{ inlineSize: '50%' }}
+				style={{ inlineSize: '100%' }}
 				className='noDrag'
 			/>
 		</Flex>

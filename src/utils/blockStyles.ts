@@ -2,7 +2,7 @@ import { CSSProperties } from 'react';
 
 export const connectorStyle: CSSProperties = {
 	blockSize: 25,
-	inlineSize: 30	,
+	inlineSize: 30,
 	borderRadius: 3,
 	border: 0,
 	boxShadow: 'none',
@@ -13,7 +13,7 @@ export const blockStyle: CSSProperties = {
 	background: '#fff',
 	border: '5px solid #000',
 	borderRadius: 15,
-	padding: 10,
-	width: 110,
-	height: 110,
+	padding: 15,
+	width: 100,
+	height: 100,
 };

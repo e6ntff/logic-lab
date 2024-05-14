@@ -40,10 +40,13 @@ const Button: React.FC<Props> = observer(({ id }) => {
 		<Flex
 			vertical
 			style={blockStyle}
-			justify='space-evenly'
+			justify='space-between'
 			align='center'
 		>
-			<ButtonAntd onClick={() => setNodeData(id, { output: true })}>
+			<ButtonAntd
+				style={{ marginBlockStart: 'auto' }}
+				onClick={() => setNodeData(id, { output: true })}
+			>
 				<PlayCircleOutlined />
 			</ButtonAntd>
 			<TimeRange

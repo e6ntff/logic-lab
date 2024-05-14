@@ -46,7 +46,7 @@ const Delay: React.FC<Props> = observer(({ id }) => {
 		<Flex
 			vertical
 			style={blockStyle}
-			justify='space-around'
+			justify='end'
 			align='center'
 		>
 			<TimeRange
