@@ -16,7 +16,7 @@ import {
 import logo from '../media/logo.png';
 
 const Panel: React.FC = observer(() => {
-	const { addNode } = appStore;
+	const { addNewNode } = appStore;
 
 	return (
 		<>
@@ -35,52 +35,50 @@ const Panel: React.FC = observer(() => {
 			>
 				<Button
 					size='large'
-					onClick={() => addNode(null, 'start', { output: true })}
+					onClick={() => addNewNode('start', { output: true })}
 				>
 					<PoweroffOutlined />
 				</Button>
 				<Button
 					size='large'
-					onClick={() =>
-						addNode(null, 'button', { output: false, delay: 1000 })
-					}
+					onClick={() => addNewNode('button', { output: false, delay: 1000 })}
 				>
 					<PlayCircleOutlined />
 				</Button>
 				<Button
 					size='large'
-					onClick={() => addNode(null, 'and')}
+					onClick={() => addNewNode('and')}
 				>
 					&
 				</Button>
 				<Button
 					size='large'
-					onClick={() => addNode(null, 'or')}
+					onClick={() => addNewNode('or')}
 				>
 					||
 				</Button>
 				<Button
 					size='large'
-					onClick={() => addNode(null, 'xor')}
+					onClick={() => addNewNode('xor')}
 				>
 					⊕
 				</Button>
 				<Button
 					size='large'
-					onClick={() => addNode(null, 'not')}
+					onClick={() => addNewNode('not')}
 				>
 					!
 				</Button>
 				<Button
 					size='large'
-					onClick={() => addNode(null, 'splitter')}
+					onClick={() => addNewNode('splitter')}
 				>
 					<ShareAltOutlined />
 				</Button>
 				<Button
 					size='large'
 					onClick={() =>
-						addNode(null, 'flasher', {
+						addNewNode('flasher', {
 							output: true,
 							plusDelay: 1000,
 							minusDelay: 1000,
@@ -91,23 +89,21 @@ const Panel: React.FC = observer(() => {
 				</Button>
 				<Button
 					size='large'
-					onClick={() => addNode(null, 'delay', { output: false, delay: 1000 })}
+					onClick={() => addNewNode('delay', { output: false, delay: 1000 })}
 				>
 					<EllipsisOutlined />
 				</Button>
 				<TransmitterPanel
 					addTransmitter={() =>
-						addNode(null, 'transmitter', {
+						addNewNode('transmitter', {
 							remote: { type: 'in', id: null },
 						})
 					}
-					addReceiver={() =>
-						addNode(null, 'receiver', { remote: { id: null } })
-					}
+					addReceiver={() => addNewNode('receiver', { remote: { id: null } })}
 				/>
 				<Button
 					size='large'
-					onClick={() => addNode(null, 'end')}
+					onClick={() => addNewNode('end')}
 				>
 					<BulbOutlined />
 				</Button>

@@ -5,6 +5,7 @@ import {
 	EdgeChange,
 	Node,
 	NodeChange,
+	OnSelectionChangeParams,
 	ReactFlowInstance,
 	Viewport,
 	applyEdgeChanges,
@@ -12,7 +13,15 @@ import {
 } from 'reactflow';
 import uniqid from 'uniqid';
 import { nodeType } from './types';
-import { NodeData, NodeDataOptional } from './interfaces';
+import {
+	Clipboard,
+	NodeData,
+	NodeDataOptional,
+	OnSelectionChangeParamsWithData,
+	RemoteConnection,
+	RemoteUsed,
+} from './interfaces';
+import { addNodes } from './addNodes';
 
 const defaultNodeData: NodeData = {
 	rotation: 0,
@@ -32,16 +41,14 @@ class AppStore {
 		sessionStorage.getItem('viewport') || '{"x":0,"y":0,"zoom":1}'
 	);
 	nodes: Node[] = [];
+	clipboard: Clipboard = { selected: null, copiedSelected: null, copied: {} };
 	nodesData: { [key: string]: NodeData } = JSON.parse(
 		localStorage.getItem('nodesData') || '{}'
 	);
 	edges: Edge[] = JSON.parse(localStorage.getItem('edges') || '[]');
 	remoteConnections: {
-		used: { in: number[]; out: number[]; receiver: number[] };
-		[key: number]: {
-			in: boolean;
-			out: boolean;
-		};
+		used: RemoteUsed;
+		[key: number]: RemoteConnection;
 	} = JSON.parse(
 		localStorage.getItem('remoteConnections') ||
 			'{ "used": { "in": [], "out": [] } }'
@@ -82,6 +89,108 @@ class AppStore {
 			};
 	};
 
+	setSelected = (items: typeof this.clipboard.selected) => {
+		this.clipboard = { ...this.clipboard, selected: items };
+	};
+
+	addCopiedItem = (item: OnSelectionChangeParams) => {
+		const id = uniqid();
+
+		const nodesWithData = item.nodes.map((node: Node) => ({
+			node: node,
+			data: this.nodesData[node.id],
+		}));
+
+		this.clipboard = {
+			...this.clipboard,
+			copied: {
+				...this.clipboard.copied,
+				[id]: { ...item, nodes: nodesWithData },
+			},
+			copiedSelected: id,
+		};
+	};
+
+	removeCopiedItem = (id: string) => {
+		const { [id]: _, ...items } = this.clipboard.copied;
+		this.clipboard = { ...this.clipboard, copied: items };
+	};
+
+	clearCopiedItems = () => {
+		this.clipboard = { ...this.clipboard, copied: {} };
+	};
+
+	setSelectedCopied = (id: string | null) => {
+		this.clipboard = { ...this.clipboard, copiedSelected: id };
+	};
+
+	pasteCopiedItem = (id: string) => {
+		const { [id]: item } = this.clipboard.copied;
+
+		const { nodes, edges } = item;
+
+		const postfix = uniqid();
+
+		const newEdges = edges.map((edge: Edge) => {
+			const id = `${edge.id}_${postfix}`;
+			const source = `${edge.source}_${postfix}`;
+			const target = `${edge.target}_${postfix}`;
+			const selected = false;
+			edge = { ...edge, id, source, target, selected };
+			this.updateEdges([{ item: edge, type: 'add' }]);
+			return edge;
+		});
+
+		let minX = nodes[0].node.position.x;
+		let minY = nodes[0].node.position.y;
+		let maxX = nodes[0].node.position.x;
+		let maxY = nodes[0].node.position.y;
+
+		nodes.forEach((data: OnSelectionChangeParamsWithData['nodes'][0]) => {
+			const { x, y } = data.node.position;
+
+			if (x > maxX) maxX = x;
+			if (y > maxY) maxY = y;
+			if (x < minX) minX = x;
+			if (y < minY) minY = y;
+		});
+
+		const diffX = maxX - minX;
+		const diffY = maxY - minY;
+
+		const newNodes = nodes.map(
+			(node: OnSelectionChangeParamsWithData['nodes'][0]) => {
+				const id = `${node.node.id}_${postfix}`;
+				const position = {
+					x: node.node.position.x + diffX + 140,
+					y: node.node.position.y + diffY + 140,
+				};
+				const selected = false;
+				const prevNodeIds = node.data.prevNodeIds
+					.filter((id: string) =>
+						edges.some(
+							(edge: Edge) => edge.source === id && edge.target === node.node.id
+						)
+					)
+					.map((id: string) => `${id}_${postfix}`);
+				return {
+					node: { ...node.node, id, position, selected },
+					data: { ...node.data, prevNodeIds },
+				};
+			}
+		);
+
+		addNodes(newNodes);
+
+		this.clipboard = {
+			...this.clipboard,
+			copied: {
+				...this.clipboard.copied,
+				[id]: { nodes: newNodes, edges: newEdges },
+			},
+		};
+	};
+
 	setRemoteConnectionUsed = (values: typeof this.remoteConnections.used) => {
 		this.remoteConnections = {
 			...this.remoteConnections,
@@ -111,19 +220,11 @@ class AppStore {
 		this.updateEdges([{ item: newEdge, type: 'add' }]);
 	};
 
-	addNode = (
-		existing?: Node<NodeData> | null,
-		type?: nodeType,
-		parameters?: NodeDataOptional
-	) => {
+	addNewNode = (type: nodeType, parameters?: NodeDataOptional) => {
 		const { x, y } = getCoordinates();
 
-		if (existing) {
-			this.updateNodes([{ item: existing, type: 'add' }]);
-			return;
-		}
-
 		const id = uniqid();
+
 		const node: Node = {
 			id: id,
 			position: { x, y },
@@ -132,6 +233,11 @@ class AppStore {
 		};
 		this.setNodeData(id, { ...defaultNodeData, ...parameters });
 		this.updateNodes([{ item: node, type: 'add' }]);
+	};
+
+	addExistingNode = (node: Node, data?: NodeData) => {
+		this.updateNodes([{ item: node, type: 'add' }]);
+		data && this.setNodeData(node.id, data);
 	};
 
 	setNodeData = (id: string, data: NodeDataOptional) => {

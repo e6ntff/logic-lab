@@ -1,4 +1,4 @@
-import { Edge } from 'reactflow';
+import { Edge, Node, OnSelectionChangeParams } from 'reactflow';
 
 export interface NodeData {
 	rotation: number;
@@ -31,4 +31,18 @@ export interface RemoteUsed {
 export interface RemoteConnection {
 	in: boolean;
 	out: boolean;
+}
+
+export interface OnSelectionChangeParamsWithData {
+	nodes: {
+		node: Node;
+		data: NodeData;
+	}[];
+	edges: Edge[];
+}
+
+export interface Clipboard {
+	selected: OnSelectionChangeParams | null;
+	copiedSelected: string | null;
+	copied: { [key: string]: OnSelectionChangeParamsWithData };
 }

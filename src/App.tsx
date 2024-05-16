@@ -18,7 +18,7 @@ import FpsScreen from './components/FpsScreen';
 import React, { useCallback, useEffect } from 'react';
 import { Flex, Progress } from 'antd';
 import { NodeData, RemoteUsed } from './utils/interfaces';
-import getNodes from './utils/getNodes';
+import { loadNodes } from './utils/addNodes';
 
 const App: React.FC = observer(() => {
 	const {
@@ -35,6 +35,7 @@ const App: React.FC = observer(() => {
 		setRemoteConnectionUsed,
 		flow,
 		setFlow,
+		setSelected,
 	} = appStore;
 
 	const handleNodesDeleting = useCallback(
@@ -49,7 +50,7 @@ const App: React.FC = observer(() => {
 	);
 
 	useEffect(() => {
-		getNodes();
+		loadNodes();
 		// eslint-disable-next-line
 	}, []);
 
@@ -88,6 +89,8 @@ const App: React.FC = observer(() => {
 				snapGrid={[35, 35]}
 				nodeTypes={nodeTypes}
 				edgeTypes={edgeTypes}
+				onSelectionChange={setSelected}
+				selectNodesOnDrag={false}
 				onNodesChange={updateNodes}
 				onEdgesChange={updateEdges}
 				onConnect={updateConnections}
@@ -127,6 +130,7 @@ const App: React.FC = observer(() => {
 				/>
 			</ReactFlow>
 			<MessageButton />
+			<CopyPasteHandler />
 			<FpsScreen />
 		</>
 	);
@@ -179,3 +183,41 @@ const Preloader: React.FC<PreloaderProps> = ({ loading }) => (
 		/>
 	</Flex>
 );
+
+const CopyPasteHandler: React.FC = observer(() => {
+	const { addCopiedItem, pasteCopiedItem, clipboard } = appStore;
+
+	const { selected, copiedSelected } = clipboard;
+
+	const copy = useCallback(
+		(event: KeyboardEvent) => {
+			if (!selected) return;
+			if (event.ctrlKey && event.key.toLowerCase() === 'c') {
+				addCopiedItem(selected);
+			}
+		},
+		[addCopiedItem, selected]
+	);
+
+	const paste = useCallback(
+		(event: KeyboardEvent) => {
+			if (!copiedSelected) return;
+			if (event.ctrlKey && event.key.toLowerCase() === 'v') {
+				pasteCopiedItem(copiedSelected);
+			}
+		},
+		[pasteCopiedItem, copiedSelected]
+	);
+
+	useEffect(() => {
+		window.addEventListener('keyup', copy);
+		window.addEventListener('keyup', paste);
+
+		return () => {
+			window.removeEventListener('keyup', copy);
+			window.removeEventListener('keyup', paste);
+		};
+	}, [copy, paste]);
+
+	return null;
+});
