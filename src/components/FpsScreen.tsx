@@ -23,12 +23,16 @@ const FpsScreen: React.FC = observer(() => {
 
 	return (
 		<Flex
-			style={{ position: 'absolute', bottom: 10, right: 10 }}
+			style={{ position: 'absolute', top: 20, right: 220 }}
 			vertical
 			align='end'
-			gap={8}
 		>
-			{isViewportChanged && <ReloadOutlined onClick={resetViewport} />}
+			<Typography.Text
+				type={currentFps >= 60 ? 'success' : 'danger'}
+				style={{ fontSize: 25 }}
+			>
+				{currentFps || 0}
+			</Typography.Text>
 			<Flex
 				vertical
 				align='end'
@@ -37,12 +41,7 @@ const FpsScreen: React.FC = observer(() => {
 				<Typography.Text>y: {Math.round(y / zoom)}</Typography.Text>
 				<Typography.Text>x{zoom.toFixed(2)}</Typography.Text>
 			</Flex>
-			<Typography.Text
-				type={currentFps >= 60 ? 'success' : 'danger'}
-				style={{ fontSize: 25 }}
-			>
-				{currentFps || 0}
-			</Typography.Text>
+			{isViewportChanged && <ReloadOutlined onClick={resetViewport} />}
 		</Flex>
 	);
 });

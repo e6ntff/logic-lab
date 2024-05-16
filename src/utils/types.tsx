@@ -12,6 +12,17 @@ import ButtonAntd from '../components/blocks/Button';
 import Transmitter from '../components/blocks/Transmitter';
 import Receiver from '../components/blocks/Receiver';
 import Xor from '../components/blocks/Xor';
+import {
+	ApiOutlined,
+	BulbOutlined,
+	EllipsisOutlined,
+	HistoryOutlined,
+	LineOutlined,
+	PlayCircleOutlined,
+	PoweroffOutlined,
+	ShareAltOutlined,
+	WifiOutlined,
+} from '@ant-design/icons';
 
 export type nodeType =
 	| 'and'
@@ -45,3 +56,19 @@ export const nodeTypes: NodeTypes = {
 };
 
 export const edgeTypes: EdgeTypes = { wire: Wire };
+
+export const icons: { [key: string]: any } = {
+	and: '&',
+	or: '||',
+	xor: '⊕',
+	not: '!',
+	start: <PoweroffOutlined />,
+	end: <BulbOutlined />,
+	splitter: <ShareAltOutlined />,
+	flasher: <HistoryOutlined />,
+	delay: <EllipsisOutlined />,
+	button: <PlayCircleOutlined />,
+	transmitter: <WifiOutlined />,
+	receiver: <ApiOutlined />,
+	edge: <LineOutlined />,
+};

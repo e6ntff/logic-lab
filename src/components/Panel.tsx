@@ -1,19 +1,10 @@
 import { Button, Flex, Image, Tooltip } from 'antd';
 import { observer } from 'mobx-react-lite';
 import appStore from '../utils/appStore';
-import {
-	ApiOutlined,
-	BulbOutlined,
-	CloudOutlined,
-	EllipsisOutlined,
-	HistoryOutlined,
-	PlayCircleOutlined,
-	PoweroffOutlined,
-	ShareAltOutlined,
-	WifiOutlined,
-} from '@ant-design/icons';
+import { CloudOutlined } from '@ant-design/icons';
 
 import logo from '../media/logo.png';
+import { icons } from '../utils/types';
 
 const Panel: React.FC = observer(() => {
 	const { addNewNode } = appStore;
@@ -37,43 +28,43 @@ const Panel: React.FC = observer(() => {
 					size='large'
 					onClick={() => addNewNode('start', { output: true })}
 				>
-					<PoweroffOutlined />
+					{icons.start}
 				</Button>
 				<Button
 					size='large'
 					onClick={() => addNewNode('button', { output: false, delay: 1000 })}
 				>
-					<PlayCircleOutlined />
+					{icons.button}
 				</Button>
 				<Button
 					size='large'
 					onClick={() => addNewNode('and')}
 				>
-					&
+					{icons.and}
 				</Button>
 				<Button
 					size='large'
 					onClick={() => addNewNode('or')}
 				>
-					||
+					{icons.or}
 				</Button>
 				<Button
 					size='large'
 					onClick={() => addNewNode('xor')}
 				>
-					⊕
+					{icons.xor}
 				</Button>
 				<Button
 					size='large'
 					onClick={() => addNewNode('not')}
 				>
-					!
+					{icons.not}
 				</Button>
 				<Button
 					size='large'
 					onClick={() => addNewNode('splitter')}
 				>
-					<ShareAltOutlined />
+					{icons.splitter}
 				</Button>
 				<Button
 					size='large'
@@ -85,13 +76,13 @@ const Panel: React.FC = observer(() => {
 						})
 					}
 				>
-					<HistoryOutlined />
+					{icons.flasher}
 				</Button>
 				<Button
 					size='large'
 					onClick={() => addNewNode('delay', { output: false, delay: 1000 })}
 				>
-					<EllipsisOutlined />
+					{icons.delay}
 				</Button>
 				<TransmitterPanel
 					addTransmitter={() =>
@@ -105,7 +96,7 @@ const Panel: React.FC = observer(() => {
 					size='large'
 					onClick={() => addNewNode('end')}
 				>
-					<BulbOutlined />
+					{icons.end}
 				</Button>
 			</Flex>
 			<Flex
@@ -149,13 +140,13 @@ const TransmitterPanel: React.FC<PanelProps> = observer(
 							size='large'
 							onClick={addTransmitter}
 						>
-							<WifiOutlined />
+							{icons.transmitter}
 						</Button>
 						<Button
 							size='large'
 							onClick={addReceiver}
 						>
-							<ApiOutlined />
+							{icons.receiver}
 						</Button>
 					</Flex>
 				}

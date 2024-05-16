@@ -19,6 +19,7 @@ import React, { useCallback, useEffect } from 'react';
 import { Flex, Progress } from 'antd';
 import { NodeData, RemoteUsed } from './utils/interfaces';
 import { loadNodes } from './utils/addNodes';
+import Clipboard from './components/Clipboard';
 
 const App: React.FC = observer(() => {
 	const {
@@ -131,6 +132,7 @@ const App: React.FC = observer(() => {
 			</ReactFlow>
 			<MessageButton />
 			<CopyPasteHandler />
+			<Clipboard />
 			<FpsScreen />
 		</>
 	);
@@ -191,7 +193,7 @@ const CopyPasteHandler: React.FC = observer(() => {
 
 	const copy = useCallback(
 		(event: KeyboardEvent) => {
-			if (!selected) return;
+			if (!selected || !selected.nodes.length) return;
 			if (event.ctrlKey && event.key.toLowerCase() === 'c') {
 				addCopiedItem(selected);
 			}
