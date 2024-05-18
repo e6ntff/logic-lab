@@ -2,12 +2,12 @@ import { observer } from 'mobx-react-lite';
 import { Position } from 'reactflow';
 import { blockStyle } from '../../utils/blockStyles';
 import Title from 'antd/es/typography/Title';
-import appStore from '../../utils/appStore';
+import appStore, { defaultNodeData } from '../../utils/appStore';
 import { Flex } from 'antd';
-import { ShareAltOutlined } from '@ant-design/icons';
 import { useEffect, useMemo } from 'react';
 import NodeUtils from '../NodeUtils';
 import Connector from '../Connector';
+import { icons, nodeTypes } from '../../utils/types';
 
 interface Props {
 	id: string;
@@ -17,7 +17,7 @@ const Splitter: React.FC<Props> = observer(({ id }) => {
 	const { setNodeData, nodesData } = appStore;
 
 	const { rotation, prevNodeIds } = useMemo(
-		() => nodesData[id],
+		() => (Object.hasOwn(nodeTypes, id) ? defaultNodeData : nodesData[id]),
 		[nodesData, id]
 	);
 
@@ -37,9 +37,7 @@ const Splitter: React.FC<Props> = observer(({ id }) => {
 			justify='center'
 			align='center'
 		>
-			<Title style={{ margin: 0 }}>
-				<ShareAltOutlined />
-			</Title>
+			<Title style={{ margin: 0 }}>{icons.splitter}</Title>
 			<NodeUtils
 				id={id}
 				rotation={rotation}

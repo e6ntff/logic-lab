@@ -2,11 +2,12 @@ import { observer } from 'mobx-react-lite';
 import { Position } from 'reactflow';
 import { blockStyle } from '../../utils/blockStyles';
 import Title from 'antd/es/typography/Title';
-import appStore from '../../utils/appStore';
+import appStore, { defaultNodeData } from '../../utils/appStore';
 import { Flex } from 'antd';
 import { useEffect, useMemo } from 'react';
 import Connector from '../Connector';
 import RotationPanel from '../NodeUtils';
+import { icons, nodeTypes } from '../../utils/types';
 
 interface Props {
 	id: string;
@@ -16,7 +17,7 @@ const And: React.FC<Props> = observer(({ id }) => {
 	const { nodesData, setNodeData } = appStore;
 
 	const { rotation, prevNodeIds } = useMemo(
-		() => nodesData[id],
+		() => (Object.hasOwn(nodeTypes, id) ? defaultNodeData : nodesData[id]),
 		[nodesData, id]
 	);
 
@@ -37,7 +38,7 @@ const And: React.FC<Props> = observer(({ id }) => {
 			justify='center'
 			align='center'
 		>
-			<Title style={{ color: '#fff', margin: 0 }}>&</Title>
+			<Title style={{ color: '#fff', margin: 0 }}>{icons.and}</Title>
 			<RotationPanel
 				id={id}
 				rotation={rotation}

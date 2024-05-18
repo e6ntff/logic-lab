@@ -1,13 +1,13 @@
 import { observer } from 'mobx-react-lite';
 import { blockStyle } from '../../utils/blockStyles';
-import appStore from '../../utils/appStore';
+import appStore, { defaultNodeData } from '../../utils/appStore';
 import { Button as ButtonAntd, Flex } from 'antd';
-import { PlayCircleOutlined } from '@ant-design/icons';
 import { useCallback, useEffect, useMemo } from 'react';
 import { Position } from 'reactflow';
 import Connector from '../Connector';
 import NodeUtils from '../NodeUtils';
 import TimeRange from '../TimeRange';
+import { icons, nodeTypes } from '../../utils/types';
 
 interface Props {
 	id: string;
@@ -17,7 +17,7 @@ const Button: React.FC<Props> = observer(({ id }) => {
 	const { setNodeData, nodesData } = appStore;
 
 	const { delay, output, rotation } = useMemo(
-		() => nodesData[id],
+		() => (Object.hasOwn(nodeTypes, id) ? defaultNodeData : nodesData[id]),
 		[nodesData, id]
 	);
 
@@ -47,7 +47,7 @@ const Button: React.FC<Props> = observer(({ id }) => {
 				style={{ marginBlockStart: 'auto' }}
 				onClick={() => setNodeData(id, { output: true })}
 			>
-				<PlayCircleOutlined />
+				{icons.button}
 			</ButtonAntd>
 			<TimeRange
 				onChange={handleDelayChange}

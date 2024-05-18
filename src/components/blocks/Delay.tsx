@@ -1,12 +1,13 @@
 import { observer } from 'mobx-react-lite';
 import { blockStyle } from '../../utils/blockStyles';
-import appStore from '../../utils/appStore';
 import { Flex } from 'antd';
 import { useCallback, useEffect, useMemo } from 'react';
 import { Position } from 'reactflow';
 import Connector from '../Connector';
 import NodeUtils from '../NodeUtils';
 import TimeRange from '../TimeRange';
+import appStore, { defaultNodeData } from '../../utils/appStore';
+import { nodeTypes } from '../../utils/types';
 
 interface Props {
 	id: string;
@@ -16,7 +17,7 @@ const Delay: React.FC<Props> = observer(({ id }) => {
 	const { setNodeData, nodesData } = appStore;
 
 	const { delay, output, rotation, prevNodeIds } = useMemo(
-		() => nodesData[id],
+		() => (Object.hasOwn(nodeTypes, id) ? defaultNodeData : nodesData[id]),
 		[nodesData, id]
 	);
 

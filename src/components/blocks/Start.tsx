@@ -1,11 +1,12 @@
 import { observer } from 'mobx-react-lite';
 import { blockStyle } from '../../utils/blockStyles';
-import appStore from '../../utils/appStore';
+import appStore, { defaultNodeData } from '../../utils/appStore';
 import { Flex, Switch } from 'antd';
 import { useCallback, useEffect, useMemo } from 'react';
 import { Position } from 'reactflow';
 import NodeUtils from '../NodeUtils';
 import Connector from '../Connector';
+import { nodeTypes } from '../../utils/types';
 
 interface Props {
 	id: string;
@@ -14,7 +15,11 @@ interface Props {
 const Start: React.FC<Props> = observer(({ id }) => {
 	const { setNodeData, nodesData } = appStore;
 
-	const { output, rotation } = useMemo(() => nodesData[id], [nodesData, id]);
+	const { output, rotation } =useMemo(
+		() => (Object.hasOwn(nodeTypes, id) ? defaultNodeData : nodesData[id]),
+		[nodesData, id]
+	);
+
 
 	useEffect(() => {
 		setNodeData(id, { output });

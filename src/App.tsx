@@ -84,8 +84,8 @@ const App: React.FC = observer(() => {
 			<ReactFlow
 				onInit={setFlow}
 				defaultViewport={viewport}
-				minZoom={0.1}
-				maxZoom={1}
+				minZoom={0.01}
+				maxZoom={5}
 				snapToGrid
 				snapGrid={[35, 35]}
 				nodeTypes={nodeTypes}
@@ -101,14 +101,6 @@ const App: React.FC = observer(() => {
 				edges={edges}
 				noDragClassName='noDrag'
 				selectionMode={SelectionMode.Partial}
-				translateExtent={[
-					[-10000, -10000],
-					[10000, 10000],
-				]}
-				nodeExtent={[
-					[-10000, -10000],
-					[10000, 10000],
-				]}
 			>
 				<ViewportChangeHandler />
 				<Background

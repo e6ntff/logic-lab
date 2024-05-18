@@ -15,11 +15,8 @@ import Xor from '../components/blocks/Xor';
 import {
 	ApiOutlined,
 	BulbOutlined,
-	EllipsisOutlined,
-	HistoryOutlined,
 	LineOutlined,
 	PlayCircleOutlined,
-	PoweroffOutlined,
 	ShareAltOutlined,
 	WifiOutlined,
 } from '@ant-design/icons';
@@ -62,11 +59,8 @@ export const icons: { [key: string]: any } = {
 	or: '||',
 	xor: '⊕',
 	not: '!',
-	start: <PoweroffOutlined />,
 	end: <BulbOutlined />,
 	splitter: <ShareAltOutlined />,
-	flasher: <HistoryOutlined />,
-	delay: <EllipsisOutlined />,
 	button: <PlayCircleOutlined />,
 	transmitter: <WifiOutlined />,
 	receiver: <ApiOutlined />,

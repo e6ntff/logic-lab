@@ -2,14 +2,15 @@ import { observer } from 'mobx-react-lite';
 import { Position } from 'reactflow';
 import { blockStyle } from '../../utils/blockStyles';
 import Title from 'antd/es/typography/Title';
-import appStore from '../../utils/appStore';
+import appStore, { defaultNodeData } from '../../utils/appStore';
 import { Flex, Segmented } from 'antd';
 import { useCallback, useEffect, useMemo } from 'react';
 import NodeUtils from '../NodeUtils';
 import Connector from '../Connector';
-import { LoginOutlined, LogoutOutlined, WifiOutlined } from '@ant-design/icons';
+import { LoginOutlined, LogoutOutlined } from '@ant-design/icons';
 import RemoteSelect from '../RemoteSelect';
 import { SegmentedLabeledOption } from 'antd/es/segmented';
+import { icons, nodeTypes } from '../../utils/types';
 
 interface Props {
 	id: string;
@@ -25,10 +26,10 @@ const Transmitter: React.FC<Props> = observer(({ id }) => {
 	} = appStore;
 
 	const { remote, rotation, prevNodeIds } = useMemo(
-		() => nodesData[id],
+		() => (Object.hasOwn(nodeTypes, id) ? defaultNodeData : nodesData[id]),
 		[nodesData, id]
 	);
-	
+
 	const output: boolean = useMemo(
 		() =>
 			remote?.type === 'in'
@@ -80,9 +81,7 @@ const Transmitter: React.FC<Props> = observer(({ id }) => {
 					options={options}
 					onChange={handleTypeChanging}
 				/>
-				<Title style={{ margin: 0 }}>
-					<WifiOutlined />
-				</Title>
+				<Title style={{ margin: 0 }}>{icons.transmitter}</Title>
 				<RemoteSelect
 					nodeId={id}
 					remote={remote}

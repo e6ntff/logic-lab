@@ -16,3 +16,7 @@ body {
 	inline-size: 100%;
 	block-size: 100%;
 }
+
+a {
+	display: none;
+}

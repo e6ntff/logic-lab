@@ -12,7 +12,7 @@ import {
 	applyNodeChanges,
 } from 'reactflow';
 import uniqid from 'uniqid';
-import { nodeType } from './types';
+import { nodeType, nodeTypes } from './types';
 import {
 	Clipboard,
 	NodeData,
@@ -23,13 +23,13 @@ import {
 } from './interfaces';
 import { addNodes } from './addNodes';
 
-const defaultNodeData: NodeData = {
+export const defaultNodeData: NodeData = {
 	rotation: 0,
 	output: false,
-	delay: 0,
-	plusDelay: 0,
-	minusDelay: 0,
-	remote: { id: null },
+	delay: 1000,
+	plusDelay: 1000,
+	minusDelay: 1000,
+	remote: { id: null, type: 'in' },
 	mode: 'all',
 	prevNodeIds: [],
 };
@@ -146,8 +146,8 @@ class AppStore {
 		let maxX = nodes[0].node.position.x;
 		let maxY = nodes[0].node.position.y;
 
-		nodes.forEach((data: OnSelectionChangeParamsWithData['nodes'][0]) => {
-			const { x, y } = data.node.position;
+		nodes.forEach(({ node }: OnSelectionChangeParamsWithData['nodes'][0]) => {
+			const { x, y } = node.position;
 
 			if (x > maxX) maxX = x;
 			if (y > maxY) maxY = y;
@@ -175,7 +175,11 @@ class AppStore {
 					.map((id: string) => `${id}_${postfix}`);
 				return {
 					node: { ...node.node, id, position, selected },
-					data: { ...node.data, prevNodeIds },
+					data: {
+						...node.data,
+						prevNodeIds,
+						remote: { ...node.data.remote, id: null },
+					},
 				};
 			}
 		);
@@ -220,7 +224,7 @@ class AppStore {
 		this.updateEdges([{ item: newEdge, type: 'add' }]);
 	};
 
-	addNewNode = (type: nodeType, parameters?: NodeDataOptional) => {
+	addNewNode = (type: nodeType) => {
 		const { x, y } = getCoordinates();
 
 		const id = uniqid();
@@ -231,7 +235,7 @@ class AppStore {
 			data: {},
 			type: type,
 		};
-		this.setNodeData(id, { ...defaultNodeData, ...parameters });
+		this.setNodeData(id, { ...defaultNodeData });
 		this.updateNodes([{ item: node, type: 'add' }]);
 	};
 
@@ -241,6 +245,7 @@ class AppStore {
 	};
 
 	setNodeData = (id: string, data: NodeDataOptional) => {
+		if (Object.hasOwn(nodeTypes, id)) return;
 		this.nodesData = {
 			...this.nodesData,
 			[id]: { ...this.nodesData[id], ...data },
