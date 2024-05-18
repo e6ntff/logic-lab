@@ -1,111 +1,74 @@
-import { Button, Flex, Image, Tooltip } from 'antd';
+import { Drawer, Flex, Image } from 'antd';
 import { observer } from 'mobx-react-lite';
 import appStore from '../utils/appStore';
-import { CloudOutlined } from '@ant-design/icons';
-
+import { ArrowRightOutlined } from '@ant-design/icons';
 import logo from '../media/logo.png';
-import { icons } from '../utils/types';
+import { nodeType, nodeTypes } from '../utils/types';
+import ReactFlow, { Node } from 'reactflow';
+import { useCallback, useState } from 'react';
 
 const Panel: React.FC = observer(() => {
 	const { addNewNode } = appStore;
 
+	const [open, setOpen] = useState<boolean>(true);
+
+	const toggleOpen = useCallback(
+		() => setOpen((prev: boolean) => !prev),
+		[setOpen]
+	);
+
 	return (
 		<>
-			<Flex
-				vertical
-				gap={8}
-				style={{
-					overflow: 'visible',
-					position: 'absolute',
-					left: 5,
-					top: 5,
-					zIndex: 999,
-					inlineSize: 'min-content',
-					blockSize: 'min-content',
+			<Drawer
+				styles={{
+					content: { padding: 0 },
+					header: { padding: 0 },
+					body: { padding: 2.5 },
 				}}
+				open={open}
+				autoFocus={false}
+				mask={false}
+				placement='left'
+				width={40}
+				closeIcon={<></>}
 			>
-				<Button
-					size='large'
-					onClick={() => addNewNode('start', { output: true })}
+				<Flex
+					vertical
+					gap={8}
+					style={{
+						inlineSize: '100%',
+						blockSize: '100%',
+					}}
+					justify='start'
 				>
-					{icons.start}
-				</Button>
-				<Button
-					size='large'
-					onClick={() => addNewNode('button', { output: false, delay: 1000 })}
-				>
-					{icons.button}
-				</Button>
-				<Button
-					size='large'
-					onClick={() => addNewNode('and')}
-				>
-					{icons.and}
-				</Button>
-				<Button
-					size='large'
-					onClick={() => addNewNode('or')}
-				>
-					{icons.or}
-				</Button>
-				<Button
-					size='large'
-					onClick={() => addNewNode('xor')}
-				>
-					{icons.xor}
-				</Button>
-				<Button
-					size='large'
-					onClick={() => addNewNode('not')}
-				>
-					{icons.not}
-				</Button>
-				<Button
-					size='large'
-					onClick={() => addNewNode('splitter')}
-				>
-					{icons.splitter}
-				</Button>
-				<Button
-					size='large'
-					onClick={() =>
-						addNewNode('flasher', {
-							output: true,
-							plusDelay: 1000,
-							minusDelay: 1000,
-						})
-					}
-				>
-					{icons.flasher}
-				</Button>
-				<Button
-					size='large'
-					onClick={() => addNewNode('delay', { output: false, delay: 1000 })}
-				>
-					{icons.delay}
-				</Button>
-				<TransmitterPanel
-					addTransmitter={() =>
-						addNewNode('transmitter', {
-							remote: { type: 'in', id: null },
-						})
-					}
-					addReceiver={() => addNewNode('receiver', { remote: { id: null } })}
-				/>
-				<Button
-					size='large'
-					onClick={() => addNewNode('end')}
-				>
-					{icons.end}
-				</Button>
-			</Flex>
+					<ReactFlow
+						fitView
+						minZoom={0.25}
+						maxZoom={0.25}
+						zoomOnDoubleClick={false}
+						nodes={panelNodes}
+						zoomOnScroll={false}
+						zoomOnPinch={false}
+						translateExtent={[
+							[0, 140],
+							[0, 160 * 11],
+						]}
+						nodesDraggable={false}
+						nodesConnectable={false}
+						elementsSelectable={false}
+						nodeTypes={nodeTypes}
+						autoPanOnConnect={false}
+						onNodeClick={(_, { type }) => addNewNode(type as nodeType)}
+					/>
+				</Flex>
+			</Drawer>
 			<Flex
 				style={{
 					pointerEvents: 'none',
 					position: 'absolute',
 					bottom: 10,
 					left: 10,
-					zIndex: 9999,
+					zIndex: 999,
 					inlineSize: '7.5em',
 				}}
 			>
@@ -115,46 +78,50 @@ const Panel: React.FC = observer(() => {
 					alt='logo'
 				/>
 			</Flex>
+			<ArrowRightOutlined
+				style={{
+					position: 'absolute',
+					top: 5,
+					left: 5,
+					zIndex: 9999,
+					opacity: 0.5,
+					rotate: `${open ? 180 : 0}deg`,
+					transition: '.25s',
+				}}
+				onClick={toggleOpen}
+			/>
 		</>
 	);
 });
 
 export default Panel;
 
-interface PanelProps {
-	addTransmitter: () => void;
-	addReceiver: () => void;
-}
-
-const TransmitterPanel: React.FC<PanelProps> = observer(
-	({ addTransmitter, addReceiver }) => {
-		return (
-			<Tooltip
-				placement='right'
-				trigger='click'
-				overlayInnerStyle={{ background: '#0000', boxShadow: 'none' }}
-				arrow={false}
-				title={
-					<Flex gap={12}>
-						<Button
-							size='large'
-							onClick={addTransmitter}
-						>
-							{icons.transmitter}
-						</Button>
-						<Button
-							size='large'
-							onClick={addReceiver}
-						>
-							{icons.receiver}
-						</Button>
-					</Flex>
-				}
-			>
-				<Button size='large'>
-					<CloudOutlined />
-				</Button>
-			</Tooltip>
-		);
-	}
-);
+const panelNodes: Node[] = [
+	{ id: 'start', type: 'start', position: { x: 0, y: 160 * 0 }, data: {} },
+	{ id: 'and', type: 'and', position: { x: 0, y: 160 * 1 }, data: {} },
+	{ id: 'or', type: 'or', position: { x: 0, y: 160 * 2 }, data: {} },
+	{ id: 'xor', type: 'xor', position: { x: 0, y: 160 * 3 }, data: {} },
+	{ id: 'not', type: 'not', position: { x: 0, y: 160 * 4 }, data: {} },
+	{
+		id: 'splitter',
+		type: 'splitter',
+		position: { x: 0, y: 160 * 5 },
+		data: {},
+	},
+	{ id: 'flasher', type: 'flasher', position: { x: 0, y: 160 * 6 }, data: {} },
+	{ id: 'delay', type: 'delay', position: { x: 0, y: 160 * 7 }, data: {} },
+	{ id: 'button', type: 'button', position: { x: 0, y: 160 * 8 }, data: {} },
+	{
+		id: 'transmitter',
+		type: 'transmitter',
+		position: { x: 0, y: 160 * 9 },
+		data: {},
+	},
+	{
+		id: 'receiver',
+		type: 'receiver',
+		position: { x: 0, y: 160 * 10 },
+		data: {},
+	},
+	{ id: 'end', type: 'end', position: { x: 0, y: 160 * 11 }, data: {} },
+];
