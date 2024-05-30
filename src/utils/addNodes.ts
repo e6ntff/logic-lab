@@ -1,6 +1,5 @@
-import { Node } from 'reactflow';
+import { Node, OnSelectionChangeParams } from 'reactflow';
 import appStore from './appStore';
-import { OnSelectionChangeParamsWithData } from './interfaces';
 
 export const loadNodes = () => {
 	const { setNodes, addExistingNode, setLoaded } = appStore;
@@ -26,7 +25,7 @@ export const loadNodes = () => {
 	});
 };
 
-export const addNodes = (nodes: OnSelectionChangeParamsWithData['nodes']) => {
+export const addNodes = (nodes: OnSelectionChangeParams['nodes']) => {
 	const { addExistingNode, setLoaded } = appStore;
 
 	setLoaded(0);
@@ -36,12 +35,10 @@ export const addNodes = (nodes: OnSelectionChangeParamsWithData['nodes']) => {
 		return;
 	}
 
-	nodes.forEach(
-		(node: OnSelectionChangeParamsWithData['nodes'][0], index: number) => {
-			setTimeout(() => {
-				addExistingNode(node.node, node.data);
-				setLoaded(++index / nodes.length || 0);
-			});
-		}
-	);
+	nodes.forEach((node: OnSelectionChangeParams['nodes'][0], index: number) => {
+		setTimeout(() => {
+			addExistingNode(node);
+			setLoaded(++index / nodes.length || 0);
+		});
+	});
 };

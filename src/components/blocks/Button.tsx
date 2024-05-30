@@ -1,29 +1,28 @@
 import { observer } from 'mobx-react-lite';
 import { blockStyle } from '../../utils/blockStyles';
-import appStore, { defaultNodeData } from '../../utils/appStore';
+import appStore from '../../utils/appStore';
 import { Button as ButtonAntd, Flex } from 'antd';
-import { useCallback, useEffect, useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
 import { Position } from 'reactflow';
 import Connector from '../Connector';
 import NodeUtils from '../NodeUtils';
 import TimeRange from '../TimeRange';
-import { icons, nodeTypes } from '../../utils/types';
+import { icons } from '../../utils/types';
+import { NodeData } from '../../utils/interfaces';
+import useNodeSignal from '../../hooks/useNodeSignal';
 
 interface Props {
 	id: string;
+	type: string;
+	data: NodeData;
 }
 
-const Button: React.FC<Props> = observer(({ id }) => {
-	const { setNodeData, nodesData } = appStore;
+const Button: React.FC<Props> = observer(({ id, type, data }) => {
+	const { setNodeData } = appStore;
 
-	const { delay, output, rotation } = useMemo(
-		() => (Object.hasOwn(nodeTypes, id) ? defaultNodeData : nodesData[id]),
-		[nodesData, id]
-	);
+	const { delay, rotation } = useMemo(() => data, [data]);
 
-	useEffect(() => {
-		if (output) setTimeout(() => setNodeData(id, { output: false }), delay);
-	}, [delay, output, setNodeData, id]);
+	const { output, setOutput } = useNodeSignal(id, data, type);
 
 	const handleDelayChange = useCallback(
 		(delay: number) => {
@@ -32,9 +31,10 @@ const Button: React.FC<Props> = observer(({ id }) => {
 		[setNodeData, id]
 	);
 
-	useEffect(() => {
-		setNodeData(id, { output });
-	}, [setNodeData, id, output]);
+	const pressButton = useCallback(() => {
+		setOutput(true);
+		setTimeout(() => setOutput(false), delay);
+	}, [setOutput, delay]);
 
 	return (
 		<Flex
@@ -45,7 +45,7 @@ const Button: React.FC<Props> = observer(({ id }) => {
 		>
 			<ButtonAntd
 				style={{ marginBlockStart: 'auto' }}
-				onClick={() => setNodeData(id, { output: true })}
+				onClick={pressButton}
 			>
 				{icons.button}
 			</ButtonAntd>

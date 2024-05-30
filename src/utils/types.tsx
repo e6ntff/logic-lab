@@ -9,8 +9,6 @@ import Splitter from '../components/blocks/Splitter';
 import Flasher from '../components/blocks/Flasher';
 import Delay from '../components/blocks/Delay';
 import ButtonAntd from '../components/blocks/Button';
-import Transmitter from '../components/blocks/Transmitter';
-import Receiver from '../components/blocks/Receiver';
 import Xor from '../components/blocks/Xor';
 import {
 	ApiOutlined,
@@ -31,8 +29,6 @@ export type nodeType =
 	| 'flasher'
 	| 'button'
 	| 'start'
-	| 'transmitter'
-	| 'receiver'
 	| 'end';
 
 export type edgeType = 'wire';
@@ -48,8 +44,6 @@ export const nodeTypes: NodeTypes = {
 	flasher: Flasher,
 	delay: Delay,
 	button: ButtonAntd,
-	transmitter: Transmitter,
-	receiver: Receiver,
 };
 
 export const edgeTypes: EdgeTypes = { wire: Wire };

@@ -2,34 +2,24 @@ import { observer } from 'mobx-react-lite';
 import { Position } from 'reactflow';
 import { blockStyle } from '../../utils/blockStyles';
 import Title from 'antd/es/typography/Title';
-import appStore, { defaultNodeData } from '../../utils/appStore';
 import { Flex } from 'antd';
-import { useEffect, useMemo } from 'react';
+import { useMemo } from 'react';
 import NodeUtils from '../NodeUtils';
 import Connector from '../Connector';
-import { icons, nodeTypes } from '../../utils/types';
+import { icons } from '../../utils/types';
+import { NodeData } from '../../utils/interfaces';
+import useNodeSignal from '../../hooks/useNodeSignal';
 
 interface Props {
 	id: string;
+	type: string;
+	data: NodeData;
 }
 
-const Splitter: React.FC<Props> = observer(({ id }) => {
-	const { setNodeData, nodesData } = appStore;
+const Splitter: React.FC<Props> = observer(({ id, type, data }) => {
+	const { rotation } = useMemo(() => data, [data]);
 
-	const { rotation, prevNodeIds } = useMemo(
-		() => (Object.hasOwn(nodeTypes, id) ? defaultNodeData : nodesData[id]),
-		[nodesData, id]
-	);
-
-	const output: boolean = useMemo(
-		() => nodesData[prevNodeIds[0]]?.output || false,
-		// eslint-disable-next-line
-		[nodesData[prevNodeIds[0]], prevNodeIds]
-	);
-
-	useEffect(() => {
-		setNodeData(id, { output });
-	}, [id, output, setNodeData]);
+	const { input, output } = useNodeSignal(id, data, type);
 
 	return (
 		<Flex
@@ -46,7 +36,7 @@ const Splitter: React.FC<Props> = observer(({ id }) => {
 				id='a'
 				type='target'
 				position={'left' as Position}
-				active={output}
+				active={input}
 				nodeId={id}
 				rotation={rotation}
 			/>

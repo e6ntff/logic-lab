@@ -17,7 +17,7 @@ import MessageButton from './components/MessageButton';
 import FpsScreen from './components/FpsScreen';
 import React, { useCallback, useEffect } from 'react';
 import { Flex, Progress } from 'antd';
-import { NodeData, RemoteUsed } from './utils/interfaces';
+import { NodeData } from './utils/interfaces';
 import { loadNodes } from './utils/addNodes';
 import Clipboard from './components/Clipboard';
 
@@ -26,14 +26,12 @@ const App: React.FC = observer(() => {
 		loading,
 		nodes,
 		edges,
-		nodesData,
 		updateNodes,
 		updateEdges,
 		updateConnections,
 		removeNode,
 		removeEdge,
 		viewport,
-		setRemoteConnectionUsed,
 		flow,
 		setFlow,
 		setSelected,
@@ -54,24 +52,6 @@ const App: React.FC = observer(() => {
 		loadNodes();
 		// eslint-disable-next-line
 	}, []);
-
-	useEffect(() => {
-		const used: RemoteUsed = {
-			in: [],
-			out: [],
-			receiver: [],
-		};
-		Object.keys(nodesData).forEach((key: string) => {
-			const remote = nodesData[key].remote;
-			if (remote?.id === null || !remote) return;
-			if (remote?.type) {
-				used[remote.type].push(remote.id);
-			} else {
-				used.receiver.push(remote.id);
-			}
-		});
-		setRemoteConnectionUsed(used);
-	}, [setRemoteConnectionUsed, nodesData]);
 
 	useEffect(() => {
 		flow?.setViewport(viewport);

@@ -3,10 +3,11 @@ import { observer } from 'mobx-react-lite';
 import appStore from '../utils/appStore';
 import Item from 'antd/es/list/Item';
 import { useCallback, useMemo } from 'react';
-import { OnSelectionChangeParamsWithData } from '../utils/interfaces';
 import { Scrollbars } from 'react-custom-scrollbars';
 import { icons } from '../utils/types';
 import { DeleteOutlined } from '@ant-design/icons';
+import { OnSelectionChangeParams } from 'reactflow';
+import uniqid from 'uniqid';
 
 const Clipboard: React.FC = observer(() => {
 	const { clipboard, setSelectedCopied, removeCopiedItem } = appStore;
@@ -17,17 +18,15 @@ const Clipboard: React.FC = observer(() => {
 		(id: string) => {
 			const item = copied[id];
 			const items: { [key: string]: number } = {};
-			item.nodes.forEach(
-				({ node }: OnSelectionChangeParamsWithData['nodes'][0]) => {
-					const { type } = node;
-					if (!type) return;
-					if (Object.hasOwn(items, type)) {
-						items[type] += 1;
-					} else {
-						items[type] = 1;
-					}
+			item.nodes.forEach((node: OnSelectionChangeParams['nodes'][0]) => {
+				const { type } = node;
+				if (!type) return;
+				if (Object.hasOwn(items, type)) {
+					items[type] += 1;
+				} else {
+					items[type] = 1;
 				}
-			);
+			});
 			if (item.edges.length) items.edge = item.edges.length;
 			return items;
 		},
@@ -83,7 +82,7 @@ const Clipboard: React.FC = observer(() => {
 							>
 								<Flex wrap='wrap'>
 									{Object.keys(copiedItems[id]).map((type: string) => (
-										<Typography.Text key={id}>
+										<Typography.Text key={uniqid()}>
 											{icons[type]}
 											{`\u00A0x${copiedItems[id][type]}\u00A0\u00A0\u00A0`}
 										</Typography.Text>

@@ -2,35 +2,24 @@ import { observer } from 'mobx-react-lite';
 import { Position } from 'reactflow';
 import { blockStyle } from '../../utils/blockStyles';
 import Title from 'antd/es/typography/Title';
-import appStore, { defaultNodeData } from '../../utils/appStore';
 import { Flex } from 'antd';
-import { useEffect, useMemo } from 'react';
 import Connector from '../Connector';
 import RotationPanel from '../NodeUtils';
-import { icons, nodeTypes } from '../../utils/types';
+import { icons } from '../../utils/types';
+import useNodeSignal from '../../hooks/useNodeSignal';
+import { useMemo } from 'react';
+import { NodeData } from '../../utils/interfaces';
 
 interface Props {
 	id: string;
+	type: string;
+	data: NodeData;
 }
 
-const And: React.FC<Props> = observer(({ id }) => {
-	const { nodesData, setNodeData } = appStore;
+const And: React.FC<Props> = observer(({ id, type, data }) => {
+	const { rotation } = useMemo(() => data, [data]);
 
-	const { rotation, prevNodeIds } = useMemo(
-		() => (Object.hasOwn(nodeTypes, id) ? defaultNodeData : nodesData[id]),
-		[nodesData, id]
-	);
-
-	const output: boolean = useMemo(
-		() =>
-			prevNodeIds.length > 0 &&
-			prevNodeIds.every((id: string) => nodesData[id]?.output),
-		[prevNodeIds, nodesData]
-	);
-
-	useEffect(() => {
-		setNodeData(id, { output });
-	}, [id, output, setNodeData]);
+	const { input, output } = useNodeSignal(id, data, type);
 
 	return (
 		<Flex
@@ -47,7 +36,7 @@ const And: React.FC<Props> = observer(({ id }) => {
 				id='a'
 				type='target'
 				position={'left' as Position}
-				active={output}
+				active={input}
 				nodeId={id}
 				rotation={rotation}
 				maxConnections={Infinity}

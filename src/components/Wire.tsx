@@ -6,13 +6,12 @@ import appStore from '../utils/appStore';
 
 const Wire: React.FC = observer(
 	({ id, target, source, sourceX, sourceY, targetX, targetY }: any) => {
-		const { removeEdge, nodes } = appStore;
+		const { removeEdge, signals } = appStore;
 
-		const output = useMemo(
-			() => nodes[source]?.data?.output,
-			// eslint-disable-next-line
-			[nodes[source], source]
-		);
+		const sourceSignal = signals[source];
+
+		const output = useMemo(() => sourceSignal, [sourceSignal]);
+
 		const [edgePath, labelX, labelY] = getSimpleBezierPath({
 			sourceX,
 			sourceY,

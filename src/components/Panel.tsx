@@ -1,6 +1,6 @@
 import { Drawer, Flex, Image } from 'antd';
 import { observer } from 'mobx-react-lite';
-import appStore from '../utils/appStore';
+import appStore, { defaultNodeData } from '../utils/appStore';
 import { ArrowRightOutlined } from '@ant-design/icons';
 import logo from '../media/logo.png';
 import { nodeType, nodeTypes } from '../utils/types';
@@ -97,31 +97,64 @@ const Panel: React.FC = observer(() => {
 export default Panel;
 
 const panelNodes: Node[] = [
-	{ id: 'start', type: 'start', position: { x: 0, y: 160 * 0 }, data: {} },
-	{ id: 'and', type: 'and', position: { x: 0, y: 160 * 1 }, data: {} },
-	{ id: 'or', type: 'or', position: { x: 0, y: 160 * 2 }, data: {} },
-	{ id: 'xor', type: 'xor', position: { x: 0, y: 160 * 3 }, data: {} },
-	{ id: 'not', type: 'not', position: { x: 0, y: 160 * 4 }, data: {} },
+	{
+		id: 'start',
+		type: 'start',
+		position: { x: 0, y: 160 * 0 },
+		data: defaultNodeData,
+	},
+	{
+		id: 'and',
+		type: 'and',
+		position: { x: 0, y: 160 * 1 },
+		data: defaultNodeData,
+	},
+	{
+		id: 'or',
+		type: 'or',
+		position: { x: 0, y: 160 * 2 },
+		data: defaultNodeData,
+	},
+	{
+		id: 'xor',
+		type: 'xor',
+		position: { x: 0, y: 160 * 3 },
+		data: defaultNodeData,
+	},
+	{
+		id: 'not',
+		type: 'not',
+		position: { x: 0, y: 160 * 4 },
+		data: defaultNodeData,
+	},
 	{
 		id: 'splitter',
 		type: 'splitter',
 		position: { x: 0, y: 160 * 5 },
-		data: {},
+		data: defaultNodeData,
 	},
-	{ id: 'flasher', type: 'flasher', position: { x: 0, y: 160 * 6 }, data: {} },
-	{ id: 'delay', type: 'delay', position: { x: 0, y: 160 * 7 }, data: {} },
-	{ id: 'button', type: 'button', position: { x: 0, y: 160 * 8 }, data: {} },
 	{
-		id: 'transmitter',
-		type: 'transmitter',
+		id: 'flasher',
+		type: 'flasher',
+		position: { x: 0, y: 160 * 6 },
+		data: defaultNodeData,
+	},
+	{
+		id: 'delay',
+		type: 'delay',
+		position: { x: 0, y: 160 * 7 },
+		data: defaultNodeData,
+	},
+	{
+		id: 'button',
+		type: 'button',
+		position: { x: 0, y: 160 * 8 },
+		data: defaultNodeData,
+	},
+	{
+		id: 'end',
+		type: 'end',
 		position: { x: 0, y: 160 * 9 },
-		data: {},
+		data: defaultNodeData,
 	},
-	{
-		id: 'receiver',
-		type: 'receiver',
-		position: { x: 0, y: 160 * 10 },
-		data: {},
-	},
-	{ id: 'end', type: 'end', position: { x: 0, y: 160 * 11 }, data: {} },
 ];

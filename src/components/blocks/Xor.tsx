@@ -2,38 +2,24 @@ import { observer } from 'mobx-react-lite';
 import { Position } from 'reactflow';
 import { blockStyle } from '../../utils/blockStyles';
 import Title from 'antd/es/typography/Title';
-import appStore, { defaultNodeData } from '../../utils/appStore';
 import { Flex } from 'antd';
-import { useEffect, useMemo } from 'react';
+import { useMemo } from 'react';
 import Connector from '../Connector';
 import NodeUtils from '../NodeUtils';
-import { icons, nodeTypes } from '../../utils/types';
+import { icons } from '../../utils/types';
+import { NodeData } from '../../utils/interfaces';
+import useNodeSignal from '../../hooks/useNodeSignal';
 
 interface Props {
 	id: string;
+	type: string;
+	data: NodeData;
 }
 
-const Xor: React.FC<Props> = observer(({ id }) => {
-	const { setNodeData, nodesData } = appStore;
+const Xor: React.FC<Props> = observer(({ id, type, data }) => {
+	const { rotation } = useMemo(() => data, [data]);
 
-	const { rotation, prevNodeIds } = useMemo(
-		() => (Object.hasOwn(nodeTypes, id) ? defaultNodeData : nodesData[id]),
-		[nodesData, id]
-	);
-
-	const output: boolean = useMemo(() => {
-		if (prevNodeIds.length !== 2) return false;
-		const [first, second] = [
-			nodesData[prevNodeIds[0]]?.output,
-			nodesData[prevNodeIds[1]]?.output,
-		];
-		return first !== second;
-		// eslint-disable-next-line
-	}, [nodesData[prevNodeIds[0]], nodesData[prevNodeIds[1]], prevNodeIds]);
-
-	useEffect(() => {
-		setNodeData(id, { output });
-	}, [output, setNodeData, id]);
+	const { input, output } = useNodeSignal(id, data, type);
 
 	return (
 		<Flex
@@ -50,7 +36,7 @@ const Xor: React.FC<Props> = observer(({ id }) => {
 				id='a'
 				type='target'
 				position={'left' as Position}
-				active={output}
+				active={input}
 				nodeId={id}
 				rotation={rotation}
 				maxConnections={2}

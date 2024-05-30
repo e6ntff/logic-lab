@@ -1,31 +1,25 @@
 import { observer } from 'mobx-react-lite';
 import { blockStyle } from '../../utils/blockStyles';
 import { Flex } from 'antd';
-import { useMemo } from 'react';
 import { Position } from 'reactflow';
 import Title from 'antd/es/typography/Title';
 import NodeUtils from '../NodeUtils';
 import Connector from '../Connector';
-import appStore, { defaultNodeData } from '../../utils/appStore';
-import { icons, nodeTypes } from '../../utils/types';
+import { icons } from '../../utils/types';
+import useNodeSignal from '../../hooks/useNodeSignal';
+import { NodeData } from '../../utils/interfaces';
+import { useMemo } from 'react';
 
 interface Props {
 	id: string;
+	type: string;
+	data: NodeData;
 }
 
-const End: React.FC<Props> = observer(({ id }) => {
-	const { nodesData } = appStore;
+const End: React.FC<Props> = observer(({ id, type, data }) => {
+	const { rotation } = useMemo(() => data, [data]);
 
-	const { prevNodeIds, rotation } = useMemo(
-		() => (Object.hasOwn(nodeTypes, id) ? defaultNodeData : nodesData[id]),
-		[nodesData, id]
-	);
-
-	const input: boolean = useMemo(
-		() => nodesData[prevNodeIds[0]]?.output || false,
-		// eslint-disable-next-line
-		[nodesData[prevNodeIds[0]], prevNodeIds]
-	);
+	const { input } = useNodeSignal(id, data, type);
 
 	return (
 		<Flex

@@ -1,46 +1,36 @@
 import { observer } from 'mobx-react-lite';
 import { blockStyle } from '../../utils/blockStyles';
-import appStore, { defaultNodeData } from '../../utils/appStore';
+import appStore from '../../utils/appStore';
 import { Flex, Switch } from 'antd';
 import { useCallback, useEffect, useMemo } from 'react';
 import { Position } from 'reactflow';
 import Connector from '../Connector';
 import NodeUtils from '../NodeUtils';
 import TimeRange from '../TimeRange';
-import { nodeTypes } from '../../utils/types';
+import { NodeData } from '../../utils/interfaces';
+import useNodeSignal from '../../hooks/useNodeSignal';
 
 interface Props {
 	id: string;
+	type: string;
+	data: NodeData;
 }
 
-const Flasher: React.FC<Props> = observer(({ id }) => {
-	const { setNodeData, nodesData } = appStore;
+const Flasher: React.FC<Props> = observer(({ id, type, data }) => {
+	const { setNodeData } = appStore;
 
-	const { plusDelay, minusDelay, output, rotation } = useMemo(
-		() => (Object.hasOwn(nodeTypes, id) ? defaultNodeData : nodesData[id]),
-		[nodesData, id]
-	);
+	const { plusDelay, minusDelay, rotation } = useMemo(() => data, [data]);
 
+	const { output, setOutput } = useNodeSignal(id, data, type);
 
 	useEffect(() => {
-		let timerId: NodeJS.Timer;
-		if (output)
-			timerId = setTimeout(() => setNodeData(id, { output: false }), plusDelay);
+		const timeout = setTimeout(
+			() => setOutput(!output),
+			output ? plusDelay : minusDelay
+		);
 
-		return () => clearTimeout(timerId);
-	}, [plusDelay, output, id, setNodeData]);
-
-	useEffect(() => {
-		let timerId: NodeJS.Timer;
-		if (!output)
-			timerId = setTimeout(() => setNodeData(id, { output: true }), minusDelay);
-
-		return () => clearTimeout(timerId);
-	}, [minusDelay, output, id, setNodeData]);
-
-	useEffect(() => {
-		setNodeData(id, { output });
-	}, [setNodeData, id, output]);
+		return () => clearTimeout(timeout);
+	}, [output, plusDelay, minusDelay, setOutput]);
 
 	const handlePlusDelayChange = useCallback(
 		(plusDelay: number) => {
@@ -83,7 +73,7 @@ const Flasher: React.FC<Props> = observer(({ id }) => {
 				id='a'
 				type='source'
 				position={'right' as Position}
-				active={output || false}
+				active={output}
 				nodeId={id}
 				rotation={rotation}
 			/>

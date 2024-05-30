@@ -1,33 +1,27 @@
 import { observer } from 'mobx-react-lite';
 import { blockStyle } from '../../utils/blockStyles';
-import appStore, { defaultNodeData } from '../../utils/appStore';
 import { Flex, Switch } from 'antd';
-import { useCallback, useEffect, useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
 import { Position } from 'reactflow';
 import NodeUtils from '../NodeUtils';
 import Connector from '../Connector';
-import { nodeTypes } from '../../utils/types';
+import { NodeData } from '../../utils/interfaces';
+import useNodeSignal from '../../hooks/useNodeSignal';
 
 interface Props {
 	id: string;
+	type: string;
+	data: NodeData;
 }
 
-const Start: React.FC<Props> = observer(({ id }) => {
-	const { setNodeData, nodesData } = appStore;
+const Start: React.FC<Props> = observer(({ id, type, data }) => {
+	const { rotation } = useMemo(() => data, [data]);
 
-	const { output, rotation } =useMemo(
-		() => (Object.hasOwn(nodeTypes, id) ? defaultNodeData : nodesData[id]),
-		[nodesData, id]
-	);
-
-
-	useEffect(() => {
-		setNodeData(id, { output });
-	}, [setNodeData, output, id]);
+	const { setOutput, output } = useNodeSignal(id, data, type);
 
 	const handleSwitchChange = useCallback(
-		(active: boolean) => setNodeData(id, { output: active }),
-		[setNodeData, id]
+		(active: boolean) => setOutput(active),
+		[setOutput]
 	);
 
 	return (
@@ -48,7 +42,7 @@ const Start: React.FC<Props> = observer(({ id }) => {
 				id='a'
 				type='source'
 				position={'right' as Position}
-				active={output || false}
+				active={output}
 				nodeId={id}
 				rotation={rotation}
 			/>

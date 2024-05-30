@@ -1,36 +1,27 @@
 import { observer } from 'mobx-react-lite';
 import { blockStyle } from '../../utils/blockStyles';
 import { Flex } from 'antd';
-import { useCallback, useEffect, useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
 import { Position } from 'reactflow';
 import Connector from '../Connector';
 import NodeUtils from '../NodeUtils';
 import TimeRange from '../TimeRange';
-import appStore, { defaultNodeData } from '../../utils/appStore';
-import { nodeTypes } from '../../utils/types';
+import appStore from '../../utils/appStore';
+import { NodeData } from '../../utils/interfaces';
+import useNodeSignal from '../../hooks/useNodeSignal';
 
 interface Props {
 	id: string;
+	type: string;
+	data: NodeData;
 }
 
-const Delay: React.FC<Props> = observer(({ id }) => {
-	const { setNodeData, nodesData } = appStore;
+const Delay: React.FC<Props> = observer(({ id, type, data }) => {
+	const { setNodeData } = appStore;
 
-	const { delay, output, rotation, prevNodeIds } = useMemo(
-		() => (Object.hasOwn(nodeTypes, id) ? defaultNodeData : nodesData[id]),
-		[nodesData, id]
-	);
+	const { delay, rotation } = useMemo(() => data, [data]);
 
-	const input: boolean = useMemo(
-		() => nodesData[prevNodeIds[0]]?.output || false,
-		// eslint-disable-next-line
-		[nodesData[prevNodeIds[0]], prevNodeIds]
-	);
-
-	useEffect(() => {
-		if (input) setTimeout(() => setNodeData(id, { output: true }), delay);
-		if (!input) setTimeout(() => setNodeData(id, { output: false }), delay);
-	}, [input, delay, setNodeData, id]);
+	const { input, output } = useNodeSignal(id, data, type);
 
 	const handleDelayChange = useCallback(
 		(delay: number) => {
@@ -38,10 +29,6 @@ const Delay: React.FC<Props> = observer(({ id }) => {
 		},
 		[setNodeData, id]
 	);
-
-	useEffect(() => {
-		setNodeData(id, { output });
-	}, [setNodeData, id, output]);
 
 	return (
 		<Flex
@@ -70,7 +57,7 @@ const Delay: React.FC<Props> = observer(({ id }) => {
 				id='b'
 				type='source'
 				position={'right' as Position}
-				active={output || false}
+				active={output}
 				nodeId={id}
 				rotation={rotation}
 			/>

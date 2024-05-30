@@ -12,47 +12,28 @@ import {
 	applyNodeChanges,
 } from 'reactflow';
 import uniqid from 'uniqid';
-import { nodeType, nodeTypes } from './types';
-import {
-	Clipboard,
-	NodeData,
-	NodeDataOptional,
-	OnSelectionChangeParamsWithData,
-	RemoteConnection,
-	RemoteUsed,
-} from './interfaces';
+import { nodeType } from './types';
+import { Clipboard, NodeData, NodeDataOptional } from './interfaces';
 import { addNodes } from './addNodes';
 
 export const defaultNodeData: NodeData = {
 	rotation: 0,
-	output: false,
 	delay: 1000,
 	plusDelay: 1000,
 	minusDelay: 1000,
-	remote: { id: null, type: 'in' },
-	mode: 'all',
 	prevNodeIds: [],
 };
 
 class AppStore {
-	flow: ReactFlowInstance | null = null;
+	flow: ReactFlowInstance<NodeData> | null = null;
 	loading: number = 0;
 	viewport: Viewport = JSON.parse(
 		sessionStorage.getItem('viewport') || '{"x":0,"y":0,"zoom":1}'
 	);
-	nodes: Node[] = [];
-	clipboard: Clipboard = { selected: null, copiedSelected: null, copied: {} };
-	nodesData: { [key: string]: NodeData } = JSON.parse(
-		localStorage.getItem('nodesData') || '{}'
-	);
+	signals: { [id: string]: boolean } = {};
+	nodes: Node<NodeData>[] = [];
 	edges: Edge[] = JSON.parse(localStorage.getItem('edges') || '[]');
-	remoteConnections: {
-		used: RemoteUsed;
-		[key: number]: RemoteConnection;
-	} = JSON.parse(
-		localStorage.getItem('remoteConnections') ||
-			'{ "used": { "in": [], "out": [] } }'
-	);
+	clipboard: Clipboard = { selected: null, copiedSelected: null, copied: {} };
 
 	setFlow = (flow: typeof this.flow) => {
 		this.flow = flow;
@@ -74,21 +55,6 @@ class AppStore {
 		this.edges = edges;
 	};
 
-	setRemoteConnectionValues = (
-		id: number,
-		type: 'in' | 'out',
-		value: boolean
-	) => {
-		if (id)
-			this.remoteConnections = {
-				...this.remoteConnections,
-				[id]: {
-					...this.remoteConnections[id],
-					[type]: value,
-				},
-			};
-	};
-
 	setSelected = (items: typeof this.clipboard.selected) => {
 		this.clipboard = { ...this.clipboard, selected: items };
 	};
@@ -96,16 +62,11 @@ class AppStore {
 	addCopiedItem = (item: OnSelectionChangeParams) => {
 		const id = uniqid();
 
-		const nodesWithData = item.nodes.map((node: Node) => ({
-			node: node,
-			data: this.nodesData[node.id],
-		}));
-
 		this.clipboard = {
 			...this.clipboard,
 			copied: {
 				...this.clipboard.copied,
-				[id]: { ...item, nodes: nodesWithData },
+				[id]: item,
 			},
 			copiedSelected: id,
 		};
@@ -124,90 +85,44 @@ class AppStore {
 		this.clipboard = { ...this.clipboard, copiedSelected: id };
 	};
 
-	pasteCopiedItem = (id: string) => {
-		const { [id]: item } = this.clipboard.copied;
-
-		const { nodes, edges } = item;
-
-		const postfix = uniqid();
-
-		const newEdges = edges.map((edge: Edge) => {
-			const id = `${edge.id}_${postfix}`;
-			const source = `${edge.source}_${postfix}`;
-			const target = `${edge.target}_${postfix}`;
-			const selected = false;
-			edge = { ...edge, id, source, target, selected };
-			this.updateEdges([{ item: edge, type: 'add' }]);
-			return edge;
-		});
-
-		let minX = nodes[0].node.position.x;
-		let minY = nodes[0].node.position.y;
-		let maxX = nodes[0].node.position.x;
-		let maxY = nodes[0].node.position.y;
-
-		nodes.forEach(({ node }: OnSelectionChangeParamsWithData['nodes'][0]) => {
-			const { x, y } = node.position;
-
-			if (x > maxX) maxX = x;
-			if (y > maxY) maxY = y;
-			if (x < minX) minX = x;
-			if (y < minY) minY = y;
-		});
-
-		const diffX = maxX - minX;
-		const diffY = maxY - minY;
-
-		const newNodes = nodes.map(
-			(node: OnSelectionChangeParamsWithData['nodes'][0]) => {
-				const id = `${node.node.id}_${postfix}`;
-				const position = {
-					x: node.node.position.x + diffX + 140,
-					y: node.node.position.y + diffY + 140,
-				};
-				const selected = false;
-				const prevNodeIds = node.data.prevNodeIds
-					.filter((id: string) =>
-						edges.some(
-							(edge: Edge) => edge.source === id && edge.target === node.node.id
-						)
-					)
-					.map((id: string) => `${id}_${postfix}`);
-				return {
-					node: { ...node.node, id, position, selected },
-					data: {
-						...node.data,
-						prevNodeIds,
-						remote: { ...node.data.remote, id: null },
-					},
-				};
-			}
-		);
-
-		addNodes(newNodes);
-
-		this.clipboard = {
-			...this.clipboard,
-			copied: {
-				...this.clipboard.copied,
-				[id]: { nodes: newNodes, edges: newEdges },
-			},
-		};
-	};
-
-	setRemoteConnectionUsed = (values: typeof this.remoteConnections.used) => {
-		this.remoteConnections = {
-			...this.remoteConnections,
-			used: values,
-		};
-	};
-
 	updateNodes = (changes: NodeChange[]) => {
 		this.nodes = applyNodeChanges(changes, this.nodes);
 	};
 
 	updateEdges = (changes: EdgeChange[]) => {
 		this.edges = applyEdgeChanges(changes, this.edges);
+	};
+
+	setSignal = (id: string, signal: boolean) => {
+		this.signals = {
+			...this.signals,
+			[id]: signal,
+		};
+	};
+
+	addConnection = (id: string, prev: string) => {
+		this.setNodes(
+			this.nodes.map((node: Node<NodeData>) => {
+				if (node.id === id) {
+					if (prev) node.data.prevNodeIds = [...node.data.prevNodeIds, prev];
+				}
+				return node;
+			})
+		);
+	};
+
+	removeConnection = (id: string, prev: string | null, next: string | null) => {
+		this.setNodes(
+			this.nodes.map((node: Node<NodeData>) => {
+				if (node.id === id) {
+					if (prev)
+						node.data.prevNodeIds = node.data.prevNodeIds.filter(
+							(id: string) => id !== prev
+						);
+				}
+				return node;
+			})
+		);
 	};
 
 	updateConnections = (changes: Edge | Connection) => {
@@ -217,11 +132,9 @@ class AppStore {
 			id: uniqid(),
 		};
 		const newEdge = changes as Edge;
-		const { source, target } = newEdge;
-		this.setNodeData(target, {
-			prevNodeIds: [...this.nodesData[target].prevNodeIds, source],
-		});
 		this.updateEdges([{ item: newEdge, type: 'add' }]);
+		const { source, target } = newEdge;
+		this.addConnection(target, source);
 	};
 
 	addNewNode = (type: nodeType) => {
@@ -232,33 +145,29 @@ class AppStore {
 		const node: Node = {
 			id: id,
 			position: { x, y },
-			data: {},
+			data: defaultNodeData,
 			type: type,
 		};
-		this.setNodeData(id, { ...defaultNodeData });
 		this.updateNodes([{ item: node, type: 'add' }]);
 	};
 
-	addExistingNode = (node: Node, data?: NodeData) => {
+	addExistingNode = (node: Node<NodeData>) => {
 		this.updateNodes([{ item: node, type: 'add' }]);
-		data && this.setNodeData(node.id, data);
 	};
 
 	setNodeData = (id: string, data: NodeDataOptional) => {
-		if (Object.hasOwn(nodeTypes, id)) return;
-		this.nodesData = {
-			...this.nodesData,
-			[id]: { ...this.nodesData[id], ...data },
-		};
+		const nodes = this.nodes.map((node: Node<NodeData>) => {
+			if (node.id === id) {
+				node.data = { ...node.data, ...data };
+			}
+			return node;
+		});
+		this.setNodes(nodes);
 	};
 
 	removeNode = (id: string) => {
 		this.removeEdges(id, true, true);
 		this.updateNodes([{ id, type: 'remove' }]);
-		setTimeout(() => {
-			const { [id]: _, ...data } = this.nodesData;
-			this.nodesData = data;
-		});
 	};
 
 	removeEdges = (id: string, prev: boolean, next: boolean) => {
@@ -270,13 +179,92 @@ class AppStore {
 
 	removeEdge = ({ id, target, source }: Edge) => {
 		this.updateEdges([{ id, type: 'remove' }]);
-		this.nodesData = {
-			...this.nodesData,
-			[target]: {
-				...this.nodesData[target],
-				prevNodeIds: this.nodesData[target].prevNodeIds.filter(
-					(edgeId: string) => edgeId !== source
-				),
+		this.removeConnection(source, null, target);
+		this.removeConnection(target, source, null);
+	};
+
+	pasteCopiedItem = (id: string) => {
+		const { [id]: item } = this.clipboard.copied;
+
+		const { nodes, edges } = item;
+
+		const postfix = uniqid();
+
+		const isBothNodesCopied: (source: string, target: string) => boolean = (
+			source,
+			target
+		) => {
+			let sourceCopied = false;
+			let targetCopied = false;
+			for (const node of nodes) {
+				const { id } = node;
+				if (id === source) sourceCopied = true;
+				if (id === target) targetCopied = true;
+				if (sourceCopied && targetCopied) return true;
+			}
+			return false;
+		};
+
+		const newEdges = edges
+			.filter(({ source, target }: Edge) => isBothNodesCopied(source, target))
+			.map((edge: Edge) => {
+				const id = `${edge.id}_${postfix}`;
+				const source = `${edge.source}_${postfix}`;
+				const target = `${edge.target}_${postfix}`;
+				const selected = false;
+				edge = { ...edge, id, source, target, selected };
+				this.updateEdges([{ item: edge, type: 'add' }]);
+				return edge;
+			});
+
+		let minX = nodes[0].position.x;
+		let minY = nodes[0].position.y;
+		let maxX = nodes[0].position.x;
+		let maxY = nodes[0].position.y;
+
+		nodes.forEach((node: OnSelectionChangeParams['nodes'][0]) => {
+			const { x, y } = node.position;
+
+			if (x > maxX) maxX = x;
+			if (y > maxY) maxY = y;
+			if (x < minX) minX = x;
+			if (y < minY) minY = y;
+		});
+
+		const diffX = maxX - minX;
+		const diffY = maxY - minY;
+
+		const newNodes = nodes.map((node: Node<NodeData>) => {
+			const id = `${node.id}_${postfix}`;
+			const position = {
+				x: node.position.x + diffX + 140,
+				y: node.position.y + diffY + 140,
+			};
+			const selected = false;
+			console.log(node, edges);
+			const prevNodeIds = node.data.prevNodeIds
+				.filter((id: string) => isBothNodesCopied(id, node.id))
+				.map((id: string) => `${id}_${postfix}`);
+
+			return {
+				...node,
+				id,
+				position,
+				selected,
+				data: {
+					...node.data,
+					prevNodeIds,
+				},
+			};
+		});
+
+		addNodes(newNodes);
+
+		this.clipboard = {
+			...this.clipboard,
+			copied: {
+				...this.clipboard.copied,
+				[id]: { nodes: newNodes, edges: newEdges },
 			},
 		};
 	};
@@ -303,23 +291,6 @@ reaction(
 	() => {
 		localStorage.setItem('nodes', JSON.stringify(appStore.nodes));
 		localStorage.setItem('edges', JSON.stringify(appStore.edges));
-	}
-);
-
-reaction(
-	() => appStore.nodesData,
-	() => {
-		localStorage.setItem('nodesData', JSON.stringify(appStore.nodesData));
-	}
-);
-
-reaction(
-	() => appStore.remoteConnections,
-	() => {
-		localStorage.setItem(
-			'remoteConnections',
-			JSON.stringify(appStore.remoteConnections)
-		);
 	}
 );
 
